@@ -125,6 +125,9 @@ export class ShopService {
           path: 'categories',
           model: 'Category',
           select: 'name subCategory',
+        }).catch((err) => {
+          console.log(err)
+          throw new InternalServerErrorException(err)
         });
 
       if (!foundShop)
@@ -164,6 +167,39 @@ export class ShopService {
       return shop;
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async userJoin(shopId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException("This user doesn't exist")
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, { $addToSet: { customers: user.id } }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!shop) throw new NotFoundException('There is no shop with this id')
+      return 'User added successfully!'
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async addUser(shopId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) {
+    try {
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, { $push: { customers: userId } }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!shop) throw new NotFoundException('There is no shop with this id')
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
     }
   }
   async findShopItems(request: any, id?: string) {

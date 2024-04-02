@@ -51,7 +51,7 @@ export class ShopService {
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
     @InjectModel(Review.name)
     private readonly reviewModel: mongoose.Model<ReviewDocument>,
-  ) {}
+  ) { }
 
   async create(createShopDto: CreateShopDto) {
     try {
@@ -276,6 +276,19 @@ export class ShopService {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async addUser(shopId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) {
+    try {
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, { $push: { customers: userId } }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!shop) throw new NotFoundException('There is no shop with this id')
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
     }
   }
 }

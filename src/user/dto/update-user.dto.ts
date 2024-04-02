@@ -77,12 +77,16 @@ export class UpdateUserDto {
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList?: string[]
 
-  @Prop()
-  twitter: string;
+  @Prop({ type: [Types.ObjectId], ref: 'Shop' })
+  shopsJoined?: Types.ObjectId[]
+
 
   @Prop()
-  facebook: string;
+  twitter?: string;
 
   @Prop()
-  instagram: string;
+  facebook?: string;
+
+  @Prop()
+  instagram?: string;
 }

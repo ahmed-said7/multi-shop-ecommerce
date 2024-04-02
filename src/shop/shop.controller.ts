@@ -14,6 +14,7 @@ import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import mongoose from 'mongoose';
 
 @Controller('shop')
 export class ShopController {
@@ -41,6 +42,12 @@ export class ShopController {
   @Get('one/:id')
   findOne(@Param('id') id: string) {
     return this.shopService.findOne(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('join/:id')
+  userJoin(@Param('id') id: mongoose.Types.ObjectId, @Req() request: Request) {
+    return this.shopService.userJoin(id, request);
   }
 
   @UseGuards(JwtGuard)

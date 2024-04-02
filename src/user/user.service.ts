@@ -44,6 +44,13 @@ export class UserService {
         password: hashedPassword,
       });
 
+      if (createUserDto.shopsJoined.length == 1) {
+        await this.shopService.addUser(createUserDto.shopsJoined[0], createdUser._id).catch((err) => {
+          console.log(err)
+          throw new InternalServerErrorException(err)
+        })
+        createdUser.shopsJoined.push(createUserDto.shopsJoined[0])
+      }
       const savedUser = await createdUser.save().catch((err) => {
         console.log(err);
         if (err && err.code == 11000) {
@@ -58,8 +65,9 @@ export class UserService {
           );
       });
 
-      const token = this.generateToken(savedUser);
       const userResponse = { ...savedUser.toObject(), password: undefined };
+
+      const token = this.generateToken(savedUser);
 
       return { token, user: userResponse };
     } catch (error) {

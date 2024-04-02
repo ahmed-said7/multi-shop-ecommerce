@@ -32,6 +32,7 @@ export type UserDocument = User & Document;
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class User {
+  [x: string]: any;
   @Prop({ required: true }) // Ensure name is required
   name: string;
 
@@ -88,6 +89,8 @@ export class User {
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList: string[]
 
+  @Prop({ type: [Types.ObjectId], ref: 'Shop' })
+  shopsJoined: Types.ObjectId[]
 
 }
 

@@ -13,12 +13,18 @@ import { Order, OrderDocument } from './schemas/order_schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { JwtService } from '@nestjs/jwt';
+import { request } from 'express';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
 
 
 @Injectable()
 export class OrderService {
   constructor(
+    @InjectModel(User.name) private readonly userModel: mongoose.Model<UserDocument>,
     @InjectModel(Order.name) private readonly orderModel: mongoose.Model<OrderDocument>,
+
+    private readonly jwtService: JwtService
   ) { }
   async create(createOrderDto: CreateOrderDto) {
     try {
@@ -102,6 +108,13 @@ export class OrderService {
 
   async remove(id: string) {
     try {
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException("This user doesn't exist")
+      if (user.role != 'admin') throw new UnauthorizedException("You can't delete this order")
       const order = await this.orderModel.findByIdAndDelete(id).catch(err => {
         console.log(err)
         throw new InternalServerErrorException(err)
@@ -111,5 +124,8 @@ export class OrderService {
       console.log(error)
       throw new InternalServerErrorException(error)
     }
+  }
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 }
