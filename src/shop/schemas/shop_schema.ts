@@ -34,6 +34,20 @@ export class Shop {
   }]
   @Prop()
   introPages: string[];
+
+  @Prop()
+  twitter: string
+
+  @Prop()
+  facebook: string
+
+  @Prop()
+  instagram: string
+
+  @Prop()
+  logo: string
+
+
 }
 
 // Create the Mongoose schema for the Movie class

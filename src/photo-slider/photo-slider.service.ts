@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -54,6 +54,8 @@ export class PhotoSliderService {
 
 
       });
+      if (!photoSlider) throw new NotFoundException("this slider doesn't exist")
+
       return photoSlider;
     } catch (error) {
       console.log(error);

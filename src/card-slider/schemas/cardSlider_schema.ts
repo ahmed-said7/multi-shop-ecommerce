@@ -12,7 +12,7 @@ export class CardSlider {
     @Prop({ type: [Types.ObjectId], ref: 'Card' })
     cards: string[];
     @Prop({ type: Types.ObjectId, ref: 'Shop' })
-    shop: string;
+    shop: Types.ObjectId;
 
 }
 

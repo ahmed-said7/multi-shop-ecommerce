@@ -35,7 +35,7 @@ import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
 import { ReviewContainer, ReviewContainerDocument } from 'src/review-container/schemas/reviewContainer_schema';
 import { Card, CardDocument } from 'src/card/schemas/card_schema';
 import { VideoContainer, VideoContainerDocument } from 'src/video-container/schemas/videoContainer-schema';
-import { Request } from 'express';
+
 
 @Injectable()
 export class ShopService {
@@ -50,13 +50,14 @@ export class ShopService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(ProductSlider.name)
     private readonly productSliderModel: mongoose.Model<ProductSliderDocument>,
-    @InjectModel(CardSlider.name)
-    private readonly cardModel: mongoose.Model<CardDocument>,
     @InjectModel(Card.name)
+    private readonly cardModel: mongoose.Model<CardDocument>,
+    @InjectModel(CardSlider.name)
     private readonly cardSliderModel: mongoose.Model<CardSliderDocument>,
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
-    @InjectModel(ReviewContainer.name) private reviewContainerModel: mongoose.Model<ReviewContainerDocument>,
+    @InjectModel(ReviewContainer.name)
+    private reviewContainerModel: mongoose.Model<ReviewContainerDocument>,
     @InjectModel(VideoContainer.name)
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     private readonly jwtService: JwtService
@@ -165,7 +166,6 @@ export class ShopService {
       throw new InternalServerErrorException(error);
     }
   }
-
   async findShopItems(request: any, id?: string) {
     try {
       const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
@@ -243,7 +243,7 @@ export class ShopService {
         }
       }
 
-      const deletedShop = await this.shopModel
+      await this.shopModel
         .findByIdAndDelete(user.shop)
         .catch((err) => {
           console.log(err);
@@ -268,8 +268,9 @@ export class ShopService {
         );
       });
       if (!shop) throw new BadRequestException("This shop doesn't exist")
+
       let containers = [];
-      await Promise.all(shop.containers.map(async (container) => {
+      for (const container of shop.containers) {
         switch (container.containerType) {
           case 'review container':
             const reviewContainer = ((await this.reviewContainerModel.findById(container.containerID)))
@@ -292,11 +293,12 @@ export class ShopService {
             };
             break;
           case 'card slider':
-            const cardSlider = ((await this.cardSliderModel.findById(container.containerID)))
+            let cardSlider = ((await this.cardSliderModel.findById(container.containerID)))
             if (cardSlider) {
-              await cardSlider.populate({ path: "cards", model: "Card" })
+              cardSlider = await cardSlider.populate({ path: "cards", model: "Card" })
+
               containers.push({ type: "card slider", container: cardSlider })
-            };
+            }
             break;
 
           case 'video container':
@@ -307,7 +309,7 @@ export class ShopService {
             containers.push({ type: "video container", container: videoContainer })
             break;
         }
-      }));
+      }
 
       return containers;
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateCardSliderDto } from './dto/create-card-slider.dto';
 import { UpdateCardSliderDto } from './dto/update-card-slider.dto';
 import { CardSlider, CardSliderDocument } from './schemas/cardSlider_schema';
@@ -49,6 +49,7 @@ export class CardSliderService {
 
 
       });
+      if (!cardSlider) throw new NotFoundException("this slider doesn't exist")
       return cardSlider;
     } catch (error) {
       console.log(error);
