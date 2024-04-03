@@ -4,6 +4,7 @@ import { OrderController } from './order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
+import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
         schema: OrderSchema,
       },
       { name: User.name, schema: UserSchema },
+      { name: Shop.name, schema: ShopSchema },
     ]),
     OrderModule,
   ],
