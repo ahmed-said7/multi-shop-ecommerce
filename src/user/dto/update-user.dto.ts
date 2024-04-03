@@ -72,7 +72,7 @@ export class UpdateUserDto {
   orders?: string[]
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  cart?: string[]
+  cart?: Types.ObjectId[]
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList?: string[]

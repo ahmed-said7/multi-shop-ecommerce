@@ -5,7 +5,7 @@ import { OrderStatusTypes } from '../schemas/order_schema';
 import { Types } from 'mongoose';
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {
-  items: Types.Array<{ itemID: string; price: number }>;
+  items: Types.ObjectId[];
 
   deliveryType: boolean;
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -8,9 +8,10 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Req() request: Request, @Body() createOrderDto: CreateOrderDto) {
+    return this.orderService.create(request, createOrderDto);
   }
 
   @Get()
@@ -24,9 +25,10 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Query('buyerId') buyerId: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(id, buyerId, updateOrderDto);
+  update(@Req() request: Request, @Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.orderService.update(request, id, updateOrderDto);
   }
 
   @UseGuards(JwtGuard)

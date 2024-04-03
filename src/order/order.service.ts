@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { request } from 'express';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 
 
 @Injectable()
@@ -25,10 +26,11 @@ export class OrderService {
     @InjectModel(User.name) private readonly userModel: mongoose.Model<UserDocument>,
     @InjectModel(Order.name) private readonly orderModel: mongoose.Model<OrderDocument>,
     @InjectModel(Shop.name) private readonly shopModel: mongoose.Model<ShopDocument>,
+    @InjectModel(Item.name) private readonly itemModel: mongoose.Model<ItemDocument>,
 
     private readonly jwtService: JwtService
   ) { }
-  async create(createOrderDto: CreateOrderDto) {
+  async create(request: any, createOrderDto: CreateOrderDto) {
     try {
       const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
       const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
@@ -36,15 +38,22 @@ export class OrderService {
         throw new InternalServerErrorException(err);
       })
       if (!user) throw new NotFoundException("This user doesn't exist")
-      const buyerId=user.id
-      const shop= await this.shopModel.findOne({ _id: createOrderDto.shopId }).catch(err => {
+      const buyerId = user.id
+      const shop = await this.shopModel.findOne({ _id: createOrderDto.shopId }).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err);
       })
       if (!shop) throw new NotFoundException("This shop doesn't exist")
-      const sellerId=shop.userID
+      const sellerId = shop.userID
       if (buyerId == sellerId) throw new UnauthorizedException('You cant make an order from your own shop')
-      const priceTotal = createOrderDto.items.reduce((partial, item) => partial + item.price, 0)
+      const items = await this.itemModel.find({ _id: { $in: createOrderDto.items } })
+      if (items.length != createOrderDto.items.length) throw new BadRequestException('Some items are not found')
+      createOrderDto.buyerId = buyerId
+      createOrderDto.sellerId = sellerId
+      let priceTotal = 0
+      items.forEach(item => {
+        priceTotal += item.price
+      })
       createOrderDto.priceTotal = priceTotal
       const order = await new this.orderModel(createOrderDto).save().catch(err => {
         console.log(err)
@@ -96,15 +105,28 @@ export class OrderService {
     }
   }
 
-  async update(id: string, buyerId: string, updateOrderDto: UpdateOrderDto) {
+  async update(request: any, id: string, updateOrderDto: UpdateOrderDto) {
     try {
       const order = await this.orderModel.findById(id).catch(err => {
         console.log(err)
         throw new InternalServerErrorException(err)
       })
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException("This user doesn't exist")
+      const buyerId = user.id
       if (order.buyerId != buyerId) throw new UnauthorizedException("You can't adjust an order you didn't create")
       if (updateOrderDto.items) {
-        const newTotalPrice = updateOrderDto.items.reduce((partial, item) => partial + item.price, 0)
+        const items = await this.itemModel.find({ _id: { $in: updateOrderDto.items } })
+        if (items.length != updateOrderDto.items.length) throw new BadRequestException('Some items are not found')
+
+        let newTotalPrice = 0
+        items.forEach(item => {
+          newTotalPrice += item.price
+        })
         updateOrderDto.priceTotal = newTotalPrice
       }
       const newOrder = await this.orderModel.findByIdAndUpdate(id, updateOrderDto, { new: true }).catch(err => {

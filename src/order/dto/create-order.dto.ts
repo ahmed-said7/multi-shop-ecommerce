@@ -11,17 +11,14 @@ import { OrderStatusTypes } from '../schemas/order_schema';
 import { Types } from 'mongoose';
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message: 'Seller ID is required' })
-  @IsString({ message: 'An order must have a string buyerID' })
+
   buyerId: string;
 
-  @IsNotEmpty({ message: 'Seller ID is required' })
-  @IsString({ message: 'An order must have a string sellerID' })
   sellerId: string;
 
   @IsNotEmpty({ message: 'An order must have at least one item' })
   @IsArray({ message: 'An order must have a string array of items' })
-  items: Types.Array<{ itemID: string; price: number }>;
+  items: Types.ObjectId[];
 
   @IsNotEmpty({ message: 'An order must have a delivery type' })
   @IsBoolean({ message: 'Delivery type must be boolean' })

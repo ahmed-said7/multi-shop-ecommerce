@@ -219,7 +219,7 @@ export class UserService {
       const orderDto: CreateOrderDto = {
         buyerId: id,
         sellerId: shop.userID,
-        items: itemsInCart.map(item => ({ itemID: item._id.toString(), price: item.price })) as Types.Array<{ itemID: string; price: number; }>,
+        items: user.cart,
         deliveryType: false,
         paid: false,
         status: OrderStatusTypes.INPROGRESS,
