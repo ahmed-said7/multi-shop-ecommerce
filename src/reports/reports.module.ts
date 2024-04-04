@@ -6,6 +6,7 @@ import { Order, OrderSchema } from 'src/order/schemas/order_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -15,6 +16,10 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
     ]),
+    JwtModule.register({
+      secret: `${process.env.SECRET}`,
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
   controllers: [ReportsController],
   providers: [ReportsService],

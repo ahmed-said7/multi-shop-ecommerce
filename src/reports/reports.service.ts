@@ -8,6 +8,7 @@ import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import moment from 'moment';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ReportsService {
@@ -16,18 +17,24 @@ export class ReportsService {
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly jwtService: JwtService,
   ) { }
 
-  async findOne(id: string, shopId: string, report: string, year?: string, month?: string) {
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
+  }
+  async findOne(request:any, shopId: string, report: string, year?: string, month?: string) {
     try {
-      const user = await this.userModel.findById(id).catch(err => {
-        console.log(err)
-        throw new InternalServerErrorException('Unexpected error happened while finding the user!')
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
       })
+      if (!user) throw new NotFoundException('There is no user with this id')
       if (user.role != 'shop_owner') throw new UnauthorizedException("You don't have a shop")
       if (user.shop != shopId) throw new UnauthorizedException("You can't get the reports for another user's shop!")
       let result
-
+      user.password=undefined
       switch (report) {
         case "monthlySales":
           const reportYear = parseInt(year)
