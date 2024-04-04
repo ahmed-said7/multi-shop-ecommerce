@@ -23,7 +23,7 @@ export class ReportsService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async findOne(request:any, shopId: string, report: string, year?: string, month?: string) {
+  async findOne(request:any, report: string, year?: string, month?: string) {
     try {
       const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
       const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
@@ -32,7 +32,7 @@ export class ReportsService {
       })
       if (!user) throw new NotFoundException('There is no user with this id')
       if (user.role != 'shop_owner') throw new UnauthorizedException("You don't have a shop")
-      if (user.shop != shopId) throw new UnauthorizedException("You can't get the reports for another user's shop!")
+      const shopId= user.shop
       let result
       user.password=undefined
       switch (report) {
