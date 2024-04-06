@@ -1,23 +1,44 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { VideoContainer, VideoContainerDocument } from './schemas/videoContainer-schema';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class VideoContainerService {
   constructor(
     @InjectModel(VideoContainer.name) private videoContainerModel: Model<VideoContainerDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly jwtService: JwtService
   ) { }
 
-
-  async create(createVideoContainerDto: CreateVideoContainerDto) {
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
+  }
+  async create(request: any, createVideoContainerDto: CreateVideoContainerDto) {
     try {
-      const videoContainer = await new this.videoContainerModel(createVideoContainerDto).save();
-      const shop = await this.shopModel.findById(createVideoContainerDto.shop);
+
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException('There is no user with this id')
+      if (!user.shop) throw new BadRequestException("You don't have a shop")
+      const videoContainer = await new this.videoContainerModel(createVideoContainerDto).save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });;
+      const shop = await this.shopModel.findById(user.shop).catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
       shop.containers.push({ containerID: videoContainer.id, containerType: 'video container' });
       await shop.save();
       return videoContainer;
@@ -27,9 +48,16 @@ export class VideoContainerService {
     }
   }
 
-  async findAll(id: string) {
+  async findAll(request: any) {
     try {
-      const videoContainer = await this.videoContainerModel.find({ shop: id }).catch(err => {
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException('There is no user with this id')
+      if (!user.shop) throw new BadRequestException("You don't have a shop")
+      const videoContainer = await this.videoContainerModel.find({ shop: user.shop }).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err);
       })
