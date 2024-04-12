@@ -4,14 +4,15 @@ import { Document, Types } from 'mongoose';
 export type VideoContainerDocument = VideoContainer & Document;
 
 @Schema({
-    timestamps: true,
+  timestamps: true,
 })
 export class VideoContainer {
-    @Prop()
-    link: string;
+  @Prop()
+  link: string;
 
-    @Prop({ type: Types.ObjectId, ref: 'Shop' })
-    shop: string;
+  @Prop({ type: Types.ObjectId, ref: 'Shop' })
+  shop: string;
 }
 
-export const VideoContainerSchema = SchemaFactory.createForClass(VideoContainer);
+export const VideoContainerSchema =
+  SchemaFactory.createForClass(VideoContainer);
