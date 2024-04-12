@@ -27,27 +27,27 @@ export class Shop {
   @Prop({ type: [Types.ObjectId], ref: 'Category' })
   categories: string[];
 
-  @Prop({ max: 15 })
-  containers: [{
-    containerID: string,
-    containerType: string,
-  }]
+  @Prop({ max: 15, default: [] })
+  containers: [
+    {
+      containerID: string;
+      containerType: string;
+    },
+  ];
   @Prop()
   introPages: string[];
 
   @Prop()
-  twitter: string
+  twitter: string;
 
   @Prop()
-  facebook: string
+  facebook: string;
 
   @Prop()
-  instagram: string
+  instagram: string;
 
   @Prop()
-  logo: string
-
-
+  logo: string;
 }
 
 // Create the Mongoose schema for the Movie class
