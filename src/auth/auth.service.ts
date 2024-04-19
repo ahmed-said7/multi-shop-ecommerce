@@ -31,6 +31,8 @@ export class AuthService {
       },
     };
 
+    console.log({ user, payload });
+
     user.password = undefined;
     return {
       ...user,
