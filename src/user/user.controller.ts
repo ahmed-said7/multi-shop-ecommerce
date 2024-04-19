@@ -8,9 +8,8 @@ import {
   Delete,
   ValidationPipe,
   UsePipes,
-  Redirect,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -28,7 +27,7 @@ export class UserController {
     private readonly userService: UserService,
     private authService: AuthService,
     private readonly emailService: EmailService,
-  ) { }
+  ) {}
 
   @Post('register')
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -44,8 +43,8 @@ export class UserController {
   @Post('login')
   @UsePipes(ValidationPipe)
   async login(@Request() req) {
-    const user = req.user
-    return await this.authService.login(user)
+    const user = req.user;
+    return await this.authService.login(user);
   }
 
   @UseGuards(JwtGuard)
@@ -54,13 +53,11 @@ export class UserController {
     return this.userService.findAll(page);
   }
 
-
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User | null> {
     return this.userService.findOne(id);
   }
-
 
   @UseGuards(JwtGuard)
   @Patch('/checkout/:id')
@@ -68,17 +65,21 @@ export class UserController {
     return this.userService.checkOut(id);
   }
 
-
   @UseGuards(JwtGuard)
   @Patch()
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto);
   }
 
-
   @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') userId: string, @Body('id') deleteId: string) {
     return this.userService.remove(userId, deleteId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('/fav/:id')
+  addFavoriute(@Param('id') itemId: string, @Body('userId') userId: string) {
+    return this.userService.addFav(itemId, userId);
   }
 }

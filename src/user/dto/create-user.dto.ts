@@ -46,7 +46,6 @@ export class CreateUserDto {
   })
   phone: string;
 
-
   experince: boolean;
 
   @IsNotEmpty({
@@ -65,20 +64,22 @@ export class CreateUserDto {
   @ArrayUnique({ message: 'Duplicate ready options are not allowed' })
   ready: ReadyOption[];
 
-  wallet: number
+  wallet: number;
 
   @Prop({ type: [Types.ObjectId], ref: 'Order' })
-  orders: Types.ObjectId[]
+  orders: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  cart: Types.ObjectId[]
+  cart: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  wishList: Types.ObjectId[]
+  wishList: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Shop' })
-  shopsJoined?: Types.ObjectId[]
+  shopsJoined?: Types.ObjectId[];
 
+  @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
+  favorites?: Types.ObjectId[];
 
   @Prop()
   twitter: string;

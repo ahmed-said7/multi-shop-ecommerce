@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaTypes, Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 import validator from 'validator';
 
@@ -62,7 +62,6 @@ export class User {
   firstShop: boolean;
 
   @Prop({
-
     enum: UserExperienceType,
     default: UserExperienceType.STORE,
   })
@@ -78,20 +77,22 @@ export class User {
   reviews: string[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Order' })
-  orders: string[]
+  orders: string[];
 
   @Prop({ default: 0 })
-  wallet: number
+  wallet: number;
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  cart: Types.ObjectId[]
+  cart: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  wishList: string[]
+  wishList: string[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Shop' })
-  shopsJoined: Types.ObjectId[]
+  shopsJoined: Types.ObjectId[];
 
+  @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
+  favorites?: Types.ObjectId[];
 }
 
 // Create the Mongoose schema for the user class

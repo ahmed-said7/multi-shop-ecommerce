@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   HttpException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,12 +10,16 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
 import { ShopService } from 'src/user/shop.service';
-import { Order, OrderDocument, OrderStatusTypes } from 'src/order/schemas/order_schema';
+import {
+  Order,
+  OrderDocument,
+  OrderStatusTypes,
+} from 'src/order/schemas/order_schema';
 import { CreateOrderDto } from 'src/order/dto/create-order.dto';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 
@@ -27,8 +30,8 @@ export class UserService {
     private readonly shopService: ShopService,
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>
-  ) { }
+    @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
+  ) {}
   async register(createUserDto: CreateUserDto) {
     try {
       const { email } = createUserDto;
@@ -45,11 +48,13 @@ export class UserService {
       });
 
       if (createUserDto.shopsJoined.length == 1) {
-        await this.shopService.addUser(createUserDto.shopsJoined[0], createdUser._id).catch((err) => {
-          console.log(err)
-          throw new InternalServerErrorException(err)
-        })
-        createdUser.shopsJoined.push(createUserDto.shopsJoined[0])
+        await this.shopService
+          .addUser(createUserDto.shopsJoined[0], createdUser._id)
+          .catch((err) => {
+            console.log(err);
+            throw new InternalServerErrorException(err);
+          });
+        createdUser.shopsJoined.push(createUserDto.shopsJoined[0]);
       }
       const savedUser = await createdUser.save().catch((err) => {
         console.log(err);
@@ -104,7 +109,8 @@ export class UserService {
         .populate({
           path: 'cart',
           model: 'Item',
-        }).populate({
+        })
+        .populate({
           path: 'wishList',
           model: 'Item',
         })
@@ -140,49 +146,49 @@ export class UserService {
       const { currentId, updateId, cart, orders, wishList } = updateUserDto;
       const user = await this.userModel.findById(currentId).catch((err) => {
         console.log(err);
-        throw new NotFoundException('This user doesn\'t exist');
+        throw new NotFoundException("This user doesn't exist");
       });
 
       if (updateId === currentId || user.role === 'admin') {
-        let updatedUser;
-
         if (cart && cart.length > 0) {
           const itemToAdd = cart[0];
-          const existingItemIndex = user.cart.findIndex((itemId) => itemId === itemToAdd);
+          const existingItemIndex = user.cart.findIndex(
+            (itemId) => itemId === itemToAdd,
+          );
           if (existingItemIndex !== -1) {
             user.cart.splice(existingItemIndex, 1);
-            updateUserDto.cart = undefined
+            updateUserDto.cart = undefined;
           } else {
             user.cart.push(itemToAdd);
-            updateUserDto.cart = undefined
+            updateUserDto.cart = undefined;
           }
         }
         if (wishList && wishList.length > 0) {
           const itemToAddToWishList = wishList[0];
-          const existingItemIndexWish = user.wishList.findIndex((itemId) => itemId === itemToAddToWishList);
+          const existingItemIndexWish = user.wishList.findIndex(
+            (itemId) => itemId === itemToAddToWishList,
+          );
           if (existingItemIndexWish !== -1) {
             user.wishList.splice(existingItemIndexWish, 1);
-            updateUserDto.wishList = undefined
+            updateUserDto.wishList = undefined;
           } else {
             user.wishList.push(itemToAddToWishList);
-            updateUserDto.wishList = undefined
+            updateUserDto.wishList = undefined;
           }
         }
-        await user.save()
-
+        await user.save();
 
         if (orders) {
           const updatedOrders = [...user.orders, ...orders];
           updateUserDto.orders = updatedOrders;
         }
 
-        updatedUser = await this.userModel
-          .findByIdAndUpdate(updateId, updateUserDto, { new: true }).populate({ path: 'cart', model: 'Item' })
+        const updatedUser = await this.userModel
+          .findByIdAndUpdate(updateId, updateUserDto, { new: true })
+          .populate({ path: 'cart', model: 'Item' })
           .catch((err) => {
             console.log(err);
-            throw new InternalServerErrorException(
-              err
-            );
+            throw new InternalServerErrorException(err);
           });
 
         updatedUser.password = undefined;
@@ -197,8 +203,6 @@ export class UserService {
     }
   }
 
-
-
   async checkOut(id: string) {
     try {
       const user = await this.userModel.findById(id).exec();
@@ -206,13 +210,17 @@ export class UserService {
         throw new NotFoundException('User not found');
       }
 
-      const itemsInCart = await this.itemModel.find({ _id: { $in: user.cart } }).exec();
-      const shop = await this.shopService.findOne(itemsInCart[0].shopID).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException('Failed to find shop');
-      });
+      const itemsInCart = await this.itemModel
+        .find({ _id: { $in: user.cart } })
+        .exec();
+      const shop = await this.shopService
+        .findOne(itemsInCart[0].shopID)
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException('Failed to find shop');
+        });
       let totalPrice = 0;
-      itemsInCart.forEach(item => {
+      itemsInCart.forEach((item) => {
         totalPrice += item.price;
       });
 
@@ -225,18 +233,16 @@ export class UserService {
         status: OrderStatusTypes.INPROGRESS,
         comments: 'Sample comment',
         shopId: itemsInCart[0].shopID,
-        priceTotal: totalPrice
+        priceTotal: totalPrice,
       };
 
-
       const createdOrder = await this.orderModel.create(orderDto);
-
 
       user.orders.push(createdOrder._id);
       user.cart = [];
       await user.save();
 
-      return "Order created successfully!";
+      return 'Order created successfully!';
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to create order');
@@ -252,16 +258,12 @@ export class UserService {
       if (!user) throw new NotFoundException('This user doesnt exist');
       if (user.role == 'admin' || userId == deleteId) {
         if (user.role == UserRole.SHOP_OWNER) {
-
           await this.shopService.remove(user.shop);
-
-
         }
 
         for (const orderId of user.orders) {
           await this.orderModel.findByIdAndDelete(orderId);
         }
-
 
         const deletedUser = await this.userModel
           .findByIdAndDelete(deleteId)
@@ -289,5 +291,24 @@ export class UserService {
   private generateToken(user: UserDocument): string {
     const payload = { sub: user._id, email: user.email };
     return this.jwtService.sign(payload, { secret: process.env.SECRET });
+  }
+
+  async addFav(itemId: string, userId: string) {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $addToSet: {
+            favorites: itemId,
+          },
+        },
+        { new: true },
+      );
+
+      return user?.favorites || [];
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }
