@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ReviewContainerService } from './review-container.service';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
 
 @Controller('review-container')
 export class ReviewContainerController {
-  constructor(private readonly reviewService: ReviewContainerService) { }
+  constructor(private readonly reviewService: ReviewContainerService) {}
 
   @Post()
   create(@Body() createReviewDto: CreateReviewContainerDto) {
@@ -13,7 +22,7 @@ export class ReviewContainerController {
   }
 
   @Get()
-  findAll(@Query("shop") shop?: string) {
+  findAll(@Query('shop') shop?: string) {
     return this.reviewService.findAll(shop);
   }
 
@@ -23,7 +32,10 @@ export class ReviewContainerController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewContainerDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateReviewDto: UpdateReviewContainerDto,
+  ) {
     return this.reviewService.update(id, updateReviewDto);
   }
 
