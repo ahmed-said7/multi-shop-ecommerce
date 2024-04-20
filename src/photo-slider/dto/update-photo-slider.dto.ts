@@ -7,8 +7,8 @@ export class UpdatePhotoSliderDto extends PartialType(CreatePhotoSliderDto) {
     title: string;
     @IsString({ message: "must be a string" })
     subTitle: string;
-    @IsNumber()
-    titleAndSubTitlePostion: number;
+    @IsString()
+    titleAndSubTitlePostion: string;
     @IsString({ message: "must be a string" })
     titleAndSubTitleColor: string;
     @IsString({ message: "must be a string" })
@@ -19,8 +19,8 @@ export class UpdatePhotoSliderDto extends PartialType(CreatePhotoSliderDto) {
     buttonColor: string;
     @IsString({ message: "must be a string" })
     buttonTextColor: string;
-    @IsNumber()
-    buttonPosition: number;
+    @IsString()
+    buttonPosition: string;
     @IsString({ message: "must be a string" })
     photo: string;
     @IsBoolean({ message: "must be a bool" })
