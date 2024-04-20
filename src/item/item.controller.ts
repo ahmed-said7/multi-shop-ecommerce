@@ -32,6 +32,7 @@ export class ItemController {
   findAll(
     @Param('shop') shopID: string,
     @Query('page') page: number,
+    @Query('limitParam') limitParam: number,
     @Query('category') category: string,
     @Query('subCategory') subCategorey: string,
     @Query('sortOrder') sortOrder: string,
@@ -40,7 +41,7 @@ export class ItemController {
   ) {
 
 
-    return this.itemService.findAll(page, shopID, category, subCategorey, sortOrder, minPrice, maxPrice);
+    return this.itemService.findAll(page, shopID, category, subCategorey, sortOrder, minPrice, maxPrice , limitParam);
   }
 
   @Get('one-item/:id')

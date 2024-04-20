@@ -57,6 +57,7 @@ export class ItemService {
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
+    limitParam?:number
   ) {
     try {
       const query: any = { shopID, category, subCategory };
@@ -72,8 +73,41 @@ export class ItemService {
       } else if (maxPrice !== undefined) {
         query.price = { $lte: maxPrice }; // Maximum price filter
       }
-      if (!page) page = 0
+
+      const count = await this.itemModel.countDocuments(query);
+
+
+      const pageValue =+ page  || 1
+      const limit =+ limitParam || 10
+   
       // Construct sort criteria based on sortOrder
+
+      const skip = (pageValue - 1) * limit 
+       const endIndex= pageValue * limit
+      
+
+      const pagination:{currentPage :number , numberOfPages:number , limit:number ,nextPage:number , prevPage:number  }  = {
+        currentPage : 0,
+        numberOfPages : 0 ,
+        limit: 0 ,
+        nextPage : 0 ,
+        prevPage : 0 
+      }
+      pagination.currentPage = pageValue;
+      pagination.numberOfPages = Math.ceil(count / limit); // 90 / 20 = 4.3  => 5
+      pagination.limit = limit;
+  
+      if (endIndex < count) {
+        pagination.nextPage = pageValue + 1;
+       
+      }
+      if (skip > 0) {
+        pagination.prevPage = pageValue - 1;
+     
+      }
+
+
+
       const sortCriteria: any = {};
       if (sortOrder === 'asc') {
         sortCriteria['price'] = 1;
@@ -85,17 +119,16 @@ export class ItemService {
       const items = await this.itemModel
         .find(query)
         .sort(sortCriteria)
-        .limit(10)
-        .skip(page * 10)
+        .limit(limit)
+        .skip(skip)
         .catch(err => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
 
       // Count the total number of matching items
-      const count = await this.itemModel.countDocuments(query);
 
-      return { count, items };
+      return {count , pagination,  items };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
