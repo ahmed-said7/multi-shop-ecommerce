@@ -80,8 +80,6 @@ export class ReviewService {
         throw new InternalServerErrorException(err)
       })
 
-      if (review.shop == userId) throw new BadRequestException('You cant delete reviews from your own shop!')
-
       if (review.user != userId || user.role != "admin") throw new BadRequestException('You cant delete this review!')
 
       await this.reviewModel.deleteOne({ id }).catch(err => {

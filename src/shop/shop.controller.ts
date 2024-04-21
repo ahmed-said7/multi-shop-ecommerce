@@ -38,7 +38,7 @@ export class ShopController {
     return this.shopService.findShopItems(request, id)
   }
 
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   @Get('one/:id')
   findOne(@Param('id') id: string) {
     return this.shopService.findOne(id);

@@ -19,10 +19,10 @@ export class ReviewContainerService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
-  ) {}
+  ) { }
   async create(createReviewContainerDto: CreateReviewContainerDto) {
     try {
-      const created = await new this.reviewContainerModel(
+      const reviewContainer = await new this.reviewContainerModel(
         createReviewContainerDto,
       )
         .save()
@@ -32,19 +32,23 @@ export class ReviewContainerService {
         });
 
       const review = await this.reviewModel
-        .findById(created.review[0])
+        .findById(reviewContainer.review[0])
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-      const shop = await this.shopModel.findById(review.shop);
+      const shop = await this.shopModel.findById(review.shop).catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
 
       shop.containers.push({
-        containerID: created.id,
+        containerID: reviewContainer.id,
         containerType: 'review container',
       });
       await shop.save();
-      return review;
+
+      return reviewContainer;
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException(err);
