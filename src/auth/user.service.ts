@@ -22,7 +22,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly shopService: ShopService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(createUserDto: CreateUserDto) {
     try {
@@ -155,9 +155,7 @@ export class UserService {
       });
       if (!user) throw new NotFoundException('This user doesnt exist');
       if (user.role == 'admin' || userId == deleteId) {
-
         await this.shopService.remove(user.shop);
-
 
         const deletedUser = await this.userModel
           .findByIdAndDelete(deleteId)

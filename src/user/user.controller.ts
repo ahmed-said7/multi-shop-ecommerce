@@ -54,6 +54,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async login(@Request() req) {
     const user = req.user;
+
     return await this.authService.login(user);
   }
 
