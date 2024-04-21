@@ -14,7 +14,7 @@ export class PhotoSlider {
   @Prop()
   subTitle: string;
   @Prop()
-  titleAndSubTitlePostion: number;
+  titleAndSubTitlePostion: string;
   @Prop()
   titleAndSubTitleColor: string;
   @Prop()
@@ -26,7 +26,7 @@ export class PhotoSlider {
   @Prop()
   buttonTextColor: string;
   @Prop()
-  buttonPosition: number;
+  buttonPosition: string;
   @Prop()
   photos: string;
   @Prop({ unique: true })
