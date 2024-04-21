@@ -32,13 +32,24 @@ export class UserService {
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
   ) {}
+
   async register(createUserDto: CreateUserDto) {
     try {
       const { email } = createUserDto;
       const foundUser = await this.userModel.findOne({ email });
+
       if (foundUser) {
         throw new UnauthorizedException('There is a user with the same email!');
       }
+
+      const shop = await this.shopService.create({
+        categories: [],
+        containers: [],
+        customers: [],
+        description: 'Add Description',
+        title: 'Starter Shop',
+        userID: foundUser.id,
+      });
 
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
@@ -47,7 +58,7 @@ export class UserService {
         password: hashedPassword,
       });
 
-      if (createUserDto.shopsJoined.length == 1) {
+      if (createUserDto.shopsJoined?.length == 1) {
         await this.shopService
           .addUser(createUserDto.shopsJoined[0], createdUser._id)
           .catch((err) => {
@@ -74,7 +85,7 @@ export class UserService {
 
       const token = this.generateToken(savedUser);
 
-      return { token, user: userResponse };
+      return { token, user: userResponse, shop };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);
@@ -121,8 +132,8 @@ export class UserService {
             'Unexpected error while creating the user',
           );
       });
-      
-      const shop= await this.shopService.create(createShopDto)
+
+      const shop = await this.shopService.create(createShopDto);
 
       const userResponse = { ...savedUser.toObject(), password: undefined };
 
