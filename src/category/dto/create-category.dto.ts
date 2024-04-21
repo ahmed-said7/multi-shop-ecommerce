@@ -17,6 +17,6 @@ export class CreateCategoryDto {
     @IsArray({ message: 'A Category must have a string array subCategory' })
     subCategory: string[];
 
-    @IsNotEmpty({ message: 'A category must belong to a shop@' })
+
     shopID: string
 }

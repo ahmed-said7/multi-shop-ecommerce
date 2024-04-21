@@ -82,6 +82,60 @@ export class UserService {
     }
   }
 
+  async registerShop(registerData: any) {
+    try {
+      const createUserDto = registerData.user;
+      const createShopDto = registerData.shop;
+      const { email } = createUserDto;
+      const foundUser = await this.userModel.findOne({ email });
+      if (foundUser) {
+        throw new UnauthorizedException('There is a user with the same email!');
+      }
+
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+      const createdUser = new this.userModel({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+
+      if (createUserDto.shopsJoined.length == 1) {
+        await this.shopService
+          .addUser(createUserDto.shopsJoined[0], createdUser._id)
+          .catch((err) => {
+            console.log(err);
+            throw new InternalServerErrorException(err);
+          });
+        createdUser.shopsJoined.push(createUserDto.shopsJoined[0]);
+      }
+      const savedUser = await createdUser.save().catch((err) => {
+        console.log(err);
+        if (err && err.code == 11000) {
+          console.log(err);
+
+          throw new BadRequestException(
+            'There is a user with the same phone number!',
+          );
+        } else
+          throw new InternalServerErrorException(
+            'Unexpected error while creating the user',
+          );
+      });
+      
+      const shop= await this.shopService.create(createShopDto)
+
+      const userResponse = { ...savedUser.toObject(), password: undefined };
+
+      const token = this.generateToken(savedUser);
+
+      return { token, user: userResponse, shop };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   async findAll(page?: number) {
     try {
       const foundUsers = await this.userModel

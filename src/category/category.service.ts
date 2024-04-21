@@ -1,31 +1,38 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category_schema';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { JwtService } from '@nestjs/jwt';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(Shop.name) private readonly shopModel: mongoose.Model<ShopDocument>,
+    @InjectModel(User.name) private readonly userModel: mongoose.Model<UserDocument>,
+    private readonly jwtService: JwtService
   ) { }
-  async create(createCategoryDto: CreateCategoryDto, id: string) {
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
+  }
+  async create(request: any, createCategoryDto: CreateCategoryDto) {
     try {
-      const shop = await this.shopModel.findById(createCategoryDto.shopID).catch(err => {
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
         console.log(err);
-        throw new InternalServerErrorException(err)
+        throw new InternalServerErrorException(err);
       })
-      if (shop.userID != id) {
-        throw new UnauthorizedException('You are not authorized to create a category for this shop')
-      }
+      if (!user) throw new NotFoundException('There is no user with this id')
+      createCategoryDto.shopID = user.shop
       const category = await this.categoryModel.create(createCategoryDto).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err)
       });
-      await this.shopModel.findByIdAndUpdate(createCategoryDto.shopID, { $push: { categories: category.id } }).catch(err => {
+      await this.shopModel.findByIdAndUpdate(user.id, { $push: { categories: category.id } }).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err)
 
@@ -37,9 +44,15 @@ export class CategoryService {
     }
   }
 
-  async findAll(id: string) {
+  async findAll(request: any) {
     try {
-      const categories = await this.categoryModel.find({ shopID: id }).catch(err => {
+      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
+      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      })
+      if (!user) throw new NotFoundException('There is no user with this id')
+      const categories = await this.categoryModel.find({ shopID: user.shop }).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err)
       })
@@ -51,7 +64,7 @@ export class CategoryService {
   }
 
   async findOne(id: string) {
-    try {
+    try {  
       const category = await this.categoryModel.findById(id).catch(err => {
         console.log(err);
         throw new InternalServerErrorException(err)
