@@ -80,17 +80,17 @@ export class PhotoSliderService {
     }
   }
 
-  async update(id: string, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+  async update(newSlider: UpdatePhotoSliderDto[]) {
     try {
-      const photoSlider = await this.photoSliderModel
-        .findByIdAndUpdate(id, updatePhotoSliderDto, {
+      const photoSlider = await this.photoSliderModel.find(
+        {
+          containerName: newSlider[0].containerName,
+        },
+        newSlider,
+        {
           new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      console.log(photoSlider);
+        },
+      );
 
       return photoSlider;
     } catch (error) {
@@ -98,33 +98,28 @@ export class PhotoSliderService {
     }
   }
 
-  async remove(id: string) {
-    const photoSlider = await this.photoSliderModel
-      .findById(id)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-    if (!photoSlider) {
-      throw new InternalServerErrorException("this slider doesn't exist");
-    }
-    const shop = await this.shopModel
-      .findById(photoSlider.shop)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-    for (let i = 0; i < shop.containers.length; i++) {
-      if (shop.containers[i].containerID === id) {
-        shop.containers.splice(i, 1);
-        break;
-      }
-    }
-    await shop.save();
-    await this.photoSliderModel.findByIdAndDelete(id).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
+  async remove(name: string) {
+    const photosSliderList = await this.photoSliderModel.deleteMany({
+      containerName: name,
     });
-    return photoSlider;
+
+    const shop = await this.shopModel.updateOne(
+      {
+        'containers.containerID': name,
+      },
+      {
+        $pull: {
+          containers: { containerID: name },
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    return {
+      imagesCount: photosSliderList.deletedCount,
+      shopCount: shop.modifiedCount,
+    };
   }
 }
