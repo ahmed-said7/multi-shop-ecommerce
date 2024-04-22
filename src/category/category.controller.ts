@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -28,9 +27,9 @@ export class CategoryController {
   }
 
   @UseGuards(JwtGuard)
-  @Get()
-  findAll(@Req() request: Request) {
-    return this.categoryService.findAll(request);
+  @Get(':shopId')
+  findAll(@Param('shopId') shopId: string) {
+    return this.categoryService.findAll(shopId);
   }
 
   @UseGuards(JwtGuard)

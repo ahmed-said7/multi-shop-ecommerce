@@ -48,24 +48,10 @@ export class CategoryService {
     return category;
   }
 
-  async findAll(request: any) {
+  async findAll(shopId: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
-      const categories = await this.categoryModel
-        .find({ shopID: user.shop })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const categories = await this.categoryModel.find({ shopID: shopId });
+
       return categories;
     } catch (error) {
       console.log(error);
@@ -75,10 +61,7 @@ export class CategoryService {
 
   async findOne(id: string) {
     try {
-      const category = await this.categoryModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const category = await this.categoryModel.findById(id);
       return category;
     } catch (error) {
       console.log(error);
