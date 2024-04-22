@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
 
 import { ShopService } from './shop.service';
@@ -18,7 +18,7 @@ import mongoose from 'mongoose';
 
 @Controller('shop')
 export class ShopController {
-  constructor(private readonly shopService: ShopService) { }
+  constructor(private readonly shopService: ShopService) {}
 
   @UseGuards(JwtGuard)
   @Post()
@@ -35,7 +35,7 @@ export class ShopController {
   @UseGuards(JwtGuard)
   @Get('items')
   findShopItems(@Req() request: Request, @Param('id') id?: string) {
-    return this.shopService.findShopItems(request, id)
+    return this.shopService.findShopItems(request, id);
   }
 
   // @UseGuards(JwtGuard)
@@ -64,15 +64,13 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Delete()
-  remove(@Req() request: Request, @Param('id') id: string) {
+  remove(@Req() request: Request) {
     return this.shopService.remove(request);
   }
 
   @UseGuards(JwtGuard)
   @Get('containers/:id')
   findShopContainers(@Param('id') id: string) {
-    return this.shopService.findShopContainers(id)
+    return this.shopService.findShopContainers(id);
   }
-
-
 }

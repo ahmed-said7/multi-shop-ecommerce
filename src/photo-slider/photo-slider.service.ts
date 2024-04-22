@@ -31,15 +31,20 @@ export class PhotoSliderService {
     const collection = [];
 
     for (const photoInfo of createPhotoSliderDto) {
-      const photo = await this.photoSliderModel
-        .create(photoInfo)
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-
+      const photo = await new this.photoSliderModel(photoInfo).save();
       collection.push(photo);
     }
+
+    const { shop, containerName } = createPhotoSliderDto[0];
+
+    await this.shopModel.findByIdAndUpdate(shop, {
+      $push: {
+        containers: {
+          containerID: containerName,
+          containerType: 'photo slider',
+        },
+      },
+    });
 
     return collection;
   }
