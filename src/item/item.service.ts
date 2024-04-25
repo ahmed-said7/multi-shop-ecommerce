@@ -89,9 +89,19 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
-        new: true,
-      });
+      const item = await this.itemModel.findByIdAndUpdate(
+        id,
+        {
+          ...updateItemDto,
+          $addToSet: {
+            colors: updateItemDto.colors,
+            sizes: updateItemDto.sizes,
+          },
+        },
+        {
+          new: true,
+        },
+      );
 
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
