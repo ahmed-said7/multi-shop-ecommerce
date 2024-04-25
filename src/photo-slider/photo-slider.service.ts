@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -30,9 +31,24 @@ export class PhotoSliderService {
   async createCollection(createPhotoSliderDto: CreatePhotoSliderDto[]) {
     const collection = [];
 
-    for (const photoInfo of createPhotoSliderDto) {
-      const photo = await new this.photoSliderModel(photoInfo).save();
-      collection.push(photo);
+    try {
+      for (const photoInfo of createPhotoSliderDto) {
+        const photo = await new this.photoSliderModel(photoInfo).save();
+        collection.push(photo);
+      }
+    } catch (error) {
+      const { code, keyPattern } = error;
+
+      const keys = Object.keys(keyPattern).join(',');
+
+      if (code === 11000) {
+        const errMsg = `Dublication Error, property(s) 👉 ( ${keys} ) 👈  already exists`;
+        throw new BadRequestException(errMsg, {
+          cause: 'Duplicatoin In the database',
+        });
+      }
+
+      throw new BadRequestException(error);
     }
 
     const { shop, containerName } = createPhotoSliderDto[0];
