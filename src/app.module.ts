@@ -11,7 +11,7 @@ import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { CouponModule } from './coupon/coupon.module';
-import { ReportsModule } from './reports/reports.module';
+// import { ReportsModule } from './reports/reports.module';
 import { AdminModule } from './admin/admin.module';
 import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 import { ProductSliderModule } from './product-slider/product-slider.module';
@@ -44,7 +44,7 @@ import { VideoContainerModule } from './video-container/video-container.module';
     ItemModule,
     OrderModule,
     CouponModule,
-    ReportsModule,
+    // ReportsModule,
     CardSliderModule,
     ProductSliderModule,
     PhotoSliderModule,
