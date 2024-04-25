@@ -43,31 +43,87 @@ export class ItemService {
   }
 
   async findAll(
-    page = 0,
+    page?: number,
     shopID?: string,
     category?: string,
     subCategory?: string,
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
-    limitParam: number = 10,
+    limitParam?: number,
   ) {
     try {
+      const query: any = { shopID, category, subCategory };
+
+      // Remove undefined or null values from the query object
+      Object.keys(query).forEach(
+        (key) => query[key] == null && delete query[key],
+      );
+
+      // Add minimum and maximum price filters to the query
+      if (minPrice !== undefined && maxPrice !== undefined) {
+        query.price = { $gte: minPrice, $lte: maxPrice }; // Minimum and maximum price filter
+      } else if (minPrice !== undefined) {
+        query.price = { $gte: minPrice }; // Minimum price filter
+      } else if (maxPrice !== undefined) {
+        query.price = { $lte: maxPrice }; // Maximum price filter
+      }
+
+      const count = await this.itemModel.countDocuments(query);
+
+      const pageValue = +page || 1;
+      const limit = +limitParam || 10;
+
+      // Construct sort criteria based on sortOrder
+
+      const skip = (pageValue - 1) * limit;
+      const endIndex = pageValue * limit;
+
+      const pagination: {
+        currentPage: number;
+        numberOfPages: number;
+        limit: number;
+        nextPage: number;
+        prevPage: number;
+      } = {
+        currentPage: 0,
+        numberOfPages: 0,
+        limit: 0,
+        nextPage: 0,
+        prevPage: 0,
+      };
+      pagination.currentPage = pageValue;
+      pagination.numberOfPages = Math.ceil(count / limit); // 90 / 20 = 4.3  => 5
+      pagination.limit = limit;
+
+      if (endIndex < count) {
+        pagination.nextPage = pageValue + 1;
+      }
+      if (skip > 0) {
+        pagination.prevPage = pageValue - 1;
+      }
+
+      const sortCriteria: any = {};
+      if (sortOrder === 'asc') {
+        sortCriteria['price'] = 1;
+      } else if (sortOrder === 'desc') {
+        sortCriteria['price'] = -1;
+      }
+
       // Find items based on the constructed query and sort criteria
       const items = await this.itemModel
-        .find({
-          shopID,
-          price: { $gte: minPrice || -1, $lte: maxPrice || Infinity },
-          category: category,
-          subCategories: { $in: subCategory },
-        })
-        .sort({
-          price: sortOrder === 'asc' ? 1 : -1,
-        })
-        .skip(page * limitParam)
-        .limit(limitParam);
+        .find(query)
+        .sort(sortCriteria)
+        .limit(limit)
+        .skip(skip)
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
 
-      return { count: items.length, items };
+      // Count the total number of matching items
+
+      return { count, pagination, items };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
