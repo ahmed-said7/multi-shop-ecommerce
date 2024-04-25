@@ -31,7 +31,7 @@ export class ReviewService {
       for (let key in query) {
         if (!query[key]) delete query[key]
       }
-      const reviews = await this.reviewModel.find({ ...query }).populate({ path: "user", model: "User", select: "name" }).populate({path:"item" , model:"Item" , select:"name"}).exec().catch(err => {
+      const reviews = await this.reviewModel.find({ ...query }).populate({ path: "user", model: "User", select: "name" }).populate({path:"item" , model:"Item" , select:"name images"}).exec().catch(err => {
         console.log(err)
         throw new InternalServerErrorException(err)
       });
