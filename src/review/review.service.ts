@@ -81,7 +81,7 @@ export class ReviewService {
       })
 
 
-      await this.reviewModel.deleteOne({ id }).catch(err => {
+      await this.reviewModel.findByIdAndDelete({ id }).catch(err => {
         console.log(err)
         throw new InternalServerErrorException(err)
       })
