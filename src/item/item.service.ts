@@ -145,51 +145,40 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
+      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+        new: true,
       });
+
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
       ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.role !== 'admin' || user.shop != item.shopID)
+
+      const user = await this.userModel.findOne({ email: userEmail });
+
+      if (user.shop != item.shopID) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );
+      }
 
-      const { images, colors, sizes, category, ...rest } = updateItemDto;
-      const updatedItem = await this.itemModel
-        .findByIdAndUpdate(id, rest, {
-          new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const { images, colors, sizes, category } = updateItemDto;
 
       if (images && images.length > 0) {
-        updatedItem.images.push(...images);
+        item.images.push(...images);
       }
       if (colors && colors.length > 0) {
-        updatedItem.colors.push(...colors);
+        item.colors.push(...colors);
       }
       if (sizes && sizes.length > 0) {
-        updatedItem.sizes.push(...sizes);
+        item.sizes.push(...sizes);
       }
       if (category) {
-        updatedItem.category.push(...category);
+        item.category.push(...category);
       }
 
-      await updatedItem.save();
+      await item.save();
 
-      return updatedItem;
+      return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
