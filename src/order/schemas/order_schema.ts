@@ -45,9 +45,18 @@ export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: string;
 
-  createdAt: Date;
-
-  updatedAt: Date;
+  @Prop()
+  userAddress: {
+    city: string;
+    country?: string;
+    streetName: string;
+    nighborhood: string;
+    zipCode: number;
+    isWorkplace?: boolean;
+    isApartment?: boolean;
+    appratmentNumber: number;
+    floorNumber: number;
+  };
 }
 
 // Create the Mongoose schema for the Movie class

@@ -11,7 +11,6 @@ import { OrderStatusTypes } from '../schemas/order_schema';
 import { Types } from 'mongoose';
 
 export class CreateOrderDto {
-
   buyerId: string;
 
   sellerId: string;
@@ -45,4 +44,16 @@ export class CreateOrderDto {
   shopId: string;
 
   priceTotal: number;
+
+  userAddress: {
+    city: string;
+    country?: string;
+    streetName: string;
+    nighborhood: string;
+    zipCode: number;
+    isWorkplace?: boolean;
+    isApartment?: boolean;
+    appratmentNumber: number;
+    floorNumber: number;
+  };
 }
