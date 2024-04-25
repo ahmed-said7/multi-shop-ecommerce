@@ -45,15 +45,15 @@ export class CreateOrderDto {
 
   priceTotal: number;
 
-  userAddress: {
-    city: string;
+  userAddress?: {
+    city?: string;
     country?: string;
-    streetName: string;
-    nighborhood: string;
-    zipCode: number;
+    streetName?: string;
+    nighborhood?: string;
+    zipCode?: number;
     isWorkplace?: boolean;
     isApartment?: boolean;
-    appratmentNumber: number;
-    floorNumber: number;
+    appratmentNumber?: number;
+    floorNumber?: number;
   };
 }

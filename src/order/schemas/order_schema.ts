@@ -45,7 +45,19 @@ export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: string;
 
-  @Prop()
+  @Prop({
+    type: {
+      city: String,
+      country: String,
+      streetName: String,
+      nighborhood: String,
+      zipCode: Number,
+      isWorkplace: Boolean,
+      isApartment: Boolean,
+      appratmentNumber: Number,
+      floorNumber: Number,
+    },
+  })
   userAddress: {
     city: string;
     country?: string;
