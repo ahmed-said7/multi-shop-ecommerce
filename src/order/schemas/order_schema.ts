@@ -7,14 +7,13 @@ export type OrderDocument = Order & Document;
 export enum OrderStatusTypes {
   INPROGRESS = 'in progress',
   DELIVERED = 'delivered',
-  CANCELED = 'canceled'
+  CANCELED = 'canceled',
 }
 // Define the shop schema
 @Schema({
-  timestamps: true// Add timestamps for createdAt and updatedAt
+  timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class Order {
-
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   sellerId: string;
 
@@ -33,7 +32,11 @@ export class Order {
   @Prop({ required: true })
   paid: boolean;
 
-  @Prop({ required: true, enum: OrderStatusTypes, default: OrderStatusTypes.INPROGRESS })
+  @Prop({
+    required: true,
+    enum: OrderStatusTypes,
+    default: OrderStatusTypes.INPROGRESS,
+  })
   status: string;
 
   @Prop()
@@ -45,7 +48,6 @@ export class Order {
   createdAt: Date;
 
   updatedAt: Date;
-
 }
 
 // Create the Mongoose schema for the Movie class

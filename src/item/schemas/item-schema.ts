@@ -50,6 +50,9 @@ export class Item {
 
   @Prop()
   priceAfter: number;
+
+  @Prop({ default: 0 })
+  soldTimes: number;
 }
 
 // Create the Mongoose schema for the user class

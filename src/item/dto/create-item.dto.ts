@@ -23,4 +23,6 @@ export class CreateItemDto {
   images?: string[];
   @IsArray({ message: 'Item colors must be an array' })
   colors?: string[];
+
+  soldTimes?: number;
 }
