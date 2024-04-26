@@ -10,6 +10,7 @@ import {
   UsePipes,
   Request,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -20,6 +21,7 @@ import { EmailService } from './email/email.service';
 import { User } from './schemas/user_schema';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import mongoose from 'mongoose';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +29,7 @@ export class UserController {
     private readonly userService: UserService,
     private authService: AuthService,
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   @Post('register')
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -98,5 +100,17 @@ export class UserController {
   @Patch('/fav/:id')
   addFavoriute(@Param('id') itemId: string, @Body('userId') userId: string) {
     return this.userService.addFav(itemId, userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('/cart/add')
+  addToCart(@Body() itemId: mongoose.Types.ObjectId, @Req() request: Request) {
+    return this.userService.addToCart(itemId, request);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('/cart/remove')
+  removeFromCart(@Body() itemId: mongoose.Types.ObjectId, @Req() request: Request) {
+    return this.userService.removeItemCart(itemId, request);
   }
 }

@@ -10,7 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
@@ -31,7 +31,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
-  ) {}
+  ) { }
 
   async register(createUserDto: CreateUserDto) {
     try {
@@ -367,5 +367,60 @@ export class UserService {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
+  }
+  async addToCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      user.cart.push(itemId)
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return "Item added successfully"
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async removeItemCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      for (let i = 0; i < user.cart.length; i++) {
+        if (user.cart[i] == itemId) {
+          user.cart.splice(i, 1);
+          break;
+        }
+      }
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return "Item removed successfully"
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 }
