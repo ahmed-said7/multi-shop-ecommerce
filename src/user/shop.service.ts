@@ -16,7 +16,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import {
   CardSlider,
   CardSliderDocument,
@@ -51,7 +51,7 @@ export class ShopService {
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
     @InjectModel(Review.name)
     private readonly reviewModel: mongoose.Model<ReviewDocument>,
-  ) {}
+  ) { }
 
   async create(createShopDto: CreateShopDto) {
     try {

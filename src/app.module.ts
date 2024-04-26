@@ -13,7 +13,7 @@ import { PassportModule } from '@nestjs/passport';
 import { CouponModule } from './coupon/coupon.module';
 // import { ReportsModule } from './reports/reports.module';
 import { AdminModule } from './admin/admin.module';
-import { PhotoSliderModule } from './photo-slider/photo-slider.module';
+import { PhotoSlideModule } from './photo-slide/photo-slide.module';
 import { ProductSliderModule } from './product-slider/product-slider.module';
 import { ReviewContainerModule } from './review-container/review-container.module';
 import { CardSliderModule } from './card-slider/card-slider.module';
@@ -23,6 +23,7 @@ import { CardModule } from './card/card.module';
 import { IntroPageModule } from './intro-page/intro-page.module';
 import { AdminRequestsModule } from './admin-requests/admin-requests.module';
 import { VideoContainerModule } from './video-container/video-container.module';
+import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 
 @Module({
   imports: [
@@ -55,8 +56,9 @@ import { VideoContainerModule } from './video-container/video-container.module';
     IntroPageModule,
     AdminRequestsModule,
     VideoContainerModule,
+    PhotoSlideModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

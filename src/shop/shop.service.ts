@@ -20,7 +20,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import {
   CardSlider,
   CardSliderDocument,
@@ -65,7 +65,7 @@ export class ShopService {
     @InjectModel(VideoContainer.name)
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }

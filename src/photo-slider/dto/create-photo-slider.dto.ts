@@ -1,35 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsNotEmpty, IsArray } from "class-validator";
+import mongoose, { Types } from "mongoose";
 
 export class CreatePhotoSliderDto {
-  @IsString({ message: 'must be a string' })
-  title: string;
-  @IsString({ message: 'must be a string' })
-  subTitle: string;
-  @IsString()
-  titleAndSubTitlePostion: string;
-  @IsString({ message: 'must be a string' })
-  titleAndSubTitleColor: string;
-  @IsString({ message: 'must be a string' })
-  buttonText: string;
-  @IsString({ message: 'must be a string' })
-  buttonLink: string;
-  @IsString({ message: 'must be a string' })
-  buttonColor: string;
-  @IsString({ message: 'must be a string' })
-  buttonTextColor: string;
-  @IsString()
-  buttonPosition: string;
-  @IsString({ message: 'must be a string' })
-  photo: string;
+    @IsArray({ message: 'A CardSlider must have an array of card IDs' })
+    photoSlides: mongoose.Types.ObjectId[];
 
-  @IsString({ message: 'must be a string' })
-  containerName: string;
-  @IsBoolean({ message: 'must be a bool' })
-  isContainer: boolean = false;
-  @IsBoolean({ message: 'must be a bool' })
-  isSlider: boolean = false;
 
-  @IsNotEmpty({ message: 'A PhotoSlider must have a shop ID' })
-  shop: Types.ObjectId;
+    shop: string;
 }

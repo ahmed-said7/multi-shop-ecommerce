@@ -1,141 +1,136 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
+import mongoose, { Model } from 'mongoose';
+import { Shop } from 'src/shop/schemas/shop_schema';
+import { PhotoSlider, PhotoSliderDocument } from './schemas/photo-slider_schema';
+import { PhotoSlide, PhotoSlideDocument } from 'src/photo-slide/schemas/photoSlide_schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-import { PhotoSlider, PhotoSliderDocument } from './schemas/photoSlider_schema';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class PhotoSliderService {
   constructor(
     @InjectModel(PhotoSlider.name)
-    private photoSliderModel: Model<PhotoSliderDocument>,
-    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-  ) {}
-
-  async create(createPhotoSliderDto: CreatePhotoSliderDto) {
-    return await this.photoSliderModel
-      .create(createPhotoSliderDto)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    private readonly photoSliderModel: Model<PhotoSliderDocument>,
+    @InjectModel(PhotoSlide.name)
+    private readonly photoSlideModel: Model<PhotoSlideDocument>,
+    @InjectModel(Shop.name)
+    private readonly shopModel: Model<Shop>,
+    private readonly jwtService: JwtService,
+    @InjectModel(User.name)
+    private readonly userModel: mongoose.Model<UserDocument>,
+  ) { }
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-
-  async createCollection(createPhotoSliderDto: CreatePhotoSliderDto[]) {
-    const collection = [];
-
+  async create(request: any, createPhotoSliderDto: CreatePhotoSliderDto) {
     try {
-      for (const photoInfo of createPhotoSliderDto) {
-        const photo = await new this.photoSliderModel(photoInfo).save();
-        collection.push(photo);
-      }
-    } catch (error) {
-      const { code, keyPattern } = error;
-
-      const keys = Object.keys(keyPattern).join(',');
-
-      if (code === 11000) {
-        const errMsg = `Dublication Error, property(s) 👉 ( ${keys} ) 👈  already exists`;
-        throw new BadRequestException(errMsg, {
-          cause: 'Duplicatoin In the database',
-        });
-      }
-
-      throw new BadRequestException(error);
-    }
-
-    const { shop, containerName } = createPhotoSliderDto[0];
-
-    await this.shopModel.findByIdAndUpdate(shop, {
-      $push: {
-        containers: {
-          containerID: containerName,
-          containerType: 'photo slider',
-        },
-      },
-    });
-
-    return collection;
-  }
-
-  async findAll() {
-    try {
-      return await this.photoSliderModel.find().catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async findOne(id: string) {
-    try {
-      const photoSlider = await this.photoSliderModel
-        .findById(id)
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-      if (!photoSlider) {
-        throw new NotFoundException("this slider doesn't exist");
-      }
-
+      if (!user) throw new NotFoundException('There is no user with this id');
+      if (!user.shop) throw new BadRequestException("You don't have a shop");
+      createPhotoSliderDto.shop = user.shop;
+      const photoSlider = await this.photoSliderModel.create(createPhotoSliderDto).catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      const shop = await this.shopModel.findById(photoSlider.shop);
+      shop.containers.push({ containerID: photoSlider.id, containerType: 'photo slider' });
+      await shop.save();
       return photoSlider;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(err);
     }
   }
 
-  async update(newSlider: UpdatePhotoSliderDto[]) {
+  async findAll(request: any) {
     try {
-      const photoSlider = await this.photoSliderModel.find(
-        {
-          containerName: newSlider[0].containerName,
-        },
-        newSlider,
-        {
-          new: true,
-        },
-      );
-
-      return photoSlider;
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+      if (!user) throw new NotFoundException('There is no user with this id');
+      if (!user.shop) throw new BadRequestException("You don't have a shop");
+      return await this.photoSliderModel.find({ shop: user.shop }).catch(err => {
+        console.log(err)
+        throw new InternalServerErrorException(err)
+      });
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      console.log(error)
+      throw new InternalServerErrorException(error)
     }
   }
 
-  async remove(name: string) {
-    const photosSliderList = await this.photoSliderModel.deleteMany({
-      containerName: name,
+  async findOne(id: number) {
+    try {
+      return await this.photoSliderModel.findById(id).catch(err => {
+        console.log(err)
+        throw new InternalServerErrorException(err)
+      });
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async update(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    try {
+      return await this.photoSliderModel.findByIdAndUpdate(id, updatePhotoSliderDto, { new: true }).catch(err => {
+        console.log(err)
+        throw new InternalServerErrorException(err)
+      });
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async remove(id: string) {
+    const photoSlider = await this.photoSliderModel.findById(id).catch(err => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
     });
+    if (!photoSlider) throw new InternalServerErrorException("this slider doesn't exist")
+    await this.photoSlideModel.deleteMany({
+      _id: {
+        $in: photoSlider.photoSlides
+      }
+    }).catch(err => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    })
 
-    const shop = await this.shopModel.updateOne(
-      {
-        'containers.containerID': name,
-      },
-      {
-        $pull: {
-          containers: { containerID: name },
-        },
-      },
-      {
-        new: true,
-      },
-    );
+    const shop = await this.shopModel.findById(photoSlider.shop).catch(err => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
 
-    return {
-      imagesCount: photosSliderList.deletedCount,
-      shopCount: shop.modifiedCount,
-    };
+    })
+    for (let i = 0; i < shop.containers.length; i++) {
+      if (shop.containers[i].containerID === id) {
+        shop.containers.splice(i, 1);
+        break;
+      }
+    }
+    await shop.save();
+    await this.photoSliderModel.findByIdAndDelete(id).catch(err => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    })
+    return 'cardSlider deleted successfully';
   }
 }
