@@ -21,7 +21,7 @@ export class ItemService {
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
@@ -50,29 +50,39 @@ export class ItemService {
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
+    keyword?: string,
     limitParam: number = 10,
   ) {
     try {
-      // Find items based on the constructed query and sort criteria
+      const query: any = {
+        shopID,
+        price: { $gte: minPrice || -1, $lte: maxPrice || Infinity },
+        category: category,
+        subCategories: { $in: subCategory },
+      };
+
+      if (keyword) {
+        query.$or = [
+          { title: { $regex: keyword, $options: 'i' } },
+          { description: { $regex: keyword, $options: 'i' } },
+        ];
+      }
+
       const items = await this.itemModel
-        .find({
-          shopID,
-          price: { $gte: minPrice || -1, $lte: maxPrice || Infinity },
-          category: category,
-          subCategories: { $in: subCategory },
-        })
-        .sort({
-          price: sortOrder === 'asc' ? 1 : -1,
-        })
+        .find(query)
+        .sort({ price: sortOrder === 'asc' ? 1 : -1 })
         .skip(page * limitParam)
         .limit(limitParam);
 
-      return { count: items.length, items };
+      const count = await this.itemModel.countDocuments(query);
+
+      return { count, items };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
     }
   }
+
 
   async findOne(id: string) {
     try {
