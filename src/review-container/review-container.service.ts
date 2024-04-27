@@ -19,7 +19,7 @@ export class ReviewContainerService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
-  ) { }
+  ) {}
   async create(createReviewContainerDto: CreateReviewContainerDto) {
     try {
       const reviewContainer = await new this.reviewContainerModel(
@@ -85,14 +85,16 @@ export class ReviewContainerService {
 
   async update(id: string, updatereviewContainerDto: UpdateReviewContainerDto) {
     try {
-      return await this.reviewContainerModel
-        .findByIdAndUpdate(id, updatereviewContainerDto, {
+      const review = await this.reviewContainerModel.findByIdAndUpdate(
+        id,
+        updatereviewContainerDto,
+        {
           new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        },
+      );
+
+      review.save();
+      return review;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
