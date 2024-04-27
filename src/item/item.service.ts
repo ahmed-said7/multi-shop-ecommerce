@@ -32,9 +32,9 @@ export class ItemService {
 
       const shop = await this.shopModel.findById(item.shopID);
 
-      shop.itemsIDs.push(item.id);
+      shop?.itemsIDs?.push(item.id);
 
-      await shop.save();
+      await shop?.save();
       return item;
     } catch (err) {
       console.log(err);
