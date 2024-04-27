@@ -30,6 +30,8 @@ export class PhotoSlide {
   photo: string;
   @Prop({ type: Types.ObjectId, ref: 'PhotoSlider' })
   photoSlider: mongoose.Types.ObjectId;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
+  shop: string;
 }
 
 export const PhotoSlideSchema = SchemaFactory.createForClass(PhotoSlide);

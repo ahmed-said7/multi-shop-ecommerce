@@ -88,6 +88,46 @@ export class PhotoSliderService {
     }
   }
 
+  async addPhotoSlide(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    try {
+      const updatedSlider = await this.photoSliderModel.findByIdAndUpdate(
+        id,
+        { $push: { photoSlides: { $each: updatePhotoSliderDto.photoSlides } } },
+        { new: true }
+      ).exec();
+
+      if (!updatedSlider) {
+        throw new NotFoundException('Photo slider not found');
+      }
+
+      return updatedSlider;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+
+  async removePhotoSlide(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    try {
+      const updatedSlider = await this.photoSliderModel.findByIdAndUpdate(
+        id,
+        { $pullAll: { photoSlides: updatePhotoSliderDto.photoSlides } },
+        { new: true }
+      ).exec();
+
+      if (!updatedSlider) {
+        throw new NotFoundException('Photo slider not found');
+      }
+
+      return updatedSlider;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+
   async update(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
     try {
       return await this.photoSliderModel.findByIdAndUpdate(id, updatePhotoSliderDto, { new: true }).catch(err => {

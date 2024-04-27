@@ -18,7 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('item')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(private readonly itemService: ItemService) { }
 
   @UseGuards(JwtGuard)
   @Post()
@@ -36,6 +36,7 @@ export class ItemController {
     @Query('sortOrder') sortOrder: string,
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
+    @Query('keyword') keyword?: string,
   ) {
     return this.itemService.findAll(
       page,
@@ -45,6 +46,7 @@ export class ItemController {
       sortOrder,
       minPrice,
       maxPrice,
+      keyword,
       limitParam,
     );
   }

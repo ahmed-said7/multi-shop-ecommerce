@@ -24,4 +24,5 @@ export class CreatePhotoSlideDto {
   photo: string;
   @IsNotEmpty({ message: 'A photoSlide must belong a photoSlider' })
   photoSlider: mongoose.Types.ObjectId;
+  shop?: string;
 }

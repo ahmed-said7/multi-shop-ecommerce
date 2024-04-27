@@ -25,6 +25,18 @@ export class PhotoSliderController {
     return this.photoSliderService.findOne(+id);
   }
 
+
+  @Patch('add/:id')
+  addPhotoSlide(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    return this.photoSliderService.addPhotoSlide(+id, updatePhotoSliderDto);
+  }
+
+  @Patch('remove/:id')
+  removePhotoSlides(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    return this.photoSliderService.removePhotoSlide(+id, updatePhotoSliderDto);
+  }
+
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
     return this.photoSliderService.update(+id, updatePhotoSliderDto);
