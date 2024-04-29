@@ -23,13 +23,13 @@ export class PhotoSliderService {
     private readonly userModel: mongoose.Model<UserDocument>,
   ) { }
   private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
+    return this.jwtService.decode<{ userId: string; email: string }>(token);
   }
   async create(request: any, createPhotoSliderDto: CreatePhotoSliderDto) {
     try {
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).email;
       const user = await this.userModel
         .findOne({ email: userEmail })
         .catch((err) => {
@@ -57,7 +57,7 @@ export class PhotoSliderService {
     try {
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).email;
       const user = await this.userModel
         .findOne({ email: userEmail })
         .catch((err) => {

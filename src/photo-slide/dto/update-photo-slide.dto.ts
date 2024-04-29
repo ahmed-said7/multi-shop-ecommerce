@@ -24,7 +24,7 @@ export class UpdatePhotoSlideDto extends PartialType(CreatePhotoSlideDto) {
     buttonPosition: string;
     @IsString({ message: 'must be a string' })
     photo: string;
-    @IsNotEmpty({ message: 'A photoSlide must belong a photoSlider' })
+
     photoSlider: Types.ObjectId
     shop?: string;
 

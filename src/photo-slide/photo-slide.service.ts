@@ -18,18 +18,15 @@ export class PhotoSlideService {
   constructor(
     @InjectModel(PhotoSlide.name)
     private photoSlideModel: Model<PhotoSlideDocument>,
-    private readonly jwtService: JwtService,
   ) { }
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
-  }
+
   async create(createPhotoSlideDto: CreatePhotoSlideDto) {
-    return await this.photoSlideModel
-      .create(createPhotoSlideDto)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    console.log(createPhotoSlideDto);
+    const photoSlide = new this.photoSlideModel(createPhotoSlideDto);
+    return await photoSlide.save().catch(err => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    });
   }
 
   // async createCollection(createPhotoSlideDto: CreatePhotoSlideDto[]) {
