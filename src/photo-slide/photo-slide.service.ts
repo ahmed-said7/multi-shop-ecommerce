@@ -21,7 +21,7 @@ export class PhotoSlideService {
   ) { }
 
   async create(createPhotoSlideDto: CreatePhotoSlideDto) {
-    console.log(createPhotoSlideDto);
+
     const photoSlide = new this.photoSlideModel(createPhotoSlideDto);
     return await photoSlide.save().catch(err => {
       console.log(err);
