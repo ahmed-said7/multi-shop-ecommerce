@@ -36,9 +36,7 @@ export class PhotoSliderService {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-      console.log(this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ))
+
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
       createPhotoSliderDto.shop = user.shop;
@@ -149,20 +147,13 @@ export class PhotoSliderService {
       throw new InternalServerErrorException(err);
     });
     if (!photoSlider) throw new InternalServerErrorException("this slider doesn't exist")
-    await this.photoSlideModel.deleteMany({
-      _id: {
-        $in: photoSlider.photoSlides
-      }
-    }).catch(err => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    })
 
     const shop = await this.shopModel.findById(photoSlider.shop).catch(err => {
       console.log(err);
       throw new InternalServerErrorException(err);
 
     })
+    if (!shop) throw new NotFoundException("this shop doesn't exist")
     for (let i = 0; i < shop.containers.length; i++) {
       if (shop.containers[i].containerID === id) {
         shop.containers.splice(i, 1);
@@ -174,6 +165,6 @@ export class PhotoSliderService {
       console.log(err);
       throw new InternalServerErrorException(err);
     })
-    return 'cardSlider deleted successfully';
+    return 'Photo slider deleted successfully';
   }
 }

@@ -73,7 +73,7 @@ export class UserService {
         containers: [],
         customers: [],
         description: 'Add Description',
-        title: 'Starter Shop',
+        title: `${userResponse.email.split('@')[0]} shop`,
         userID: userResponse._id,
       });
 
