@@ -39,7 +39,7 @@ export class PhotoSliderController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
-    return this.photoSliderService.update(+id, updatePhotoSliderDto);
+    return this.photoSliderService.update(id, updatePhotoSliderDto);
   }
 
   @Delete(':id')

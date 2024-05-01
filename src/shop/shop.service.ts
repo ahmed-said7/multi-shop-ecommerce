@@ -71,11 +71,11 @@ export class ShopService {
   }
   async create(createShopDto: CreateShopDto, request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -185,11 +185,11 @@ export class ShopService {
 
   async userJoin(shopId: mongoose.Types.ObjectId, request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -228,11 +228,11 @@ export class ShopService {
   }
   async findShopItems(request: any, id?: string) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -260,11 +260,11 @@ export class ShopService {
 
   async remove(request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);

@@ -23,19 +23,22 @@ export class PhotoSliderService {
     private readonly userModel: mongoose.Model<UserDocument>,
   ) { }
   private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; email: string }>(token);
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
   async create(request: any, createPhotoSliderDto: CreatePhotoSliderDto) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
+      console.log(this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ))
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
       createPhotoSliderDto.shop = user.shop;
@@ -55,11 +58,11 @@ export class PhotoSliderService {
 
   async findAll(request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).email;
+      ).userId;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -128,7 +131,7 @@ export class PhotoSliderService {
   }
 
 
-  async update(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+  async update(id: string, updatePhotoSliderDto: UpdatePhotoSliderDto) {
     try {
       return await this.photoSliderModel.findByIdAndUpdate(id, updatePhotoSliderDto, { new: true }).catch(err => {
         console.log(err)
