@@ -27,7 +27,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderSchema,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import { Review, ReviewSchema } from 'src/review/schemas/review_schema';
 import {
   ReviewContainer,

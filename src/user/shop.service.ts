@@ -16,7 +16,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import {
   CardSlider,
   CardSliderDocument,
@@ -55,12 +55,7 @@ export class ShopService {
 
   async create(createShopDto: CreateShopDto) {
     try {
-      const shop = await new this.shopModel(createShopDto)
-        .save()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shop = await new this.shopModel(createShopDto).save();
 
       return shop;
     } catch (error) {
@@ -279,16 +274,21 @@ export class ShopService {
     }
   }
 
-  async addUser(shopId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) {
+  async addUser(
+    shopId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId,
+  ) {
     try {
-      const shop = await this.shopModel.findByIdAndUpdate(shopId, { $push: { customers: userId } }).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
-      if (!shop) throw new NotFoundException('There is no shop with this id')
+      const shop = await this.shopModel
+        .findByIdAndUpdate(shopId, { $push: { customers: userId } })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+      if (!shop) throw new NotFoundException('There is no shop with this id');
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 }

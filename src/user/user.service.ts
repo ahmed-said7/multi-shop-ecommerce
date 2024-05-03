@@ -10,7 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
@@ -31,11 +31,13 @@ export class UserService {
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
-  ) {}
+  ) { }
+
   async register(createUserDto: CreateUserDto) {
     try {
       const { email } = createUserDto;
       const foundUser = await this.userModel.findOne({ email });
+
       if (foundUser) {
         throw new UnauthorizedException('There is a user with the same email!');
       }
@@ -47,15 +49,6 @@ export class UserService {
         password: hashedPassword,
       });
 
-      if (createUserDto.shopsJoined.length == 1) {
-        await this.shopService
-          .addUser(createUserDto.shopsJoined[0], createdUser._id)
-          .catch((err) => {
-            console.log(err);
-            throw new InternalServerErrorException(err);
-          });
-        createdUser.shopsJoined.push(createUserDto.shopsJoined[0]);
-      }
       const savedUser = await createdUser.save().catch((err) => {
         console.log(err);
         if (err && err.code == 11000) {
@@ -74,7 +67,17 @@ export class UserService {
 
       const token = this.generateToken(savedUser);
 
-      return { token, user: userResponse };
+      // Creating a shop on regsiter, CR.
+      const shop = await this.shopService.create({
+        categories: [],
+        containers: [],
+        customers: [],
+        description: 'Add Description',
+        title: `${userResponse.email.split('@')[0]} shop`,
+        userID: userResponse._id,
+      });
+
+      return { token, user: userResponse, shop };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);
@@ -121,8 +124,8 @@ export class UserService {
             'Unexpected error while creating the user',
           );
       });
-      
-      const shop= await this.shopService.create(createShopDto)
+
+      const shop = await this.shopService.create(createShopDto);
 
       const userResponse = { ...savedUser.toObject(), password: undefined };
 
@@ -364,5 +367,60 @@ export class UserService {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
+  }
+  async addToCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      user.cart.push(itemId)
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return "Item added successfully"
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async removeItemCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      for (let i = 0; i < user.cart.length; i++) {
+        if (user.cart[i] == itemId) {
+          user.cart.splice(i, 1);
+          break;
+        }
+      }
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return "Item removed successfully"
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException(error)
+    }
+  }
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 }

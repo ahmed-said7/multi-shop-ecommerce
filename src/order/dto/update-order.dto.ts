@@ -1,17 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateOrderDto } from './create-order.dto';
-import { IsString, MinLength, MaxLength, IsEnum, IsBoolean, IsNumber } from 'class-validator';
-import { OrderStatusTypes } from '../schemas/order_schema';
 import { Types } from 'mongoose';
+import { PartialType } from '@nestjs/mapped-types';
+import { IsString, MinLength, MaxLength, IsEnum } from 'class-validator';
+
+import { CreateOrderDto } from './create-order.dto';
+import { OrderStatusTypes } from '../schemas/order_schema';
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   items: Types.ObjectId[];
 
   deliveryType: boolean;
 
-
   priceTotal: number;
-
 
   paid: boolean;
 
@@ -27,4 +26,3 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   })
   comments: string;
 }
-

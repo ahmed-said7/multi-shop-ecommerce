@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
 
 import { ShopService } from './shop.service';
@@ -35,7 +35,7 @@ export class ShopController {
   @UseGuards(JwtGuard)
   @Get('items')
   findShopItems(@Req() request: Request, @Param('id') id?: string) {
-    return this.shopService.findShopItems(request, id)
+    return this.shopService.findShopItems(request, id);
   }
 
   // @UseGuards(JwtGuard)
@@ -63,16 +63,14 @@ export class ShopController {
   }
 
   @UseGuards(JwtGuard)
-  @Delete()
-  remove(@Req() request: Request, @Param('id') id: string) {
-    return this.shopService.remove(request);
+  @Delete("/:shopId")
+  remove(@Req() request: Request, @Param("shopId") shopId: string) {
+    return this.shopService.remove(request, shopId);
   }
 
   @UseGuards(JwtGuard)
   @Get('containers/:id')
   findShopContainers(@Param('id') id: string) {
-    return this.shopService.findShopContainers(id)
+    return this.shopService.findShopContainers(id);
   }
-
-
 }

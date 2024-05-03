@@ -20,7 +20,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import {
   CardSlider,
   CardSliderDocument,

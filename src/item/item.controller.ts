@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
-  Req
+  Req,
 } from '@nestjs/common';
 
 import { ItemService } from './item.service';
@@ -20,13 +20,11 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 export class ItemController {
   constructor(private readonly itemService: ItemService) { }
 
-
   @UseGuards(JwtGuard)
   @Post()
   create(@Body() createItemDto: CreateItemDto) {
     return this.itemService.create(createItemDto);
   }
-
 
   @Get('all-items/:shop/')
   findAll(
@@ -38,10 +36,19 @@ export class ItemController {
     @Query('sortOrder') sortOrder: string,
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
+    @Query('keyword') keyword?: string,
   ) {
-
-
-    return this.itemService.findAll(page, shopID, category, subCategorey, sortOrder, minPrice, maxPrice , limitParam);
+    return this.itemService.findAll(
+      page,
+      shopID,
+      category,
+      subCategorey,
+      sortOrder,
+      minPrice,
+      maxPrice,
+      keyword,
+      limitParam,
+    );
   }
 
   @Get('one-item/:id')
@@ -49,18 +56,19 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-
   @UseGuards(JwtGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto, @Req() request: Request) {
+  update(
+    @Param('id') id: string,
+    @Body() updateItemDto: UpdateItemDto,
+    @Req() request: Request,
+  ) {
     return this.itemService.update(id, updateItemDto, request);
   }
-
 
   @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() request: Request) {
     return this.itemService.remove(id, request);
   }
-
 }

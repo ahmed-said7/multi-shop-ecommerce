@@ -41,8 +41,8 @@ export class ItemService {
         throw new InternalServerErrorException(err);
       });
 
-      shop?.itemsIDs?.push(item.id);
-      await shop?.save().catch((err) => {
+      shop.itemsIDs.push(item.id);
+      await shop.save().catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
@@ -54,7 +54,7 @@ export class ItemService {
   }
 
   async findAll(
-    page?: number,
+    page = 0,
     shopID?: string,
     category?: string,
     subCategory?: string,
@@ -121,7 +121,6 @@ export class ItemService {
         sortCriteria['price'] = -1;
       }
 
-      // Find items based on the constructed query and sort criteria
       const items = await this.itemModel
         .find(query)
         .sort(sortCriteria)
@@ -132,7 +131,7 @@ export class ItemService {
           throw new InternalServerErrorException(err);
         });
 
-      // Count the total number of matching items
+      const count = await this.itemModel.countDocuments(query);
 
       return { count, pagination, items };
     } catch (error) {
@@ -186,21 +185,21 @@ export class ItemService {
         });
 
       if (images && images.length > 0) {
-        updatedItem.images.push(...images);
+        item.images.push(...images);
       }
       if (colors && colors.length > 0) {
-        updatedItem.colors.push(...colors);
+        item.colors.push(...colors);
       }
       if (sizes && sizes.length > 0) {
-        updatedItem.sizes.push(...sizes);
+        item.sizes.push(...sizes);
       }
       if (category) {
-        updatedItem.category.push(...category);
+        item.category.push(...category);
       }
 
-      await updatedItem.save();
+      await item.save();
 
-      return updatedItem;
+      return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

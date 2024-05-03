@@ -26,7 +26,7 @@ export class Item {
 
   @Prop({
     required: true,
-    type: [{ type: Types.ObjectId, ref: 'Category' }]
+    type: [{ type: Types.ObjectId, ref: 'Category' }],
   })
   category: string[];
 
@@ -46,10 +46,13 @@ export class Item {
   colors: string[];
 
   @Prop()
-  subCategories: string[]
+  subCategories: string[];
 
   @Prop()
   priceAfter: number;
+
+  @Prop({ default: 0 })
+  soldTimes: number;
 }
 
 // Create the Mongoose schema for the user class
