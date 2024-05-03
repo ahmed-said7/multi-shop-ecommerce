@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
@@ -16,36 +20,36 @@ export class ItemService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
-    private readonly jwtService: JwtService
-  ) { }
+    private readonly jwtService: JwtService,
+  ) {}
 
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
   async create(createItemDto: CreateItemDto) {
     try {
-      const item = await new this.itemModel(createItemDto).save().catch(err => {
+      const item = await new this.itemModel(createItemDto)
+        .save()
+        .catch((err) => {
+          console.log(err);
+          if (err == 11000)
+            throw new InternalServerErrorException('Item name already exists!');
+          else throw new InternalServerErrorException(err);
+        });
+      const shop = await this.shopModel.findById(item.shopID).catch((err) => {
         console.log(err);
-        if (err == 11000) throw new InternalServerErrorException('Item name already exists!')
-
-        else throw new InternalServerErrorException(err);
+        throw new InternalServerErrorException(err);
       });
-      const shop = await this.shopModel.findById(item.shopID).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
 
-      shop.itemsIDs.push(item.id);
-      await shop.save().catch(err => {
+      shop?.itemsIDs?.push(item.id);
+      await shop?.save().catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
-      })
+      });
       return item;
     } catch (err) {
       console.log(err);
-      throw new InternalServerErrorException(
-        err
-      );
+      throw new InternalServerErrorException(err);
     }
   }
 
@@ -57,13 +61,15 @@ export class ItemService {
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
-    limitParam?:number
+    limitParam?: number,
   ) {
     try {
       const query: any = { shopID, category, subCategory };
 
       // Remove undefined or null values from the query object
-      Object.keys(query).forEach(key => query[key] == null && delete query[key]);
+      Object.keys(query).forEach(
+        (key) => query[key] == null && delete query[key],
+      );
 
       // Add minimum and maximum price filters to the query
       if (minPrice !== undefined && maxPrice !== undefined) {
@@ -76,37 +82,37 @@ export class ItemService {
 
       const count = await this.itemModel.countDocuments(query);
 
+      const pageValue = +page || 1;
+      const limit = +limitParam || 10;
 
-      const pageValue =+ page  || 1
-      const limit =+ limitParam || 10
-   
       // Construct sort criteria based on sortOrder
 
-      const skip = (pageValue - 1) * limit 
-       const endIndex= pageValue * limit
-      
+      const skip = (pageValue - 1) * limit;
+      const endIndex = pageValue * limit;
 
-      const pagination:{currentPage :number , numberOfPages:number , limit:number ,nextPage:number , prevPage:number  }  = {
-        currentPage : 0,
-        numberOfPages : 0 ,
-        limit: 0 ,
-        nextPage : 0 ,
-        prevPage : 0 
-      }
+      const pagination: {
+        currentPage: number;
+        numberOfPages: number;
+        limit: number;
+        nextPage: number;
+        prevPage: number;
+      } = {
+        currentPage: 0,
+        numberOfPages: 0,
+        limit: 0,
+        nextPage: 0,
+        prevPage: 0,
+      };
       pagination.currentPage = pageValue;
       pagination.numberOfPages = Math.ceil(count / limit); // 90 / 20 = 4.3  => 5
       pagination.limit = limit;
-  
+
       if (endIndex < count) {
         pagination.nextPage = pageValue + 1;
-       
       }
       if (skip > 0) {
         pagination.prevPage = pageValue - 1;
-     
       }
-
-
 
       const sortCriteria: any = {};
       if (sortOrder === 'asc') {
@@ -121,29 +127,25 @@ export class ItemService {
         .sort(sortCriteria)
         .limit(limit)
         .skip(skip)
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
 
       // Count the total number of matching items
 
-      return {count , pagination,  items };
+      return { count, pagination, items };
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
     }
   }
 
-
-
   async findOne(id: string) {
     try {
-      const item = await this.itemModel.findById(id).catch(err => {
+      const item = await this.itemModel.findById(id).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
-
-
       });
       if (!item) throw new InternalServerErrorException('Item not found!');
       return item;
@@ -154,27 +156,34 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findById(id).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
-      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
-      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
-      if (!user) throw new NotFoundException('There is no user with this id')
-      if (user.role !== 'admin' || user.shop != item.shopID) throw new NotFoundException('You are not authorized to perform this action')
-
-
-      const { images, colors, sizes, category, ...rest } = updateItemDto;
-      const updatedItem = await this.itemModel.findByIdAndUpdate(id, rest, {
-        new: true,
-      }).catch(err => {
+      const item = await this.itemModel.findById(id).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+      if (!user) throw new NotFoundException('There is no user with this id');
+      if (user.role !== 'admin' || user.shop != item.shopID)
+        throw new NotFoundException(
+          'You are not authorized to perform this action',
+        );
 
+      const { images, colors, sizes, category, ...rest } = updateItemDto;
+      const updatedItem = await this.itemModel
+        .findByIdAndUpdate(id, rest, {
+          new: true,
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
 
       if (images && images.length > 0) {
         updatedItem.images.push(...images);
@@ -197,21 +206,27 @@ export class ItemService {
     }
   }
 
-
   async remove(id: string, request: any) {
     try {
-      const item = await this.itemModel.findById(id).catch(err => {
+      const item = await this.itemModel.findById(id).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
-      })
-      const userEmail = this.decodeToken(request.headers.authorization.split(' ')[1]).username
-      const user = await this.userModel.findOne({ email: userEmail }).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
-      if (!user) throw new NotFoundException('There is no user with this id')
-      if (user.shop != item.shopID) throw new NotFoundException('You are not authorized to perform this action')
-      await this.itemModel.findByIdAndDelete(id).catch(err => {
+      });
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+      if (!user) throw new NotFoundException('There is no user with this id');
+      if (user.shop != item.shopID)
+        throw new NotFoundException(
+          'You are not authorized to perform this action',
+        );
+      await this.itemModel.findByIdAndDelete(id).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
