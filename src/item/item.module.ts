@@ -24,5 +24,6 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
   controllers: [ItemController],
   providers: [ItemService],
+  exports:[ItemService]
 })
 export class ItemModule { }

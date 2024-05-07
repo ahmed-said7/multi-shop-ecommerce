@@ -58,7 +58,6 @@ export class UserService {
 
       return { token, user: userResponse };
     } catch (error) {
-      if (error instanceof HttpException) throw error;
       console.log(error);
       throw new InternalServerErrorException(error);
     }

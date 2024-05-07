@@ -8,8 +8,9 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get()
-  findOne(@Req() request:Request, @Body('report') report: string, @Body('year') year?:string, @Body('month') month?: string) {
-    return this.reportsService.findOne(request, report, year , month);
+  findOne(@Req() request:Request, @Body() CreateReportDto:CreateReportDto) {
+    console.log(CreateReportDto)
+    return this.reportsService.findOne(request,CreateReportDto.report,CreateReportDto.year , CreateReportDto.month);
   }
 
   @Delete(':id')

@@ -99,19 +99,11 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(
-        id,
-        {
-          ...updateItemDto,
-          $addToSet: {
-            colors: updateItemDto.colors,
-            sizes: updateItemDto.sizes,
-          },
-        },
-        {
-          new: true,
-        },
-      );
+      let item = await this.itemModel.findById(id);
+
+      if (!item) {
+        throw new NotFoundException('Item not found');
+      }
 
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
