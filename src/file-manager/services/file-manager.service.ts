@@ -3,14 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { ConfigService } from '@nestjs/config';
 import { CloudflareR2Communicator } from '../communicators/cloudflare-r2.communicator';
-import { InjectModel } from '@nestjs/mongoose';
-import {
-  PhotoSlide,
-  PhotoSlideDocument,
-} from 'src/photo-slide/schemas/photoSlide_schema';
-import { Model } from 'mongoose';
 import { ItemService } from 'src/item/item.service';
 import { UpdateItemDto } from 'src/item/dto/update-item.dto';
+import { PhotoSlideService } from 'src/photo-slide/photo-slide.service';
+import { UpdatePhotoSlideDto } from 'src/photo-slide/dto/update-photo-slide.dto';
 
 @Injectable()
 export class FileManagerService {
@@ -18,11 +14,13 @@ export class FileManagerService {
     private config: ConfigService,
     private cloudflareR2Communicator: CloudflareR2Communicator,
     private readonly itemService: ItemService,
+    private readonly photoSlideService: PhotoSlideService,
   ) {}
 
   async uploadFile(
     file: any,
     itemID: string,
+    isSlider: boolean,
     request: any,
     allowedFormats?: string[],
   ): Promise<any> {
@@ -57,10 +55,13 @@ export class FileManagerService {
       file,
       filePath,
     );
-    const updateItemDto: UpdateItemDto = UpdateItemDto;
-    updateItemDto.images = [uploadResponse];
-    this.itemService.update(itemID, updateItemDto, request);
-    
-    return uploadResponse;
+    if (isSlider == true) {
+      const updateItemDto: UpdateItemDto = UpdateItemDto;
+      updateItemDto.images = [uploadResponse];
+      this.itemService.update(itemID, updateItemDto, request);
+    } else {
+      this.photoSlideService.updatePhoto(itemID, uploadResponse);
+      return uploadResponse;
+    }
   }
 }

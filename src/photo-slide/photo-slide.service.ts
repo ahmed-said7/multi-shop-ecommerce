@@ -109,6 +109,17 @@ export class PhotoSlideService {
       throw new InternalServerErrorException(error);
     }
   }
+  async updatePhoto(id:string, photo: string) {
+    try {
+      const photoSlide = await this.photoSlideModel.findByIdAndUpdate(id, {photo}, {
+        new: true,
+      });
+
+      return photoSlide;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
   // async update(newSlider: UpdatePhotoSlideDto[]) {
   //   try {
   //     const photoSlider = await this.photoSlideModel.find(
