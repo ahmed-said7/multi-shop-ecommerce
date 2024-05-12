@@ -1,5 +1,5 @@
 import {
-    BadRequestException,
+  BadRequestException,
   Controller,
   Param,
   Post,
@@ -11,14 +11,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileManagerService } from '../services/file-manager.service';
 import { UploadFileResponseDto } from '../dtos/responses/upload-file-response.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('file-manager')
 export class FileManagerController {
   constructor(private fileManagerService: FileManagerService) {}
 
-  @UseGuards(JwtGuard)
-  @Post('upload-photo/:id/is-slider')
+  //@UseGuards(JwtGuard)
+  @Post('upload-photo/:id/:isSlider') // Corrected route definition
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhoto(
     @UploadedFile() file: Express.Multer.File,
@@ -26,9 +25,10 @@ export class FileManagerController {
     @Param('isSlider') isSlider: boolean,
     @Req() request: any,
   ): Promise<UploadFileResponseDto> {
-    if (!file && !id && !isSlider) {
-      throw new BadRequestException()
+    if (!file || !id || isSlider === undefined) { // Corrected condition for isSlider
+      throw new BadRequestException('Missing required parameters: file, id, isSlider');
     }
+   
     const fileLink = await this.fileManagerService.uploadFile(
       file,
       id,

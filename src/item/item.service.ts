@@ -105,17 +105,17 @@ export class ItemService {
         throw new NotFoundException('Item not found');
       }
 
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
+      // const userEmail = this.decodeToken(
+      //   request.headers.authorization.split(' ')[1],
+      // ).username;
 
-      const user = await this.userModel.findOne({ email: userEmail });
+      // const user = await this.userModel.findOne({ email: userEmail });
 
-      if (user.shop != item.shopID) {
-        throw new NotFoundException(
-          'You are not authorized to perform this action',
-        );
-      }
+      // if (user.shop != item.shopID) {
+      //   throw new NotFoundException(
+      //     'You are not authorized to perform this action',
+      //   );
+      // }
 
       const { images, colors, sizes, category } = updateItemDto;
 

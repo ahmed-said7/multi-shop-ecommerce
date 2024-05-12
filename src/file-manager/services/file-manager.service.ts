@@ -55,13 +55,14 @@ export class FileManagerService {
       file,
       filePath,
     );
-    if (isSlider == true) {
+
+    if (isSlider.toString() === 'true') {
       const updateItemDto: UpdateItemDto = UpdateItemDto;
       updateItemDto.images = [uploadResponse];
-      this.itemService.update(itemID, updateItemDto, request);
+      const item=await this.itemService.update(itemID, updateItemDto, request);
     } else {
-      this.photoSlideService.updatePhoto(itemID, uploadResponse);
-      return uploadResponse;
+      await this.photoSlideService.updatePhoto(itemID, uploadResponse);
     }
+    return uploadResponse;
   }
 }
