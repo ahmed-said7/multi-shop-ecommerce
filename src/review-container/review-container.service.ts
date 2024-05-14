@@ -19,7 +19,7 @@ export class ReviewContainerService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
-  ) { }
+  ) {}
   async create(createReviewContainerDto: CreateReviewContainerDto) {
     try {
       const reviewContainer = await new this.reviewContainerModel(
@@ -86,6 +86,7 @@ export class ReviewContainerService {
 
   async update(id: string, updatereviewContainerDto: UpdateReviewContainerDto) {
     try {
+
       const reviewContainer = await this.reviewContainerModel
         .findByIdAndUpdate(id, updatereviewContainerDto, {
           new: true,
@@ -96,6 +97,7 @@ export class ReviewContainerService {
         });
       if (!reviewContainer) throw new NotFoundException("This container doesn't exist")
       return reviewContainer
+
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
