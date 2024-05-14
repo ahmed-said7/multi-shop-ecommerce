@@ -10,7 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
@@ -39,7 +39,7 @@ export class UserService {
       const foundUser = await this.userModel.findOne({ email });
 
       if (foundUser) {
-        throw new UnauthorizedException('There is a user with the same email!');
+        throw new BadRequestException('There is a user with the same email!');
       }
 
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -73,9 +73,13 @@ export class UserService {
         containers: [],
         customers: [],
         description: 'Add Description',
-        title: 'Starter Shop',
+        title: `${userResponse.email.split('@')[0]} shop`,
         userID: userResponse._id,
       });
+
+      // Save shopID in user document
+      savedUser.shop = shop._id;
+      await savedUser.save();
 
       return { token, user: userResponse, shop };
     } catch (error) {
@@ -367,5 +371,60 @@ export class UserService {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
+  }
+  async addToCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      user.cart.push(itemId);
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return 'Item added successfully';
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async removeItemCart(itemId: mongoose.Types.ObjectId, request: any) {
+    try {
+      const userEmail = this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ).username;
+      const user = await this.userModel
+        .findOne({ email: userEmail })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+
+      for (let i = 0; i < user.cart.length; i++) {
+        if (user.cart[i] == itemId) {
+          user.cart.splice(i, 1);
+          break;
+        }
+      }
+      await user.save().catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+      return 'Item removed successfully';
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+  private decodeToken(token: string) {
+    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 }

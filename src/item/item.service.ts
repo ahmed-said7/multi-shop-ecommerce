@@ -21,7 +21,7 @@ export class ItemService {
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
@@ -50,6 +50,8 @@ export class ItemService {
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
+     keyword?: string,
+
     limitParam?: number,
   ) {
     try {
@@ -109,6 +111,12 @@ export class ItemService {
       } else if (sortOrder === 'desc') {
         sortCriteria['price'] = -1;
       }
+       if (keyword) {
+        query.$or = [
+          { title: { $regex: keyword, $options: 'i' } },
+          { description: { $regex: keyword, $options: 'i' } },
+        ];
+      }
 
       // Find items based on the constructed query and sort criteria
       const items = await this.itemModel
@@ -124,11 +132,13 @@ export class ItemService {
       // Count the total number of matching items
 
       return { count, pagination, items };
+
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error.message);
     }
   }
+
 
   async findOne(id: string) {
     try {
@@ -145,19 +155,11 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(
-        id,
-        {
-          ...updateItemDto,
-          $addToSet: {
-            colors: updateItemDto.colors,
-            sizes: updateItemDto.sizes,
-          },
-        },
-        {
-          new: true,
-        },
-      );
+      let item = await this.itemModel.findById(id);
+
+      if (!item) {
+        throw new NotFoundException('Item not found');
+      }
 
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],

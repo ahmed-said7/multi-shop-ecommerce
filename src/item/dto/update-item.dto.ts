@@ -1,28 +1,39 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateItemDto } from './create-item.dto';
-import { IsString, IsNumber, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsArray, IsEmpty } from 'class-validator';
 
 export class UpdateItemDto extends PartialType(CreateItemDto) {
   @IsString()
-  name: string;
+  @IsEmpty()
+  name?: string;
   @IsNumber()
-  price: number;
+  @IsEmpty()
+  price?: number;
   @IsNumber()
-  amount: number;
+  @IsEmpty()
+  amount?: number;
   @IsString()
-  shopID: string;
+  @IsEmpty()
+  shopID?: string;
   @IsString()
-  description: string;
+  @IsEmpty()
+  description?: string;
   @IsArray({ message: 'Item categories must be an array' })
-  category: string[];
+  @IsEmpty()
+  category?: string[];
   @IsString()
+  @IsEmpty()
   brand?: string;
   @IsNumber()
+  @IsEmpty()
   rating?: number;
   @IsArray({ message: 'Item sizes must be an array' })
+  @IsEmpty()
   sizes?: string[];
   @IsArray({ message: 'Item images must be an array' })
+  @IsEmpty()
   images?: string[];
   @IsArray({ message: 'Item colors must be an array' })
+  @IsEmpty()
   colors?: string[];
 }

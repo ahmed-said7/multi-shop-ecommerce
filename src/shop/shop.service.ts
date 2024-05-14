@@ -20,7 +20,7 @@ import {
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photoSlider_schema';
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import {
   CardSlider,
   CardSliderDocument,
@@ -65,17 +65,17 @@ export class ShopService {
     @InjectModel(VideoContainer.name)
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
   private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
+    return this.jwtService.decode<{ sub: string; email: string }>(token);
   }
   async create(createShopDto: CreateShopDto, request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).sub;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -109,8 +109,8 @@ export class ShopService {
     try {
       const shops = await this.shopModel
         .find()
-        .limit(10)
-        .skip(page * 10);
+      // .limit(10)
+      // .skip(page * 10);
 
       const count = await this.shopModel.find().countDocuments();
 
@@ -185,11 +185,11 @@ export class ShopService {
 
   async userJoin(shopId: mongoose.Types.ObjectId, request: any) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).sub;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -228,11 +228,11 @@ export class ShopService {
   }
   async findShopItems(request: any, id?: string) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).sub;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -258,19 +258,22 @@ export class ShopService {
     }
   }
 
-  async remove(request: any) {
+  async remove(request: any, shopId: string) {
     try {
-      const userEmail = this.decodeToken(
+      const userId = this.decodeToken(
         request.headers.authorization.split(' ')[1],
-      ).username;
+      ).sub;
       const user = await this.userModel
-        .findOne({ email: userEmail })
+        .findOne({ _id: userId })
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
+      console.log(this.decodeToken(
+        request.headers.authorization.split(' ')[1],
+      ));
       if (!user) throw new NotFoundException('There is no user with this id');
-      const shop = await this.shopModel.findById(user.shop).catch((err) => {
+      const shop = await this.shopModel.findById(shopId).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(
           'An unexpected error happened while finding the shop',
@@ -279,10 +282,9 @@ export class ShopService {
       if (!shop) {
         throw new NotFoundException('Shop not found');
       }
-      if (shop.userID != user.id || user.role == UserRole.ADMIN)
-        throw new UnauthorizedException(
-          'You dont have the permission to delete this shop',
-        );
+      console.log(user);
+
+      if (shop.userID != user.id && user.role !== UserRole.ADMIN) throw new UnauthorizedException('You dont have the permission to delete this shop');
 
       await this.itemModel.deleteMany({ _id: { $in: shop.itemsIDs } });
 
@@ -366,9 +368,9 @@ export class ShopService {
             }
             break;
           case 'photo slider':
-            const photoSlider = await this.photoSliderModel.find({
-              containerName: container.containerID,
-            });
+            const photoSlider = await this.photoSliderModel.findById(
+              container.containerID,
+            );
             if (photoSlider) {
               containers.push({ type: 'photo slider', container: photoSlider });
             }

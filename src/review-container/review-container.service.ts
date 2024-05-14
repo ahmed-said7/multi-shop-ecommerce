@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -37,11 +37,12 @@ export class ReviewContainerService {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
+      if (!review) throw new NotFoundException("This review doesn't exist")
       const shop = await this.shopModel.findById(review.shop).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
-
+      if (!shop) throw new NotFoundException("This shop doesn't exist")
       shop.containers.push({
         containerID: reviewContainer.id,
         containerType: 'review container',
@@ -85,16 +86,18 @@ export class ReviewContainerService {
 
   async update(id: string, updatereviewContainerDto: UpdateReviewContainerDto) {
     try {
-      const review = await this.reviewContainerModel.findByIdAndUpdate(
-        id,
-        updatereviewContainerDto,
-        {
-          new: true,
-        },
-      );
 
-      review.save();
-      return review;
+      const reviewContainer = await this.reviewContainerModel
+        .findByIdAndUpdate(id, updatereviewContainerDto, {
+          new: true,
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
+      if (!reviewContainer) throw new NotFoundException("This container doesn't exist")
+      return reviewContainer
+
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -108,17 +111,20 @@ export class ReviewContainerService {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
+
+      if (!reviewContainer) throw new NotFoundException("This container doesn't exist")
       const review = await this.reviewModel
         .findById(reviewContainer.review[0])
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-
+      if (!review) throw new NotFoundException("This review doesn't exist")
       const shop = await this.shopModel.findById(review.shop).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
+      if (!shop) throw new NotFoundException("This shop doesn't exist")
       if (shop) {
         for (let i = 0; i < shop.containers.length; i++) {
           if (shop.containers[i].containerID === id) {
@@ -132,6 +138,7 @@ export class ReviewContainerService {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
+      if (!user) throw new NotFoundException("This user doesn't exist")
       if (user) {
         for (let i = 0; i < user.reviews.length; i++) {
           if (user.reviews[i] === id) {
@@ -147,6 +154,7 @@ export class ReviewContainerService {
       });
       return 'Review container deleted successfully';
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }

@@ -1,29 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ItemService } from './item.service';
-import { ItemController } from './item.controller';
+import { PhotoSlideService } from './photo-slide.service';
+import { PhotoSlideController } from './photo-slide.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Item, ItemSchema } from './schemas/item-schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
-import { User, UserSchema } from 'src/user/schemas/user_schema';
+import { PhotoSlide, PhotoSlideSchema } from './schemas/photoSlide_schema';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthModule } from 'src/auth/auth.module';
+import { User, UserSchema } from 'src/user/schemas/user_schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Item.name, schema: ItemSchema },
+      { name: PhotoSlide.name, schema: PhotoSlideSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
-
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
     }),
-    AuthModule,
   ],
-  controllers: [ItemController],
-  providers: [ItemService],
-  exports:[ItemService]
+  controllers: [PhotoSlideController],
+  providers: [PhotoSlideService],
+  exports: [PhotoSlideService],
 })
-export class ItemModule { }
+export class PhotoSlideModule { }

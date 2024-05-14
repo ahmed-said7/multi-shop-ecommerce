@@ -1,47 +1,49 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
-  constructor(private readonly photoSliderService: PhotoSliderService) {}
+  constructor(private readonly photoSliderService: PhotoSliderService) { }
 
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createPhotoSliderDto: CreatePhotoSliderDto) {
-    return this.photoSliderService.create(createPhotoSliderDto);
+  create(@Req() request: Request, @Body() createPhotoSliderDto: CreatePhotoSliderDto) {
+    return this.photoSliderService.create(request, createPhotoSliderDto);
   }
 
-  @Post('container')
-  createCollection(@Body() createPhotoSliderDto: CreatePhotoSliderDto[]) {
-    return this.photoSliderService.createCollection(createPhotoSliderDto);
-  }
-
+  @UseGuards(JwtGuard)
   @Get()
-  findAll() {
-    return this.photoSliderService.findAll();
+  findAll(@Req() request: Request) {
+    return this.photoSliderService.findAll(request);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.photoSliderService.findOne(id);
+    return this.photoSliderService.findOne(+id);
   }
 
-  @Patch()
-  update(@Body() updatePhotoSliderDto: UpdatePhotoSliderDto[]) {
-    return this.photoSliderService.update(updatePhotoSliderDto);
+
+  @Patch('add/:id')
+  addPhotoSlide(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    return this.photoSliderService.addPhotoSlide(+id, updatePhotoSliderDto);
   }
 
-  @Delete(':name')
-  remove(@Param('name') name: string) {
-    return this.photoSliderService.remove(name);
+  @Patch('remove/:id')
+  removePhotoSlides(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    return this.photoSliderService.removePhotoSlide(+id, updatePhotoSliderDto);
+  }
+
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updatePhotoSliderDto: UpdatePhotoSliderDto) {
+    return this.photoSliderService.update(id, updatePhotoSliderDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.photoSliderService.remove(id);
   }
 }
