@@ -18,7 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('item')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) { }
+  constructor(private readonly itemService: ItemService) {}
 
   @UseGuards(JwtGuard)
   @Post()
@@ -32,7 +32,7 @@ export class ItemController {
     @Query('page') page: number,
     @Query('limitParam') limitParam: number,
     @Query('category') category: string,
-    @Query('subCategory') subCategorey: string,
+    @Query('subCategory') subCategory: string,
     @Query('sortOrder') sortOrder: string,
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
@@ -42,7 +42,7 @@ export class ItemController {
       page,
       shopID,
       category,
-      subCategorey,
+      subCategory,
       sortOrder,
       minPrice,
       maxPrice,
@@ -63,6 +63,7 @@ export class ItemController {
     @Body() updateItemDto: UpdateItemDto,
     @Req() request: Request,
   ) {
+    console.log(updateItemDto);
     return this.itemService.update(id, updateItemDto, request);
   }
 

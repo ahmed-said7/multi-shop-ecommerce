@@ -28,24 +28,13 @@ export class ItemService {
   }
   async create(createItemDto: CreateItemDto) {
     try {
-      const item = await new this.itemModel(createItemDto)
-        .save()
-        .catch((err) => {
-          console.log(err);
-          if (err == 11000)
-            throw new InternalServerErrorException('Item name already exists!');
-          else throw new InternalServerErrorException(err);
-        });
-      const shop = await this.shopModel.findById(item.shopID).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const item = await new this.itemModel(createItemDto).save();
 
-      shop.itemsIDs.push(item.id);
-      await shop.save().catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const shop = await this.shopModel.findById(item.shopID);
+
+      shop?.itemsIDs?.push(item.id);
+
+      await shop?.save();
       return item;
     } catch (err) {
       console.log(err);
@@ -54,17 +43,19 @@ export class ItemService {
   }
 
   async findAll(
-    page = 0,
+    page?: number,
     shopID?: string,
     category?: string,
     subCategory?: string,
     sortOrder?: string,
     minPrice?: number,
     maxPrice?: number,
+    keyword?: string,
+
     limitParam?: number,
   ) {
     try {
-      const query: any = { shopID, category, subCategory };
+      const query: any = { shopID, category, subCategories: subCategory };
 
       // Remove undefined or null values from the query object
       Object.keys(query).forEach(
@@ -78,6 +69,13 @@ export class ItemService {
         query.price = { $gte: minPrice }; // Minimum price filter
       } else if (maxPrice !== undefined) {
         query.price = { $lte: maxPrice }; // Maximum price filter
+      }
+
+      if (keyword) {
+        query.$or = [
+          { name: { $regex: keyword, $options: 'i' } },
+          { description: { $regex: keyword, $options: 'i' } },
+        ];
       }
 
       const count = await this.itemModel.countDocuments(query);
@@ -121,6 +119,7 @@ export class ItemService {
         sortCriteria['price'] = -1;
       }
 
+      // Find items based on the constructed query and sort criteria
       const items = await this.itemModel
         .find(query)
         .sort(sortCriteria)
@@ -131,7 +130,7 @@ export class ItemService {
           throw new InternalServerErrorException(err);
         });
 
-      const count = await this.itemModel.countDocuments(query);
+      // Count the total number of matching items
 
       return { count, pagination, items };
     } catch (error) {
@@ -155,47 +154,25 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      const item = await this.itemModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      let item = await this.itemModel.findById(id);
+
+      if (!item) {
+        throw new NotFoundException('Item not found');
+      }
+
       const userEmail = this.decodeToken(
         request.headers.authorization.split(' ')[1],
       ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.role !== 'admin' || user.shop != item.shopID)
+
+      const user = await this.userModel.findOne({ email: userEmail });
+
+      if (user.shop != item.shopID) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );
+      }
 
-      const { images, colors, sizes, category, ...rest } = updateItemDto;
-      const updatedItem = await this.itemModel
-        .findByIdAndUpdate(id, rest, {
-          new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-
-      if (images && images.length > 0) {
-        item.images.push(...images);
-      }
-      if (colors && colors.length > 0) {
-        item.colors.push(...colors);
-      }
-      if (sizes && sizes.length > 0) {
-        item.sizes.push(...sizes);
-      }
-      if (category) {
-        item.category.push(...category);
-      }
+      Object.assign(item, updateItemDto);
 
       await item.save();
 
