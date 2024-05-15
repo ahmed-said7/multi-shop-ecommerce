@@ -31,7 +31,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
-  ) { }
+  ) {}
 
   async register(createUserDto: CreateUserDto) {
     try {
@@ -39,7 +39,7 @@ export class UserService {
       const foundUser = await this.userModel.findOne({ email });
 
       if (foundUser) {
-        throw new UnauthorizedException('There is a user with the same email!');
+        throw new BadRequestException('There is a user with the same email!');
       }
 
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -76,6 +76,10 @@ export class UserService {
         title: `${userResponse.email.split('@')[0]} shop`,
         userID: userResponse._id,
       });
+
+      // Save shopID in user document
+      savedUser.shop = shop._id;
+      await savedUser.save();
 
       return { token, user: userResponse, shop };
     } catch (error) {
@@ -380,15 +384,15 @@ export class UserService {
           throw new InternalServerErrorException(err);
         });
 
-      user.cart.push(itemId)
+      user.cart.push(itemId);
       await user.save().catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
-      return "Item added successfully"
+      return 'Item added successfully';
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -414,10 +418,10 @@ export class UserService {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
-      return "Item removed successfully"
+      return 'Item removed successfully';
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
   private decodeToken(token: string) {

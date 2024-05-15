@@ -32,7 +32,7 @@ export class UserController {
   ) { }
 
   @Post('register')
-  @UsePipes(new ValidationPipe({ transform: true }))
+ // @UsePipes(new ValidationPipe({ transform: true }))
   async register(@Body() createUserDto: CreateUserDto) {
     await this.emailService.emailOTPCode(
       createUserDto.email,

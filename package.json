@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.569.0",
     "@faker-js/faker": "^8.3.1",
     "@nestjs/axios": "^3.0.1",
     "@nestjs/common": "^10.0.0",
@@ -30,6 +31,7 @@
     "@nestjs/mongoose": "^10.0.2",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@types/multer": "^1.4.11",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -39,6 +41,7 @@
     "luxon": "^3.4.4",
     "moment": "^2.29.4",
     "mongoose": "^8.0.0",
+    "multer": "^1.4.5-lts.1",
     "nest": "^0.1.6",
     "node-mailjet": "^6.0.5",
     "nodemailer": "^6.9.7",

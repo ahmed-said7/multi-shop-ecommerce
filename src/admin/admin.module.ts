@@ -4,11 +4,18 @@ import { AdminController } from './admin.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { UserModule } from 'src/user/user.module';
-
+import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
+import { AdminStatisticsController } from './admin-statistics.controller';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), UserModule],
-  controllers: [AdminController],
+  imports: [
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Shop.name, schema: ShopSchema },
+    ]),
+    UserModule,
+  ],
+  controllers: [AdminController, AdminStatisticsController],
   providers: [AdminService],
 })
-export class AdminModule { }
+export class AdminModule {}

@@ -63,7 +63,6 @@ export class ItemController {
     @Body() updateItemDto: UpdateItemDto,
     @Req() request: Request,
   ) {
-    console.log(updateItemDto);
     return this.itemService.update(id, updateItemDto, request);
   }
 
