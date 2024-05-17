@@ -78,10 +78,15 @@ export class UserService {
       });
 
       // Save shopID in user document
-      savedUser.shop = shop._id;
-      await savedUser.save();
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        savedUser._id,
+        {
+          shop: shop._id,
+        },
+        { new: true },
+      );
 
-      return { token, user: userResponse, shop };
+      return { token, user: updatedUser, shop };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);

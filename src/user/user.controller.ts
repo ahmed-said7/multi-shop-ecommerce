@@ -13,6 +13,8 @@ import {
   Req,
 } from '@nestjs/common';
 
+import mongoose from 'mongoose';
+
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,7 +23,6 @@ import { EmailService } from './email/email.service';
 import { User } from './schemas/user_schema';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import mongoose from 'mongoose';
 
 @Controller('user')
 export class UserController {
@@ -32,12 +33,12 @@ export class UserController {
   ) {}
 
   @Post('register')
-  // @UsePipes(new ValidationPipe({ transform: true }))
   async register(@Body() createUserDto: CreateUserDto) {
     await this.emailService.emailOTPCode(
       createUserDto.email,
       createUserDto.name,
     );
+
     return this.userService.register(createUserDto);
   }
 
@@ -48,6 +49,7 @@ export class UserController {
       registerData.user.email,
       registerData.user.name,
     );
+
     return this.userService.registerShop(registerData);
   }
 
