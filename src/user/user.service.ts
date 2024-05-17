@@ -377,23 +377,14 @@ export class UserService {
       throw new InternalServerErrorException(error);
     }
   }
-  async addToCart(itemId: mongoose.Types.ObjectId, request: any) {
+  async addToCart(itemId: mongoose.Types.ObjectId, userId: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
 
       user.cart.push(itemId);
-      await user.save().catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+
+      await user.save();
+
       return 'Item added successfully';
     } catch (error) {
       console.log(error);
@@ -401,17 +392,9 @@ export class UserService {
     }
   }
 
-  async removeItemCart(itemId: mongoose.Types.ObjectId, request: any) {
+  async removeItemCart(itemId: mongoose.Types.ObjectId, userId: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
 
       for (let i = 0; i < user.cart.length; i++) {
         if (user.cart[i] == itemId) {
@@ -419,10 +402,9 @@ export class UserService {
           break;
         }
       }
-      await user.save().catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+
+      await user.save();
+
       return 'Item removed successfully';
     } catch (error) {
       console.log(error);

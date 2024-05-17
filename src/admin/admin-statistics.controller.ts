@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, UseGuards, Body } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -8,13 +8,13 @@ export class AdminStatisticsController {
 
   @UseGuards(JwtGuard)
   @Get('/registrations-per-month')
-  async getRegistrationsPerMonth(@Req() request: Request) {
-    return this.adminService.getUsersPerMonth(request);
+  async getRegistrationsPerMonth(@Body('userId') userId: string) {
+    return this.adminService.getUsersPerMonth(userId);
   }
 
   @UseGuards(JwtGuard)
   @Get('/shops-per-month')
-  async getshopsPerMonth(@Req() request: Request) {
-    return this.adminService.getShopsPerMonth(request);
+  async getshopsPerMonth(@Body('userId') userId: string) {
+    return this.adminService.getShopsPerMonth(userId);
   }
 }

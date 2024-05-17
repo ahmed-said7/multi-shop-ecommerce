@@ -66,38 +66,26 @@ export class ShopService {
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     private readonly jwtService: JwtService,
   ) {}
+
   private decodeToken(token: string) {
     return this.jwtService.decode<{ sub: string; email: string }>(token);
   }
-  async create(createShopDto: CreateShopDto, request: any) {
+
+  async create(createShopDto: CreateShopDto, userId: string) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).sub;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
+
       if (!user) throw new NotFoundException('There is no user with this id');
       if (user.shop) throw new BadRequestException('You already have a shop');
 
       createShopDto.userID = user.id;
-      const shop = await this.shopModel.create(createShopDto).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
 
-      await this.userModel
-        .findByIdAndUpdate(user.id, {
-          role: UserRole.SHOP_OWNER,
-          shop: shop.id,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shop = await this.shopModel.create(createShopDto);
+
+      await this.userModel.findByIdAndUpdate(user.id, {
+        role: UserRole.SHOP_OWNER,
+        shop: shop.id,
+      });
 
       return shop;
     } catch (error) {
@@ -105,11 +93,9 @@ export class ShopService {
     }
   }
 
-  async findAll(page: number = 0) {
+  async findAll() {
     try {
       const shops = await this.shopModel.find();
-      // .limit(10)
-      // .skip(page * 10);
 
       const count = await this.shopModel.find().countDocuments();
 
@@ -182,25 +168,18 @@ export class ShopService {
     }
   }
 
-  async userJoin(shopId: mongoose.Types.ObjectId, request: any) {
+  async userJoin(shopId: mongoose.Types.ObjectId, userId: string) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).sub;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
+
       if (!user) throw new NotFoundException("This user doesn't exist");
-      const shop = await this.shopModel
-        .findByIdAndUpdate(shopId, { $addToSet: { customers: user.id } })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, {
+        $addToSet: { customers: user.id },
+      });
+
       if (!shop) throw new NotFoundException('There is no shop with this id');
+
       return 'User added successfully!';
     } catch (error) {
       console.log(error);
@@ -213,42 +192,33 @@ export class ShopService {
     userId: mongoose.Types.ObjectId,
   ) {
     try {
-      const shop = await this.shopModel
-        .findByIdAndUpdate(shopId, { $push: { customers: userId } })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, {
+        $push: { customers: userId },
+      });
+
       if (!shop) throw new NotFoundException('There is no shop with this id');
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
-  async findShopItems(request: any, id?: string) {
+  async findShopItems(userId: string, id?: string) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).sub;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
+      const user = await this.userModel.findById(userId);
 
-      if (!id && user.role == UserRole.SHOP_OWNER) id = user.shop;
+      if (!user) {
+        throw new NotFoundException('There is no user with this id');
+      }
+
+      if (!id && user.role == UserRole.SHOP_OWNER) {
+        id = user.shop;
+      }
+
       const shop = await this.shopModel
         .findById(id)
         .populate('itemsIDs')
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(
-            'An expected error happened while finding shop items',
-          );
-        });
+        .exec();
+
       const items = shop.itemsIDs;
       return items;
     } catch (error) {
@@ -257,36 +227,25 @@ export class ShopService {
     }
   }
 
-  async remove(request: any, shopId: string) {
+  async remove(userId: string, shopId: string) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).sub;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      console.log(
-        this.decodeToken(request.headers.authorization.split(' ')[1]),
-      );
-      if (!user) throw new NotFoundException('There is no user with this id');
-      const shop = await this.shopModel.findById(shopId).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'An unexpected error happened while finding the shop',
-        );
-      });
+      const user = await this.userModel.findById(userId);
+
+      if (!user) {
+        throw new NotFoundException('There is no user with this id');
+      }
+
+      const shop = await this.shopModel.findById(shopId);
+
       if (!shop) {
         throw new NotFoundException('Shop not found');
       }
-      console.log(user);
 
-      if (shop.userID != user.id && user.role !== UserRole.ADMIN)
+      if (shop.userID != user.id && user.role !== UserRole.ADMIN) {
         throw new UnauthorizedException(
           'You dont have the permission to delete this shop',
         );
+      }
 
       await this.itemModel.deleteMany({ _id: { $in: shop.itemsIDs } });
 
@@ -321,12 +280,7 @@ export class ShopService {
         }
       }
 
-      await this.shopModel.findByIdAndDelete(user.shop).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'An unexpected error happened while removing the shop',
-        );
-      });
+      await this.shopModel.findByIdAndDelete(user.shop);
 
       return 'Shop was deleted successfully';
     } catch (error) {
@@ -340,6 +294,7 @@ export class ShopService {
       const shop = await this.shopModel.findById(id);
 
       const containers = [];
+
       for (const container of shop.containers) {
         switch (container.containerType) {
           case 'review container':

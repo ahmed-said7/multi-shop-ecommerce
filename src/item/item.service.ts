@@ -152,19 +152,17 @@ export class ItemService {
     }
   }
 
-  async update(id: string, updateItemDto: UpdateItemDto, request: any) {
+  async update(id: string, updateItemDto: UpdateItemDto, userId: string) {
     try {
-      const item = await this.itemModel.findById(id);
+      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+        new: true,
+      });
 
       if (!item) {
         throw new NotFoundException('Item not found');
       }
 
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-
-      const user = await this.userModel.findOne({ email: userEmail });
+      const user = await this.userModel.findById(userId);
 
       if (user.shop != item.shopID) {
         throw new NotFoundException(
@@ -172,41 +170,31 @@ export class ItemService {
         );
       }
 
-      Object.assign(item, updateItemDto);
-
-      await item.save();
-
       return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  async remove(id: string, request: any) {
+  async remove(id: string, userId: string) {
     try {
-      const item = await this.itemModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.shop != item.shopID)
+      const item = await this.itemModel.findById(id);
+
+      const user = await this.userModel.findById(userId);
+
+      if (!user) {
+        throw new NotFoundException('There is no user with this id');
+      }
+
+      if (user.shop != item.shopID) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );
-      await this.itemModel.findByIdAndDelete(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      return 'The item has been deleted successfully';
+      }
+
+      const deletedItem = await this.itemModel.findByIdAndDelete(id);
+
+      return deletedItem;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

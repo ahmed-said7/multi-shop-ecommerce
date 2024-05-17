@@ -29,37 +29,26 @@ export class VideoContainerService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async create(request: any, createVideoContainerDto: CreateVideoContainerDto) {
-    const userEmail = this.decodeToken(
-      request.headers.authorization.split(' ')[1],
-    ).username;
-    const user = await this.userModel
-      .findOne({ email: userEmail })
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+  async create(
+    userId: string,
+    createVideoContainerDto: CreateVideoContainerDto,
+  ) {
+    const user = await this.userModel.findById(userId);
+
     if (!user) {
       throw new NotFoundException('There is no user with this id');
     }
+
     if (!user.shop) {
       throw new BadRequestException("You don't have a shop");
     }
     const videoContainer = await new this.videoContainerModel(
       createVideoContainerDto,
-    )
-      .save()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    ).save();
 
-    const shop = await this.shopModel
-      .findById(createVideoContainerDto?.['shop'])
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    const shop = await this.shopModel.findById(
+      createVideoContainerDto?.['shop'],
+    );
 
     if (!shop) {
       throw new NotFoundException("Couldn't find the shop");
@@ -83,17 +72,9 @@ export class VideoContainerService {
     return videoContainer;
   }
 
-  async findAll(request: any) {
+  async findAll(userId: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
 
       if (!user) {
         throw new NotFoundException('There is no user with this id');
@@ -102,12 +83,7 @@ export class VideoContainerService {
         throw new BadRequestException("You don't have a shop");
       }
 
-      return await this.videoContainerModel
-        .find({ shop: user.shop })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      return await this.videoContainerModel.find({ shop: user.shop });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
@@ -128,36 +104,27 @@ export class VideoContainerService {
 
   async update(id: string, updateVideoContainerDto: UpdateVideoContainerDto) {
     try {
-      return await this.videoContainerModel
-        .findByIdAndUpdate(id, updateVideoContainerDto, {
+      return await this.videoContainerModel.findByIdAndUpdate(
+        id,
+        updateVideoContainerDto,
+        {
           new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        },
+      );
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
   async remove(id: string) {
-    const videoContainer = await this.videoContainerModel
-      .findById(id)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    const videoContainer = await this.videoContainerModel.findById(id);
+
     if (!videoContainer) {
       throw new InternalServerErrorException("this slider doesn't exist");
     }
 
-    const shop = await this.shopModel
-      .findById(videoContainer.shop)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    const shop = await this.shopModel.findById(videoContainer.shop);
+
     for (let i = 0; i < shop.containers.length; i++) {
       if (shop.containers[i].containerID === id) {
         shop.containers.splice(i, 1);
@@ -165,10 +132,8 @@ export class VideoContainerService {
       }
     }
     await shop.save();
-    await this.videoContainerModel.findByIdAndDelete(id).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
+    await this.videoContainerModel.findByIdAndDelete(id);
+
     return 'Video Container deleted successfully';
   }
 }

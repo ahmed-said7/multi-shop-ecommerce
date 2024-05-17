@@ -106,17 +106,15 @@ export class AdminService {
     }
   }
 
-  async getUsersPerMonth(request: any) {
-    const email = this.decodeToken(
-      request.headers.authorization.split(' ')[1],
-    ).username;
-    const user = await this.userModel.findOne({ email: email }).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
-    if (!user || user.role != 'admin')
+  async getUsersPerMonth(userId: string) {
+    const user = await this.userModel.findById(userId);
+
+    if (!user || user.role != 'admin') {
       throw new NotFoundException('There is no admin user with this id');
+    }
+
     const now = new Date();
+
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
     const result = await this.userModel.aggregate([
@@ -138,6 +136,7 @@ export class AdminService {
         $sort: { '_id.year': 1, '_id.month': 1 },
       },
     ]);
+
     // Prepare the result array with counts for the last 12 months
     const mappedData = result.map(({ _id: { month, year }, count }) => ({
       month: `${year}-${month < 10 ? '0' + month : month}`,
@@ -147,16 +146,13 @@ export class AdminService {
     return mappedData;
   }
 
-  async getShopsPerMonth(request: any) {
-    const email = this.decodeToken(
-      request.headers.authorization.split(' ')[1],
-    ).username;
-    const user = await this.userModel.findOne({ _id: email }).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
-    if (!user || user.role != 'admin')
+  async getShopsPerMonth(userId: string) {
+    const user = await this.userModel.findById(userId);
+
+    if (!user || user.role != 'admin') {
       throw new NotFoundException('There is no admin user with this id');
+    }
+
     const now = new Date();
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 

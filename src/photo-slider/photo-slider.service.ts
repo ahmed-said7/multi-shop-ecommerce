@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -34,36 +33,29 @@ export class PhotoSliderService {
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
   ) {}
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
-  }
-  async create(request: any, createPhotoSliderDto: CreatePhotoSliderDto) {
+
+  async create(userId: string, createPhotoSliderDto: CreatePhotoSliderDto) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).userId;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
 
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
+
       createPhotoSliderDto.shop = user.shop;
-      const photoSlider = await this.photoSliderModel
-        .create(createPhotoSliderDto)
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+
+      const photoSlider =
+        await this.photoSliderModel.create(createPhotoSliderDto);
+
       const shop = await this.shopModel.findById(photoSlider.shop);
+
+      //TODO: Fix this code.
       shop.containers.push({
         containerID: photoSlider.id,
         containerType: 'photo slider',
       });
+
       await shop.save();
+
       return photoSlider;
     } catch (err) {
       console.log(err);
@@ -71,25 +63,13 @@ export class PhotoSliderService {
     }
   }
 
-  async findAll(request: any) {
+  async findAll(userId: string) {
     try {
-      const userId = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).userId;
-      const user = await this.userModel
-        .findOne({ _id: userId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
+      const user = await this.userModel.findById(userId);
+
       if (!user.shop) throw new BadRequestException("You don't have a shop");
-      return await this.photoSliderModel
-        .find({ shop: user.shop })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+
+      return await this.photoSliderModel.find({ shop: user.shop });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);

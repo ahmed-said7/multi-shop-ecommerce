@@ -5,15 +5,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
 
 import * as mongoose from 'mongoose';
 
-import { Order, OrderDocument } from './schemas/order_schema';
-import { InjectModel } from '@nestjs/mongoose';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { JwtService } from '@nestjs/jwt';
-import { request } from 'express';
+import { Order, OrderDocument } from './schemas/order_schema';
+
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
@@ -33,31 +33,27 @@ export class OrderService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async create(request: any, createOrderDto: CreateOrderDto) {
+  async create(userId: string, createOrderDto: CreateOrderDto) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException("This user doesn't exist");
-      const buyerId = user.id;
-      const shop = await this.shopModel
-        .findOne({ _id: createOrderDto.shopId })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const user = await this.userModel.findById(userId);
+
+      if (!user) {
+        throw new NotFoundException("This user doesn't exist");
+      }
+
+      const shop = await this.shopModel.findById(createOrderDto.shopId);
+
       if (!shop) throw new NotFoundException("This shop doesn't exist");
+
       const sellerId = shop.userID;
-      if (buyerId == sellerId)
+
+      const buyerId = user._id;
+
+      if (userId == sellerId) {
         throw new UnauthorizedException(
           'You cant make an order from your own shop',
         );
+      }
 
       await this.itemModel.updateMany(
         {
@@ -126,27 +122,25 @@ export class OrderService {
     }
   }
 
-  async update(request: any, id: string, updateOrderDto: UpdateOrderDto) {
+  async update(userId: string, id: string, updateOrderDto: UpdateOrderDto) {
     try {
-      const order = await this.orderModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException("This user doesn't exist");
+      const order = await this.orderModel.findById(id);
+
+      const user = await this.userModel.findById(userId);
+
+      if (!user) {
+        throw new NotFoundException("This user doesn't exist");
+      }
+
       const buyerId = user.id;
-      if (order.buyerId != buyerId)
+
+      if (order.buyerId != buyerId) {
         throw new UnauthorizedException(
           "You can't adjust an order you didn't create",
         );
+      }
+
+      //TODO: This code isn't working.
       if (updateOrderDto.items) {
         const items = await this.itemModel.find({
           _id: { $in: updateOrderDto.items },
@@ -160,12 +154,13 @@ export class OrderService {
         });
         updateOrderDto.priceTotal = newTotalPrice;
       }
-      const newOrder = await this.orderModel
-        .findByIdAndUpdate(id, updateOrderDto, { new: true })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+
+      const newOrder = await this.orderModel.findByIdAndUpdate(
+        id,
+        updateOrderDto,
+        { new: true },
+      );
+
       return newOrder;
     } catch (error) {
       console.log(error);
@@ -173,13 +168,9 @@ export class OrderService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-
-      const user = await this.userModel.findOne({ email: userEmail });
+      const user = await this.userModel.findById(userId);
 
       if (!user) {
         throw new NotFoundException("This user doesn't exist");

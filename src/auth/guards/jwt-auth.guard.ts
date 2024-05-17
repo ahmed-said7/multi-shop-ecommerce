@@ -13,17 +13,25 @@ export class JwtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
+
     if (!request.headers.authorization) {
       throw new UnauthorizedException('Authorization header is missing');
     }
+
     const token = request.headers.authorization.split(' ')[1];
+
     const isValidToken = await this.validate(token);
+
     if (!isValidToken) {
       throw new UnauthorizedException('Invalid or expired token');
     }
+
     const decodedToken = this.decodeToken(token);
+
     request.body.userId = decodedToken.userId;
+
     request.body.username = decodedToken.username;
+
     return true;
   }
 

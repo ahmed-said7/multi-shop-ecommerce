@@ -4,15 +4,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-
-import { InjectModel } from '@nestjs/mongoose';
+import moment from 'moment';
 import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+
 import { Order, OrderDocument } from 'src/order/schemas/order_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-import moment from 'moment';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ReportsService {
@@ -21,47 +20,39 @@ export class ReportsService {
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly jwtService: JwtService,
   ) {}
 
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
-  }
-  async findOne(request: any, report: string, year?: string, month?: string) {
+  async findOne(userId: string, report: string, year?: string, month?: string) {
     try {
-      const userEmail = this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ).username;
-      const user = await this.userModel
-        .findOne({ email: userEmail })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.role != 'shop_owner')
+      const user = await this.userModel.findById(userId);
+
+      if (user.role != 'shop_owner') {
         throw new UnauthorizedException("You don't have a shop");
+      }
+
       const shopId = user.shop;
-      let result;
+
+      let result: any;
+
       user.password = undefined;
       switch (report) {
         case 'monthlySales':
           const reportYear = parseInt(year);
           const reportMonth = parseInt(month);
-          result = this.generateMonthlySalesReport(
+          result = await this.generateMonthlySalesReport(
             shopId,
             reportYear,
             reportMonth,
           );
           return { result };
         case 'itemSales':
-          result = this.generateItemSalesReport(shopId);
+          result = await this.generateItemSalesReport(shopId);
           return { result };
         case 'itemRatings':
-          result = this.getShopItemRatings(shopId);
+          result = await this.getShopItemRatings(shopId);
           return { result };
         case 'orderMetrics':
-          result = this.getShopOrdersMetrics(shopId);
+          result = await this.getShopOrdersMetrics(shopId);
           return { result };
       }
     } catch (error) {
@@ -79,30 +70,23 @@ export class ReportsService {
     year: number,
     month: number,
   ): Promise<Map<string, number>> {
-    const monthlySales = await this.orderModel
-      .aggregate([
-        {
-          $match: {
-            shopID: shopId,
-            createdAt: {
-              $gte: new Date(year, month - 1, 1),
-              $lt: new Date(year, month, 1),
-            },
+    const monthlySales = await this.orderModel.aggregate([
+      {
+        $match: {
+          shopID: shopId,
+          createdAt: {
+            $gte: new Date(year, month - 1, 1),
+            $lt: new Date(year, month, 1),
           },
         },
-        {
-          $group: {
-            _id: '$items.itemID',
-            totalSales: { $sum: '$items.price' },
-          },
+      },
+      {
+        $group: {
+          _id: '$items.itemID',
+          totalSales: { $sum: '$items.price' },
         },
-      ])
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened when aggregating!',
-        );
-      });
+      },
+    ]);
 
     const result = new Map<string, number>();
 
@@ -114,27 +98,20 @@ export class ReportsService {
   }
 
   async generateItemSalesReport(shopId: string): Promise<Map<string, number>> {
-    const itemSales = await this.orderModel
-      .aggregate([
-        {
-          $match: { shopID: shopId },
+    const itemSales = await this.orderModel.aggregate([
+      {
+        $match: { shopID: shopId },
+      },
+      {
+        $unwind: '$items',
+      },
+      {
+        $group: {
+          _id: '$items.itemID',
+          totalSales: { $sum: '$items.price' },
         },
-        {
-          $unwind: '$items',
-        },
-        {
-          $group: {
-            _id: '$items.itemID',
-            totalSales: { $sum: '$items.price' },
-          },
-        },
-      ])
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while aggregating!',
-        );
-      });
+      },
+    ]);
 
     const result = new Map<string, number>();
 
@@ -146,15 +123,7 @@ export class ReportsService {
   }
 
   async getShopItemRatings(shopId: string): Promise<Map<number, number>> {
-    const shop = await this.shopModel
-      .findById(shopId)
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while finding the shop!',
-        );
-      });
+    const shop = await this.shopModel.findById(shopId).exec();
 
     if (!shop) {
       throw new NotFoundException('Shop not found');
@@ -162,13 +131,7 @@ export class ReportsService {
 
     const items = await this.itemModel
       .find({ _id: { $in: shop.itemsIDs } })
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while finding the items!',
-        );
-      });
+      .exec();
 
     const ratingsMap = new Map<number, number>();
 
@@ -181,53 +144,33 @@ export class ReportsService {
   }
 
   async getShopCustomerCount(shopId: string): Promise<number> {
-    const shop = await this.shopModel
-      .findById(shopId)
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while finding the shop!',
-        );
-      });
+    const shop = await this.shopModel.findById(shopId).exec();
+
     return shop.customers.length;
   }
 
-  async getShopOrdersMetrics(shopId: string) {
-    const shop = await this.shopModel
-      .findById(shopId)
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while finding the shop!',
-        );
-      });
+  async getShopOrdersMetrics(shopId: string): Promise<Map<string, any>> {
+    const shop = await this.shopModel.findById(shopId).exec();
 
     if (!shop) {
       throw new NotFoundException('Shop not found');
     }
 
-    const orders = await this.orderModel
-      .find({ shopID: shopId })
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'Unexpected error happened while finding the orders!',
-        );
-      });
+    const orders = await this.orderModel.find({ shopID: shopId }).exec();
 
     const hoursWithMostOrders = this.calculateMostOrdersByHour(orders);
     const daysWithMostOrders = this.calculateMostOrdersByDay(orders);
     const buyersWithMostOrders = this.calculateMostOrdersByBuyer(orders);
 
-    return {
-      hoursWithMostOrders,
-      daysWithMostOrders,
-      buyersWithMostOrders,
-    };
+    const data = new Map<string, any>();
+
+    data.set('hoursWithMostOrders', hoursWithMostOrders);
+    data.set('daysWithMostOrders', daysWithMostOrders);
+    data.set('buyersWithMostOrders', buyersWithMostOrders);
+
+    return data;
   }
+
   private calculateMostOrdersByHour(orders: OrderDocument[]) {
     const orderCountsByHour = new Map<number, number>();
 
