@@ -10,7 +10,6 @@ import {
   UsePipes,
   Request,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 
 import mongoose from 'mongoose';
@@ -106,16 +105,19 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Patch('/cart/add')
-  addToCart(@Body() itemId: mongoose.Types.ObjectId, @Req() request: Request) {
-    return this.userService.addToCart(itemId, request);
+  addToCart(
+    @Body() itemId: mongoose.Types.ObjectId,
+    @Body('userId') userId: string,
+  ) {
+    return this.userService.addToCart(itemId, userId);
   }
 
   @UseGuards(JwtGuard)
   @Patch('/cart/remove')
   removeFromCart(
     @Body() itemId: mongoose.Types.ObjectId,
-    @Req() request: Request,
+    @Body('userId') userId: string,
   ) {
-    return this.userService.removeItemCart(itemId, request);
+    return this.userService.removeItemCart(itemId, userId);
   }
 }

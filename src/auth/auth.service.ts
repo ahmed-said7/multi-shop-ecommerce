@@ -33,6 +33,7 @@ export class AuthService {
     };
 
     user.password = undefined;
+
     return {
       ...user,
       accessToken: this.jwtService.sign(payload),

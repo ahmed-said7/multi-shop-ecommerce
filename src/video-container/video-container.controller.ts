@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
@@ -21,16 +20,16 @@ export class VideoContainerController {
   @UseGuards(JwtGuard)
   @Post()
   create(
-    @Req() request: Request,
+    @Body('userId') userId: string,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
-    return this.videoContainerService.create(request, createVideoContainerDto);
+    return this.videoContainerService.create(userId, createVideoContainerDto);
   }
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Req() request: Request) {
-    return this.videoContainerService.findAll(request);
+  findAll(@Body('userId') userId: string) {
+    return this.videoContainerService.findAll(userId);
   }
 
   @UseGuards(JwtGuard)

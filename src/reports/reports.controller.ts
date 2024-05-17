@@ -1,29 +1,22 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Body, Param, Delete } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get()
-  findOne(@Req() request: Request, @Body() CreateReportDto: CreateReportDto) {
-    console.log(CreateReportDto);
+  findOne(
+    @Body('userId') userId: string,
+    @Body() createReportDto: CreateReportDto,
+  ) {
+    console.log(createReportDto);
     return this.reportsService.findOne(
-      request,
-      CreateReportDto.report,
-      CreateReportDto.year,
-      CreateReportDto.month,
+      userId,
+      createReportDto.report,
+      createReportDto.year,
+      createReportDto.month,
     );
   }
 

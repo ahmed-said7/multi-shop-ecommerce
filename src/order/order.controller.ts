@@ -8,7 +8,6 @@ import {
   Delete,
   Query,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 
 import { OrderService } from './order.service';
@@ -23,8 +22,11 @@ export class OrderController {
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Req() request: Request, @Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(request, createOrderDto);
+  create(
+    @Body('userId') userId: string,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.orderService.create(userId, createOrderDto);
   }
 
   @Get()
@@ -44,16 +46,16 @@ export class OrderController {
   @UseGuards(JwtGuard)
   @Patch(':id')
   update(
-    @Req() request: Request,
+    @Body('userId') userId: string,
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
-    return this.orderService.update(request, id, updateOrderDto);
+    return this.orderService.update(userId, id, updateOrderDto);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(id);
+  remove(@Param('id') id: string, @Body('userId') userId: string) {
+    return this.orderService.remove(id, userId);
   }
 }

@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Query,
-  HttpStatus,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
 import { ThemesService } from './themes.service';
-import { Theme, ThemeDocument } from './schemas/theme.schema';
+import { ThemeDocument } from './schemas/theme.schema';
 import { CreateThemeDto } from './dto/create-themes.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -19,13 +10,13 @@ export class ThemesController {
   @UseGuards(JwtGuard)
   @Post()
   async createTheme(
-    @Req() request: Request,
+    @Body('userId') userId: string,
     @Body() themeData: CreateThemeDto,
   ): Promise<ThemeDocument> {
     return await this.themesService.createTheme(
       themeData.title,
       themeData.description,
-      request,
+      userId,
     );
   }
 

@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
@@ -21,16 +20,16 @@ export class PhotoSliderController {
   @UseGuards(JwtGuard)
   @Post()
   create(
-    @Req() request: Request,
+    @Body('userId') userId: string,
     @Body() createPhotoSliderDto: CreatePhotoSliderDto,
   ) {
-    return this.photoSliderService.create(request, createPhotoSliderDto);
+    return this.photoSliderService.create(userId, createPhotoSliderDto);
   }
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Req() request: Request) {
-    return this.photoSliderService.findAll(request);
+  findAll(@Body('userId') userId: string) {
+    return this.photoSliderService.findAll(userId);
   }
 
   @Get(':id')

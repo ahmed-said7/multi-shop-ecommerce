@@ -8,7 +8,6 @@ import {
   Delete,
   Query,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 
 import { ItemService } from './item.service';
@@ -61,14 +60,14 @@ export class ItemController {
   update(
     @Param('id') id: string,
     @Body() updateItemDto: UpdateItemDto,
-    @Req() request: Request,
+    @Body('userId') userId: string,
   ) {
-    return this.itemService.update(id, updateItemDto, request);
+    return this.itemService.update(id, updateItemDto, userId);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() request: Request) {
-    return this.itemService.remove(id, request);
+  remove(@Param('id') id: string, @Body('userId') userId: string) {
+    return this.itemService.remove(id, userId);
   }
 }

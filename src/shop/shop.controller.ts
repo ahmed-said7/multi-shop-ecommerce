@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 
 import { ShopService } from './shop.service';
@@ -22,8 +21,8 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Req() request: Request, @Body() createShopDto: CreateShopDto) {
-    return this.shopService.create(createShopDto, request);
+  create(@Body('userId') userId: string, @Body() createShopDto: CreateShopDto) {
+    return this.shopService.create(createShopDto, userId);
   }
 
   @UseGuards(JwtGuard)
@@ -34,8 +33,8 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Get('items')
-  findShopItems(@Req() request: Request, @Param('id') id?: string) {
-    return this.shopService.findShopItems(request, id);
+  findShopItems(@Body('userId') userId: string, @Param('id') id?: string) {
+    return this.shopService.findShopItems(userId, id);
   }
 
   // @UseGuards(JwtGuard)
@@ -46,8 +45,11 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Patch('join/:id')
-  userJoin(@Param('id') id: mongoose.Types.ObjectId, @Req() request: Request) {
-    return this.shopService.userJoin(id, request);
+  userJoin(
+    @Param('id') id: mongoose.Types.ObjectId,
+    @Body('userId') userId: string,
+  ) {
+    return this.shopService.userJoin(id, userId);
   }
 
   @UseGuards(JwtGuard)
@@ -64,8 +66,8 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Delete('/:shopId')
-  remove(@Req() request: Request, @Param('shopId') shopId: string) {
-    return this.shopService.remove(request, shopId);
+  remove(@Body('userId') userId: string, @Param('shopId') shopId: string) {
+    return this.shopService.remove(userId, shopId);
   }
 
   @UseGuards(JwtGuard)
