@@ -4,9 +4,8 @@ import { IsString } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 
 export class UpdateAdminRequestDto extends PartialType(CreateAdminRequestDto) {
-    @Prop()
-    adminId?: string;
-    @IsString()
-    status?: string;
+  @Prop()
+  adminId?: string;
+  @IsString()
+  status?: string;
 }
-

@@ -32,7 +32,10 @@ import {
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { ReviewContainerModule } from 'src/review-container/review-container.module';
 import { Card, CardSchema } from 'src/card/schemas/card_schema';
-import { VideoContainer, VideoContainerSchema } from 'src/video-container/schemas/videoContainer-schema';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from 'src/video-container/schemas/videoContainer-schema';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -66,4 +69,4 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [ShopController],
   providers: [ShopService],
 })
-export class ShopModule { }
+export class ShopModule {}

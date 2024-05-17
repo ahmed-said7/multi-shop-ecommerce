@@ -8,10 +8,10 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [ReviewController],
   providers: [ReviewService],
   exports: [ReviewService],
 })
-export class ReviewModule { }
+export class ReviewModule {}

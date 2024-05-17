@@ -189,7 +189,7 @@ export class OrderService {
         throw new UnauthorizedException("You can't delete this order");
       }
 
-      const order = await this.orderModel.findByIdAndRemove(id);
+      const order = await this.orderModel.findByIdAndDelete(id);
 
       return order;
     } catch (error) {

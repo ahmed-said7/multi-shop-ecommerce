@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { Model, Types } from 'mongoose';
@@ -9,20 +13,23 @@ import { Coupon } from './schemas/coupon.schema';
 export class CouponService {
   constructor(
     @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
-  ) { }
+  ) {}
 
   async create(createCouponDto: CreateCouponDto) {
     try {
-      const coupon = await new this.couponModel(createCouponDto).save().catch(err => {
-        if (err.code == 11000) {
-          console.log(err);
-          throw new InternalServerErrorException('This coupon already exists');
-        } else {
-
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        }
-      });
+      const coupon = await new this.couponModel(createCouponDto)
+        .save()
+        .catch((err) => {
+          if (err.code == 11000) {
+            console.log(err);
+            throw new InternalServerErrorException(
+              'This coupon already exists',
+            );
+          } else {
+            console.log(err);
+            throw new InternalServerErrorException(err);
+          }
+        });
 
       return coupon;
     } catch (error) {
@@ -30,14 +37,15 @@ export class CouponService {
     }
   }
 
-  async findAll(shop: Types.ObjectId, page: number = 0,) {
+  async findAll(shop: Types.ObjectId, page: number = 0) {
     try {
       const coupons = await this.couponModel
         .find({
           shop,
         })
         .limit(10)
-        .skip(10 * page).catch(err => {
+        .skip(10 * page)
+        .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
@@ -89,7 +97,8 @@ export class CouponService {
           subscriptCustomers: customer,
         },
       });
-      if (!updatedCoupon) throw new NotFoundException("This coupon doesn't exist!")
+      if (!updatedCoupon)
+        throw new NotFoundException("This coupon doesn't exist!");
       return updatedCoupon;
     } catch (error) {
       throw new InternalServerErrorException(error, "Can't Add Customer");
@@ -103,7 +112,8 @@ export class CouponService {
           items: item,
         },
       });
-      if (!updatedCoupon) throw new NotFoundException("This coupon doesn't exist!")
+      if (!updatedCoupon)
+        throw new NotFoundException("This coupon doesn't exist!");
       return updatedCoupon;
     } catch (error) {
       throw new InternalServerErrorException(error, "Can't Add Item");
@@ -115,7 +125,8 @@ export class CouponService {
       const updatedCoupon = await this.couponModel.findByIdAndUpdate(id, {
         discountPercentage: discount,
       });
-      if (!updatedCoupon) throw new NotFoundException("This coupon doesn't exist!")
+      if (!updatedCoupon)
+        throw new NotFoundException("This coupon doesn't exist!");
       return updatedCoupon;
     } catch (error) {
       throw new InternalServerErrorException(error, "Can't Add Item");

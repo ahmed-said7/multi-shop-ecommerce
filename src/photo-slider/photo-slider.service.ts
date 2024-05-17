@@ -1,10 +1,22 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import mongoose, { Model } from 'mongoose';
 import { Shop } from 'src/shop/schemas/shop_schema';
-import { PhotoSlider, PhotoSliderDocument } from './schemas/photo-slider_schema';
-import { PhotoSlide, PhotoSlideDocument } from 'src/photo-slide/schemas/photoSlide_schema';
+import {
+  PhotoSlider,
+  PhotoSliderDocument,
+} from './schemas/photo-slider_schema';
+import {
+  PhotoSlide,
+  PhotoSlideDocument,
+} from 'src/photo-slide/schemas/photoSlide_schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { JwtService } from '@nestjs/jwt';
@@ -21,7 +33,7 @@ export class PhotoSliderService {
     private readonly jwtService: JwtService,
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
-  ) { }
+  ) {}
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
@@ -40,12 +52,17 @@ export class PhotoSliderService {
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
       createPhotoSliderDto.shop = user.shop;
-      const photoSlider = await this.photoSliderModel.create(createPhotoSliderDto).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const photoSlider = await this.photoSliderModel
+        .create(createPhotoSliderDto)
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
       const shop = await this.shopModel.findById(photoSlider.shop);
-      shop.containers.push({ containerID: photoSlider.id, containerType: 'photo slider' });
+      shop.containers.push({
+        containerID: photoSlider.id,
+        containerType: 'photo slider',
+      });
       await shop.save();
       return photoSlider;
     } catch (err) {
@@ -67,35 +84,41 @@ export class PhotoSliderService {
         });
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
-      return await this.photoSliderModel.find({ shop: user.shop }).catch(err => {
-        console.log(err)
-        throw new InternalServerErrorException(err)
-      });
+      return await this.photoSliderModel
+        .find({ shop: user.shop })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
   async findOne(id: number) {
     try {
-      return await this.photoSliderModel.findById(id).catch(err => {
-        console.log(err)
-        throw new InternalServerErrorException(err)
+      return await this.photoSliderModel.findById(id).catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
       });
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
   async addPhotoSlide(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
     try {
-      const updatedSlider = await this.photoSliderModel.findByIdAndUpdate(
-        id,
-        { $push: { photoSlides: { $each: updatePhotoSliderDto.photoSlides } } },
-        { new: true }
-      ).exec();
+      const updatedSlider = await this.photoSliderModel
+        .findByIdAndUpdate(
+          id,
+          {
+            $push: { photoSlides: { $each: updatePhotoSliderDto.photoSlides } },
+          },
+          { new: true },
+        )
+        .exec();
 
       if (!updatedSlider) {
         throw new NotFoundException('Photo slider not found');
@@ -108,14 +131,18 @@ export class PhotoSliderService {
     }
   }
 
-
-  async removePhotoSlide(id: number, updatePhotoSliderDto: UpdatePhotoSliderDto) {
+  async removePhotoSlide(
+    id: number,
+    updatePhotoSliderDto: UpdatePhotoSliderDto,
+  ) {
     try {
-      const updatedSlider = await this.photoSliderModel.findByIdAndUpdate(
-        id,
-        { $pullAll: { photoSlides: updatePhotoSliderDto.photoSlides } },
-        { new: true }
-      ).exec();
+      const updatedSlider = await this.photoSliderModel
+        .findByIdAndUpdate(
+          id,
+          { $pullAll: { photoSlides: updatePhotoSliderDto.photoSlides } },
+          { new: true },
+        )
+        .exec();
 
       if (!updatedSlider) {
         throw new NotFoundException('Photo slider not found');
@@ -127,33 +154,38 @@ export class PhotoSliderService {
       throw new InternalServerErrorException(error.message);
     }
   }
-
 
   async update(id: string, updatePhotoSliderDto: UpdatePhotoSliderDto) {
     try {
-      return await this.photoSliderModel.findByIdAndUpdate(id, updatePhotoSliderDto, { new: true }).catch(err => {
-        console.log(err)
-        throw new InternalServerErrorException(err)
-      });
+      return await this.photoSliderModel
+        .findByIdAndUpdate(id, updatePhotoSliderDto, { new: true })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      console.log(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
   async remove(id: string) {
-    const photoSlider = await this.photoSliderModel.findById(id).catch(err => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
-    if (!photoSlider) throw new InternalServerErrorException("this slider doesn't exist")
+    const photoSlider = await this.photoSliderModel
+      .findById(id)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+    if (!photoSlider)
+      throw new InternalServerErrorException("this slider doesn't exist");
 
-    const shop = await this.shopModel.findById(photoSlider.shop).catch(err => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-
-    })
-    if (!shop) throw new NotFoundException("this shop doesn't exist")
+    const shop = await this.shopModel
+      .findById(photoSlider.shop)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+    if (!shop) throw new NotFoundException("this shop doesn't exist");
     for (let i = 0; i < shop.containers.length; i++) {
       if (shop.containers[i].containerID === id) {
         shop.containers.splice(i, 1);
@@ -161,10 +193,10 @@ export class PhotoSliderService {
       }
     }
     await shop.save();
-    await this.photoSliderModel.findByIdAndDelete(id).catch(err => {
+    await this.photoSliderModel.findByIdAndDelete(id).catch((err) => {
       console.log(err);
       throw new InternalServerErrorException(err);
-    })
+    });
     return 'Photo slider deleted successfully';
   }
 }

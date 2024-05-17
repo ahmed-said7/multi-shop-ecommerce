@@ -1,11 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
 
 @Controller('product-slider')
 export class ProductSliderController {
-  constructor(private readonly productSliderService: ProductSliderService) { }
+  constructor(private readonly productSliderService: ProductSliderService) {}
 
   @Post()
   create(@Body() createProductSliderDto: CreateProductSliderDto) {
@@ -23,7 +31,10 @@ export class ProductSliderController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductSliderDto: UpdateProductSliderDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProductSliderDto: UpdateProductSliderDto,
+  ) {
     return this.productSliderService.update(id, updateProductSliderDto);
   }
 

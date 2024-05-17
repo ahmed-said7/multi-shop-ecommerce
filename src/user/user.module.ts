@@ -69,4 +69,4 @@ import { Order, OrderSchema } from 'src/order/schemas/order_schema';
     ShopService,
   ],
 })
-export class UserModule { }
+export class UserModule {}

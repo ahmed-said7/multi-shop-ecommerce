@@ -14,7 +14,6 @@ import { AuthModule } from 'src/auth/auth.module';
       { name: Item.name, schema: ItemSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
-
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,
@@ -24,6 +23,6 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
   controllers: [ItemController],
   providers: [ItemService],
-  exports:[ItemService]
+  exports: [ItemService],
 })
-export class ItemModule { }
+export class ItemModule {}

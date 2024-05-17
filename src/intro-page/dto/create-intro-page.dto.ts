@@ -1,15 +1,15 @@
-import { IsNotEmpty, IsArray, IsString } from "class-validator";
-import { Types } from "mongoose";
+import { IsNotEmpty, IsArray, IsString } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateIntroPageDto {
-    @IsNotEmpty({ message: 'Intro page must have a title' })
-    @IsString({ message: "title must be a string" })
-    title: string;
+  @IsNotEmpty({ message: 'Intro page must have a title' })
+  @IsString({ message: 'title must be a string' })
+  title: string;
 
-    @IsNotEmpty({ message: 'Intro page must have a paragraph' })
-    @IsString({ message: "title must be a string" })
-    paragraph: string;
+  @IsNotEmpty({ message: 'Intro page must have a paragraph' })
+  @IsString({ message: 'title must be a string' })
+  paragraph: string;
 
-    @IsString({ message: "shopId must be a string" })
-    shop: string;
+  @IsString({ message: 'shopId must be a string' })
+  shop: string;
 }

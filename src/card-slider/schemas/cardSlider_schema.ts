@@ -6,14 +6,13 @@ export type CardSliderDocument = CardSlider & Document;
 
 // Define the shop schema
 @Schema({
-    timestamps: true, // Add timestamps for createdAt and updatedAt
+  timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class CardSlider {
-    @Prop({ type: [Types.ObjectId], ref: 'Card' })
-    cards: string[];
-    @Prop({ type: Types.ObjectId, ref: 'Shop' })
-    shop: Types.ObjectId;
-
+  @Prop({ type: [Types.ObjectId], ref: 'Card' })
+  cards: string[];
+  @Prop({ type: Types.ObjectId, ref: 'Shop' })
+  shop: Types.ObjectId;
 }
 
 // Create the Mongoose schema for the Movie class

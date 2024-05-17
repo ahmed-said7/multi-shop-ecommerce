@@ -15,4 +15,4 @@ import { IntroPage, IntroPageSchema } from './schemas/intro_page_schema';
   controllers: [IntroPageController],
   providers: [IntroPageService],
 })
-export class IntroPageModule { }
+export class IntroPageModule {}

@@ -53,16 +53,16 @@ export class ReportsService {
             reportYear,
             reportMonth,
           );
-          return {result};
+          return { result };
         case 'itemSales':
           result = this.generateItemSalesReport(shopId);
-          return {result};
+          return { result };
         case 'itemRatings':
           result = this.getShopItemRatings(shopId);
-          return {result};
+          return { result };
         case 'orderMetrics':
           result = this.getShopOrdersMetrics(shopId);
-          return {result};
+          return { result };
       }
     } catch (error) {
       console.log(error);

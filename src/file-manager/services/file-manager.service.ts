@@ -59,7 +59,11 @@ export class FileManagerService {
     if (isSlider.toString() === 'true') {
       const updateItemDto: UpdateItemDto = UpdateItemDto;
       updateItemDto.images = [uploadResponse];
-      const item=await this.itemService.update(itemID, updateItemDto, request);
+      const item = await this.itemService.update(
+        itemID,
+        updateItemDto,
+        request,
+      );
     } else {
       await this.photoSlideService.updatePhoto(itemID, uploadResponse);
     }

@@ -4,14 +4,13 @@ import { IsNotEmpty } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class UpdateReviewDto extends PartialType(CreateReviewDto) {
+  rating: number;
 
-    rating: number;
+  description: string;
 
-    description: string;
+  shop: Types.ObjectId;
 
-    shop: Types.ObjectId;
-
-    user: Types.ObjectId;
-    item: string;
-    title: string;
+  user: Types.ObjectId;
+  item: string;
+  title: string;
 }

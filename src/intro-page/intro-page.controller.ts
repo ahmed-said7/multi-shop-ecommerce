@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 
 @Controller('intro-page')
 export class IntroPageController {
-  constructor(private readonly introPageService: IntroPageService) { }
+  constructor(private readonly introPageService: IntroPageService) {}
 
   @Post()
   create(@Body() createIntroPageDto: CreateIntroPageDto) {
@@ -13,7 +22,7 @@ export class IntroPageController {
   }
 
   @Get()
-  findAll(@Query("shop") shop?: string) {
+  findAll(@Query('shop') shop?: string) {
     return this.introPageService.findAll(shop);
   }
 
@@ -23,7 +32,10 @@ export class IntroPageController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIntroPageDto: UpdateIntroPageDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateIntroPageDto: UpdateIntroPageDto,
+  ) {
     return this.introPageService.update(id, updateIntroPageDto);
   }
 

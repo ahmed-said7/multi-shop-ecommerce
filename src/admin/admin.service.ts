@@ -27,7 +27,7 @@ export class AdminService {
   }
   async findOne(id: string) {
     try {
-      var checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+      const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
       const idValid = checkForHexRegExp.test(id);
       if (!idValid) throw new BadRequestException('Please enter correct Id');
       const foundUser = await this.userModel.findById(id).catch((err) => {

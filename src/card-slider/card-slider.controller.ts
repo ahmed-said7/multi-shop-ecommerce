@@ -1,11 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CardSliderService } from './card-slider.service';
 import { CreateCardSliderDto } from './dto/create-card-slider.dto';
 import { UpdateCardSliderDto } from './dto/update-card-slider.dto';
 
 @Controller('card-slider')
 export class CardSliderController {
-  constructor(private readonly cardSliderService: CardSliderService) { }
+  constructor(private readonly cardSliderService: CardSliderService) {}
 
   @Post()
   create(@Body() createCardSliderDto: CreateCardSliderDto) {
@@ -23,7 +31,10 @@ export class CardSliderController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCardSliderDto: UpdateCardSliderDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCardSliderDto: UpdateCardSliderDto,
+  ) {
     return this.cardSliderService.update(id, updateCardSliderDto);
   }
 

@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { PhotoSliderController } from './photo-slider.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PhotoSlide, PhotoSlideSchema } from 'src/photo-slide/schemas/photoSlide_schema';
+import {
+  PhotoSlide,
+  PhotoSlideSchema,
+} from 'src/photo-slide/schemas/photoSlide_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { PhotoSlider, PhotoSliderSchema } from './schemas/photo-slider_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
@@ -19,4 +22,4 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
   controllers: [PhotoSliderController],
   providers: [PhotoSliderService],
 })
-export class PhotoSliderModule { }
+export class PhotoSliderModule {}

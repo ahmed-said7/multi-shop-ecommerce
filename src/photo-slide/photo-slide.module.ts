@@ -23,4 +23,4 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
   providers: [PhotoSlideService],
   exports: [PhotoSlideService],
 })
-export class PhotoSlideModule { }
+export class PhotoSlideModule {}

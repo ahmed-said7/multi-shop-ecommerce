@@ -66,20 +66,19 @@ export class UpdateUserDto {
   @ArrayUnique({ message: 'Duplicate ready options are not allowed' })
   ready?: ReadyOption[];
 
-  wallet?: number
+  wallet?: number;
 
   @Prop({ type: [Types.ObjectId], ref: 'Order' })
-  orders?: string[]
+  orders?: string[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  cart?: Types.ObjectId[]
+  cart?: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  wishList?: string[]
+  wishList?: string[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Shop' })
-  shopsJoined?: Types.ObjectId[]
-
+  shopsJoined?: Types.ObjectId[];
 
   @Prop()
   twitter?: string;

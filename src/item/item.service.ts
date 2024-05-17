@@ -154,7 +154,7 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, request: any) {
     try {
-      let item = await this.itemModel.findById(id);
+      const item = await this.itemModel.findById(id);
 
       if (!item) {
         throw new NotFoundException('Item not found');

@@ -29,10 +29,10 @@ export class UserController {
     private readonly userService: UserService,
     private authService: AuthService,
     private readonly emailService: EmailService,
-  ) { }
+  ) {}
 
   @Post('register')
- // @UsePipes(new ValidationPipe({ transform: true }))
+  // @UsePipes(new ValidationPipe({ transform: true }))
   async register(@Body() createUserDto: CreateUserDto) {
     await this.emailService.emailOTPCode(
       createUserDto.email,
@@ -110,7 +110,10 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Patch('/cart/remove')
-  removeFromCart(@Body() itemId: mongoose.Types.ObjectId, @Req() request: Request) {
+  removeFromCart(
+    @Body() itemId: mongoose.Types.ObjectId,
+    @Req() request: Request,
+  ) {
     return this.userService.removeItemCart(itemId, request);
   }
 }

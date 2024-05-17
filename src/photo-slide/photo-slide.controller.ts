@@ -17,7 +17,7 @@ import mongoose from 'mongoose';
 
 @Controller('photo-slide')
 export class PhotoSlideController {
-  constructor(private readonly photoSlideService: PhotoSlideService) { }
+  constructor(private readonly photoSlideService: PhotoSlideService) {}
 
   @Post()
   create(@Body() createPhotoSlideDto: CreatePhotoSlideDto) {
@@ -41,7 +41,10 @@ export class PhotoSlideController {
   }
 
   @Patch(':id')
-  update(@Param() id: mongoose.Types.ObjectId, @Body() updatePhotoSlideDto: UpdatePhotoSlideDto) {
+  update(
+    @Param() id: mongoose.Types.ObjectId,
+    @Body() updatePhotoSlideDto: UpdatePhotoSlideDto,
+  ) {
     return this.photoSlideService.update(id, updatePhotoSlideDto);
   }
 

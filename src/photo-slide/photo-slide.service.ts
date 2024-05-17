@@ -18,12 +18,11 @@ export class PhotoSlideService {
   constructor(
     @InjectModel(PhotoSlide.name)
     private photoSlideModel: Model<PhotoSlideDocument>,
-  ) { }
+  ) {}
 
   async create(createPhotoSlideDto: CreatePhotoSlideDto) {
-
     const photoSlide = new this.photoSlideModel(createPhotoSlideDto);
-    return await photoSlide.save().catch(err => {
+    return await photoSlide.save().catch((err) => {
       console.log(err);
       throw new InternalServerErrorException(err);
     });
@@ -68,11 +67,12 @@ export class PhotoSlideService {
 
   async findAll(photoSlider: mongoose.Types.ObjectId) {
     try {
-
-      return await this.photoSlideModel.find({ photoSlider: photoSlider }).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      return await this.photoSlideModel
+        .find({ photoSlider: photoSlider })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
@@ -98,22 +98,33 @@ export class PhotoSlideService {
     }
   }
 
-  async update(id: mongoose.Types.ObjectId, updatePhotoSlideDto: UpdatePhotoSlideDto) {
+  async update(
+    id: mongoose.Types.ObjectId,
+    updatePhotoSlideDto: UpdatePhotoSlideDto,
+  ) {
     try {
-      const photoSlide = await this.photoSlideModel.findByIdAndUpdate(id, updatePhotoSlideDto, {
-        new: true,
-      });
+      const photoSlide = await this.photoSlideModel.findByIdAndUpdate(
+        id,
+        updatePhotoSlideDto,
+        {
+          new: true,
+        },
+      );
 
       return photoSlide;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
-  async updatePhoto(id:string, photo: string) {
+  async updatePhoto(id: string, photo: string) {
     try {
-      const photoSlide = await this.photoSlideModel.findByIdAndUpdate(id, {photo}, {
-        new: true,
-      });
+      const photoSlide = await this.photoSlideModel.findByIdAndUpdate(
+        id,
+        { photo },
+        {
+          new: true,
+        },
+      );
 
       return photoSlide;
     } catch (error) {
@@ -143,7 +154,6 @@ export class PhotoSlideService {
       const photoSlide = await this.photoSlideModel.findById(id);
       const photoSlider = await this.photoSlideModel.findById(photoSlide.id);
       if (!photoSlider) throw new NotFoundException('This slider doesnt exist');
-
 
       return photoSlide;
     } catch (error) {

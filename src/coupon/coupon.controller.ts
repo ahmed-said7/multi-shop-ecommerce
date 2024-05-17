@@ -17,7 +17,7 @@ import { Types } from 'mongoose';
 
 @Controller('coupon')
 export class CouponController {
-  constructor(private readonly couponService: CouponService) { }
+  constructor(private readonly couponService: CouponService) {}
 
   @Post()
   create(@Body() createCouponDto: CreateCouponDto) {
@@ -25,12 +25,15 @@ export class CouponController {
   }
 
   @Get(':id')
-  findAll(@Param("id") id: Types.ObjectId, @Query('page') page?: number) {
+  findAll(@Param('id') id: Types.ObjectId, @Query('page') page?: number) {
     return this.couponService.findAll(id, page);
   }
 
   @Patch('/discount/:id')
-  changeDiscount(@Param() id: string, @Body() updateCouponDto: UpdateCouponDto) {
+  changeDiscount(
+    @Param() id: string,
+    @Body() updateCouponDto: UpdateCouponDto,
+  ) {
     return this.couponService.changeDiscount(
       id,
       updateCouponDto.discountPercentage,

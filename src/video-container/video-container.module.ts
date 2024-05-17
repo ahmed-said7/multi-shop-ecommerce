@@ -3,7 +3,10 @@ import { VideoContainerService } from './video-container.service';
 import { VideoContainerController } from './video-container.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
-import { VideoContainer, VideoContainerSchema } from './schemas/videoContainer-schema';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from './schemas/videoContainer-schema';
 import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 
@@ -22,4 +25,4 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
   controllers: [VideoContainerController],
   providers: [VideoContainerService],
 })
-export class VideoContainerModule { }
+export class VideoContainerModule {}

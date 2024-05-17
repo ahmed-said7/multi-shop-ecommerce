@@ -18,7 +18,7 @@ export class FileManagerController {
   constructor(private fileManagerService: FileManagerService) {}
 
   @UseGuards(JwtGuard)
-  @Post('upload-photo/:id/:isSlider') 
+  @Post('upload-photo/:id/:isSlider')
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhoto(
     @UploadedFile() file: Express.Multer.File,
@@ -26,10 +26,12 @@ export class FileManagerController {
     @Param('isSlider') isSlider: boolean,
     @Req() request: any,
   ): Promise<UploadFileResponseDto> {
-    if (!file || !id || isSlider === undefined) { 
-      throw new BadRequestException('Missing required parameters: file, id, isSlider');
+    if (!file || !id || isSlider === undefined) {
+      throw new BadRequestException(
+        'Missing required parameters: file, id, isSlider',
+      );
     }
-   
+
     const fileLink = await this.fileManagerService.uploadFile(
       file,
       id,

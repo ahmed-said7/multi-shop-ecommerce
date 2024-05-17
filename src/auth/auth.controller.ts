@@ -28,7 +28,7 @@ export class AuthController {
     return await this.authService.login(user);
   }
 
- // @UsePipes(new ValidationPipe({ transform: true }))
+  // @UsePipes(new ValidationPipe({ transform: true }))
   @Post('register')
   async register(@Body() creatUserDto: CreateUserDto) {
     return await this.userService.register(creatUserDto);

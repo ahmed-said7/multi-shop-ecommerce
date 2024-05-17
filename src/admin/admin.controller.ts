@@ -1,14 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Redirect, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Redirect,
+  Logger,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) { }
+  constructor(private readonly adminService: AdminService) {}
 
   @Get()
   @Redirect('/user')
-  findAll() { }
+  findAll() {}
 
   @Get(':id')
   findOne(@Param('id') id: string) {

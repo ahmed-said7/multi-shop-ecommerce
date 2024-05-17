@@ -13,7 +13,7 @@ export class Coupon {
     required: true,
     default: DateTime.now().plus({ days: 10 }).toJSDate(),
   })
-  endDate: String;
+  endDate: string;
 
   @Prop({
     required: true,

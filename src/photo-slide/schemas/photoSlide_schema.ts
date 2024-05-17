@@ -3,7 +3,6 @@ import mongoose, { Document, Types } from 'mongoose';
 
 export type PhotoSlideDocument = PhotoSlide & Document;
 
-
 @Schema({
   timestamps: true,
 })

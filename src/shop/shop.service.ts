@@ -65,7 +65,7 @@ export class ShopService {
     @InjectModel(VideoContainer.name)
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
   private decodeToken(token: string) {
     return this.jwtService.decode<{ sub: string; email: string }>(token);
   }
@@ -107,8 +107,7 @@ export class ShopService {
 
   async findAll(page: number = 0) {
     try {
-      const shops = await this.shopModel
-        .find()
+      const shops = await this.shopModel.find();
       // .limit(10)
       // .skip(page * 10);
 
@@ -269,9 +268,9 @@ export class ShopService {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-      console.log(this.decodeToken(
-        request.headers.authorization.split(' ')[1],
-      ));
+      console.log(
+        this.decodeToken(request.headers.authorization.split(' ')[1]),
+      );
       if (!user) throw new NotFoundException('There is no user with this id');
       const shop = await this.shopModel.findById(shopId).catch((err) => {
         console.log(err);
@@ -284,7 +283,10 @@ export class ShopService {
       }
       console.log(user);
 
-      if (shop.userID != user.id && user.role !== UserRole.ADMIN) throw new UnauthorizedException('You dont have the permission to delete this shop');
+      if (shop.userID != user.id && user.role !== UserRole.ADMIN)
+        throw new UnauthorizedException(
+          'You dont have the permission to delete this shop',
+        );
 
       await this.itemModel.deleteMany({ _id: { $in: shop.itemsIDs } });
 

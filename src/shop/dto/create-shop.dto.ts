@@ -27,9 +27,7 @@ export class CreateShopDto {
 
   categories: string[];
 
-
   customers: string[];
-
 
   containers: Object[];
 }

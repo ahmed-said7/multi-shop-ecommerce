@@ -1,9 +1,7 @@
-
-
 export class UploadFileResponseDto {
-    url: string;
+  url: string;
 
-    constructor(partial: Partial<UploadFileResponseDto>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<UploadFileResponseDto>) {
+    Object.assign(this, partial);
+  }
 }

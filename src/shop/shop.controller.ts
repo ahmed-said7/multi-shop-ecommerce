@@ -18,7 +18,7 @@ import mongoose from 'mongoose';
 
 @Controller('shop')
 export class ShopController {
-  constructor(private readonly shopService: ShopService) { }
+  constructor(private readonly shopService: ShopService) {}
 
   @UseGuards(JwtGuard)
   @Post()
@@ -63,8 +63,8 @@ export class ShopController {
   }
 
   @UseGuards(JwtGuard)
-  @Delete("/:shopId")
-  remove(@Req() request: Request, @Param("shopId") shopId: string) {
+  @Delete('/:shopId')
+  remove(@Req() request: Request, @Param('shopId') shopId: string) {
     return this.shopService.remove(request, shopId);
   }
 

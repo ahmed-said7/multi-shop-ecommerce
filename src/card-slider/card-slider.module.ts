@@ -18,4 +18,4 @@ import { Card, CardSchema } from 'src/card/schemas/card_schema';
   providers: [CardSliderService],
   exports: [CardSliderService],
 })
-export class CardSliderModule { }
+export class CardSliderModule {}

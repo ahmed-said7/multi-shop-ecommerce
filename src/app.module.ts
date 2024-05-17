@@ -65,4 +65,4 @@ import { FileManagerModule } from './file-manager/file-manager.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

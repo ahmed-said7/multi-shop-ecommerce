@@ -8,7 +8,6 @@ import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { JwtModule } from '@nestjs/jwt';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -28,4 +27,4 @@ import { Item, ItemSchema } from 'src/item/schemas/item-schema';
   controllers: [OrderController],
   providers: [OrderService],
 })
-export class OrderModule { }
+export class OrderModule {}

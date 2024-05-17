@@ -5,19 +5,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Card, CardDocument } from './schemas/card_schema';
-import { CardSlider, CardSliderDocument } from 'src/card-slider/schemas/cardSlider_schema';
+import {
+  CardSlider,
+  CardSliderDocument,
+} from 'src/card-slider/schemas/cardSlider_schema';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectModel(Card.name) private cardModel: Model<CardDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    @InjectModel(CardSlider.name) private cardSliderModel: Model<CardSliderDocument>,
-  ) { }
+    @InjectModel(CardSlider.name)
+    private cardSliderModel: Model<CardSliderDocument>,
+  ) {}
   async create(createCardDto: CreateCardDto) {
     try {
       const card = await this.cardModel.create(createCardDto);
-      const cardSlider = await this.cardSliderModel.findById(createCardDto.cardSlider);
+      const cardSlider = await this.cardSliderModel.findById(
+        createCardDto.cardSlider,
+      );
       cardSlider.cards.push(card.id);
       await cardSlider.save();
       return card;
@@ -27,13 +33,14 @@ export class CardService {
     }
   }
 
-
   async findAll(id: string) {
     try {
-      const cards = await this.cardModel.find({ cardSlider: id }).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      })
+      const cards = await this.cardModel
+        .find({ cardSlider: id })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
       return cards;
     } catch (error) {
       console.log(error);
@@ -43,11 +50,9 @@ export class CardService {
 
   async findOne(id: string) {
     try {
-      const card = await this.cardModel.findById(id).catch(err => {
+      const card = await this.cardModel.findById(id).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
-
-
       });
       return card;
     } catch (error) {
@@ -58,12 +63,14 @@ export class CardService {
 
   async update(id: string, updateCardDto: UpdateCardDto) {
     try {
-      const card = await this.cardSliderModel.findByIdAndUpdate(id, updateCardDto, {
-        new: true,
-      }).catch(err => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const card = await this.cardSliderModel
+        .findByIdAndUpdate(id, updateCardDto, {
+          new: true,
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
 
       return card;
     } catch (error) {
@@ -72,17 +79,19 @@ export class CardService {
   }
 
   async remove(id: string) {
-    const card = await this.cardModel.findById(id).catch(err => {
+    const card = await this.cardModel.findById(id).catch((err) => {
       console.log(err);
       throw new InternalServerErrorException(err);
     });
-    if (!card) throw new InternalServerErrorException("this slider doesn't exist")
+    if (!card)
+      throw new InternalServerErrorException("this slider doesn't exist");
 
-    const cardSlider = await this.cardSliderModel.findById(card.cardSlider).catch(err => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-
-    })
+    const cardSlider = await this.cardSliderModel
+      .findById(card.cardSlider)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
     for (let i = 0; i < cardSlider.cards.length; i++) {
       if (cardSlider.cards[i] === id) {
         cardSlider.cards.splice(i, 1);
@@ -90,10 +99,10 @@ export class CardService {
       }
     }
     await cardSlider.save();
-    await this.cardModel.findByIdAndDelete(id).catch(err => {
+    await this.cardModel.findByIdAndDelete(id).catch((err) => {
       console.log(err);
       throw new InternalServerErrorException(err);
-    })
-    return "card deleted successfully";
+    });
+    return 'card deleted successfully';
   }
 }
