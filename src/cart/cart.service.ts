@@ -29,9 +29,21 @@ export class CartService {
   }
 
   async update(id: string, updateCartDto: UpdateCartItemDto) {
-    return await this.cartItemModel.findByIdAndUpdate(id, updateCartDto, {
-      new: true,
-    });
+    const { colors, sizes, ...data } = updateCartDto;
+
+    return await this.cartItemModel.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        $addToSet: {
+          colors,
+          sizes,
+        },
+      },
+      {
+        new: true,
+      },
+    );
   }
 
   async remove(id: string) {
