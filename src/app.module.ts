@@ -26,6 +26,7 @@ import { VideoContainerModule } from './video-container/video-container.module';
 import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 import { ThemesModule } from './themes-req/themes.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { FileManagerModule } from './file-manager/file-manager.module';
     PhotoSlideModule,
     ThemesModule,
     FileManagerModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],
