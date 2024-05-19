@@ -1,4 +1,3 @@
-// update-user.dto.ts
 import {
   IsOptional,
   IsString,
@@ -6,7 +5,6 @@ import {
   IsEnum,
   ArrayUnique,
   IsNotEmpty,
-  IsArray,
 } from 'class-validator';
 
 import {
@@ -76,9 +74,6 @@ export class UpdateUserDto {
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList?: string[];
-
-  @Prop({ type: [Types.ObjectId], ref: 'Shop' })
-  shopsJoined?: Types.ObjectId[];
 
   @Prop()
   twitter?: string;

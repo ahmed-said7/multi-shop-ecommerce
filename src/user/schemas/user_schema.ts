@@ -88,9 +88,6 @@ export class User {
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList: string[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Shop' })
-  shopsJoined: Types.ObjectId[];
-
   @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
   favorites?: Types.ObjectId[];
 }
