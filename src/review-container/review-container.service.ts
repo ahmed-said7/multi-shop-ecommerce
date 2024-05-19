@@ -145,7 +145,7 @@ export class ReviewContainerService {
       if (!user) throw new NotFoundException("This user doesn't exist");
       if (user) {
         for (let i = 0; i < user.reviews.length; i++) {
-          if (user.reviews[i] === id) {
+          if (user.reviews[i].toString() === id) {
             user.reviews.splice(i, 1);
             break;
           }
