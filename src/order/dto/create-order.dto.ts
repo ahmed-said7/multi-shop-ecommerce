@@ -41,7 +41,7 @@ export class CreateOrderDto {
   comments: string;
 
   @IsNotEmpty({ message: 'An order must have a shop' })
-  shopId: string;
+  shopId: Types.ObjectId;
 
   priceTotal: number;
 

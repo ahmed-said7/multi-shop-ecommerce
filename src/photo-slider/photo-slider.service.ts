@@ -41,7 +41,7 @@ export class PhotoSliderService {
       if (!user) throw new NotFoundException('There is no user with this id');
       if (!user.shop) throw new BadRequestException("You don't have a shop");
 
-      createPhotoSliderDto.shop = user.shop;
+      createPhotoSliderDto.shop = user.shop.toString();
 
       const photoSlider =
         await this.photoSliderModel.create(createPhotoSliderDto);

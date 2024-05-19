@@ -49,7 +49,7 @@ export class OrderService {
 
       const buyerId = user._id;
 
-      if (userId == sellerId) {
+      if (userId === sellerId.toString()) {
         throw new UnauthorizedException(
           'You cant make an order from your own shop',
         );

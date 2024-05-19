@@ -266,7 +266,7 @@ export class UserService {
         .find({ _id: { $in: user.cart } })
         .exec();
       const shop = await this.shopService
-        .findOne(itemsInCart[0].shopID)
+        .findOne(itemsInCart[0].shopID.toString())
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException('Failed to find shop');

@@ -40,19 +40,19 @@ export class ReportsService {
           const reportYear = parseInt(year);
           const reportMonth = parseInt(month);
           result = await this.generateMonthlySalesReport(
-            shopId,
+            shopId.toString(),
             reportYear,
             reportMonth,
           );
           return { result };
         case 'itemSales':
-          result = await this.generateItemSalesReport(shopId);
+          result = await this.generateItemSalesReport(shopId.toString());
           return { result };
         case 'itemRatings':
-          result = await this.getShopItemRatings(shopId);
+          result = await this.getShopItemRatings(shopId.toString());
           return { result };
         case 'orderMetrics':
-          result = await this.getShopOrdersMetrics(shopId);
+          result = await this.getShopOrdersMetrics(shopId.toString());
           return { result };
       }
     } catch (error) {
