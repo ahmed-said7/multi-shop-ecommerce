@@ -142,13 +142,8 @@ export class ShopService {
       const shop = await this.shopModel
         .findById(id)
         .populate('itemsIDs')
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(
-            'An expected error happened while finding shop items',
-          );
-        });
+        .exec();
+
       const items = shop.itemsIDs;
       return items;
     } catch (error) {
@@ -159,12 +154,7 @@ export class ShopService {
 
   async remove(id: string) {
     try {
-      const shop = await this.shopModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'An unexpected error happened while finding the shop',
-        );
-      });
+      const shop = await this.shopModel.findById(id);
 
       if (!shop) {
         throw new NotFoundException('Shop not found');
@@ -256,14 +246,10 @@ export class ShopService {
               });
             containers.push(photoSlider);
           case 'card slider':
-            const cardSlider = await this.cardSliderModel
-              .findById(container.containerID)
-              .catch((err) => {
-                console.log(err);
-                throw new InternalServerErrorException(
-                  'An expected error happened while finding shop containers',
-                );
-              });
+            const cardSlider = await this.cardSliderModel.findById(
+              container.containerID,
+            );
+
             containers.push(cardSlider);
         }
       });
@@ -279,12 +265,10 @@ export class ShopService {
     userId: mongoose.Types.ObjectId,
   ) {
     try {
-      const shop = await this.shopModel
-        .findByIdAndUpdate(shopId, { $push: { customers: userId } })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shop = await this.shopModel.findByIdAndUpdate(shopId, {
+        $push: { customers: userId },
+      });
+
       if (!shop) throw new NotFoundException('There is no shop with this id');
     } catch (error) {
       console.log(error);

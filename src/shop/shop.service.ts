@@ -210,12 +210,14 @@ export class ShopService {
         throw new NotFoundException('There is no user with this id');
       }
 
-      if (!id && user.role == UserRole.SHOP_OWNER) {
-        id = user.shop;
+      let shopId = new mongoose.Types.ObjectId(id);
+
+      if (!shopId && user.role == UserRole.SHOP_OWNER) {
+        shopId = user.shop;
       }
 
       const shop = await this.shopModel
-        .findById(id)
+        .findById(shopId)
         .populate('itemsIDs')
         .exec();
 

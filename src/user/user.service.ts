@@ -10,7 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
@@ -201,10 +201,8 @@ export class UserService {
   async update(updateUserDto: UpdateUserDto) {
     try {
       const { currentId, updateId, cart, orders, wishList } = updateUserDto;
-      const user = await this.userModel.findById(currentId).catch((err) => {
-        console.log(err);
-        throw new NotFoundException("This user doesn't exist");
-      });
+
+      const user = await this.userModel.findById(currentId);
 
       if (updateId === currentId || user.role === 'admin') {
         if (cart && cart.length > 0) {
@@ -220,10 +218,11 @@ export class UserService {
             updateUserDto.cart = undefined;
           }
         }
+
         if (wishList && wishList.length > 0) {
           const itemToAddToWishList = wishList[0];
           const existingItemIndexWish = user.wishList.findIndex(
-            (itemId) => itemId === itemToAddToWishList,
+            (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
           );
           if (existingItemIndexWish !== -1) {
             user.wishList.splice(existingItemIndexWish, 1);
@@ -242,11 +241,7 @@ export class UserService {
 
         const updatedUser = await this.userModel
           .findByIdAndUpdate(updateId, updateUserDto, { new: true })
-          .populate({ path: 'cart', model: 'Item' })
-          .catch((err) => {
-            console.log(err);
-            throw new InternalServerErrorException(err);
-          });
+          .populate({ path: 'cart', model: 'Item' });
 
         updatedUser.password = undefined;
         return updatedUser;
@@ -283,7 +278,7 @@ export class UserService {
 
       const orderDto: CreateOrderDto = {
         buyerId: id,
-        sellerId: shop.userID,
+        sellerId: new Types.ObjectId(shop.userID),
         items: user.cart,
         deliveryType: false,
         paid: false,
@@ -308,14 +303,12 @@ export class UserService {
 
   async remove(userId: string, deleteId: string) {
     try {
-      const user = await this.userModel.findById(userId).catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
+      const user = await this.userModel.findById(userId);
+
       if (!user) throw new NotFoundException('This user doesnt exist');
       if (user.role == 'admin' || userId == deleteId) {
         if (user.role == UserRole.SHOP_OWNER) {
-          await this.shopService.remove(user.shop);
+          await this.shopService.remove(user.shop.toString());
         }
 
         for (const orderId of user.orders) {

@@ -13,7 +13,7 @@ import { Types } from 'mongoose';
 export class CreateOrderDto {
   buyerId: string;
 
-  sellerId: string;
+  sellerId: Types.ObjectId;
 
   @IsNotEmpty({ message: 'An order must have at least one item' })
   @IsArray({ message: 'An order must have a string array of items' })

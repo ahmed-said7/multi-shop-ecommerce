@@ -1,12 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateShopDto } from './create-shop.dto';
-import {
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  MaxLength,
-  IsArray,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
+import { Types } from 'mongoose';
 export class UpdateShopDto extends PartialType(CreateShopDto) {
   // Shop title, must not be empty, and should be a string
   @IsNotEmpty({ message: 'A shop must have a title' })
@@ -27,7 +22,7 @@ export class UpdateShopDto extends PartialType(CreateShopDto) {
   // Shop category, must not be empty and should be an array of strings
   categories: string[];
 
-  containers: Object[];
+  containers: Types.ObjectId[];
 
-  customers: string[];
+  customers: Types.ObjectId[];
 }

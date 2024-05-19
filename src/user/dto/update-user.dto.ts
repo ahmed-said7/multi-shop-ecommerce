@@ -13,9 +13,10 @@ import {
   UserRole,
 } from '../schemas/user_schema';
 import { Types } from 'mongoose';
-import { Prop } from '@nestjs/mongoose';
 
-export class UpdateUserDto {
+import { CreateUserDto } from './create-user.dto';
+
+export class UpdateUserDto implements Partial<CreateUserDto> {
   @IsOptional()
   @IsString({ message: 'A user must have a string title' })
   name?: string;
@@ -32,7 +33,6 @@ export class UpdateUserDto {
   @IsString({ message: 'A user must have a string password' })
   password?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shop?: Types.ObjectId;
 
   @IsOptional()
@@ -66,21 +66,15 @@ export class UpdateUserDto {
 
   wallet?: number;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Order' })
-  orders?: string[];
+  orders?: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item' })
   cart?: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  wishList?: string[];
+  wishList?: Types.ObjectId[];
 
-  @Prop()
   twitter?: string;
 
-  @Prop()
   facebook?: string;
 
-  @Prop()
   instagram?: string;
 }

@@ -1,4 +1,3 @@
-import { Prop } from '@nestjs/mongoose';
 import {
   IsNotEmpty,
   IsString,
@@ -31,16 +30,13 @@ export class CreateUserDto {
   password: string;
 
   // User Role, must not be empty and should be of the current options
-  @Prop({ required: true })
   @IsNotEmpty({ message: 'A user must have a role' })
   @IsEnum(UserRole, { message: 'Invalid user role' })
   role: UserRole;
 
-  @Prop({ required: true, unique: true })
   @IsEmail()
   email: string;
 
-  @Prop({ required: true, unique: true })
   @Matches(/^(\+\d{1,3}[- ]?)?\d{10}$/, {
     message: 'Invalid phone number format',
   })
@@ -53,37 +49,30 @@ export class CreateUserDto {
   })
   firstShop: boolean;
 
-  @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shop: Types.ObjectId;
 
   @IsEnum(UserExperienceType, { message: 'Invalid Experience Type' })
   userExperienceType: UserExperienceType;
 
-  @Prop({ enum: ReadyOption, isArray: true })
   @IsEnum(ReadyOption, { each: true, message: 'Invalid ready option' })
   @ArrayUnique({ message: 'Duplicate ready options are not allowed' })
   ready: ReadyOption[];
 
   wallet: number;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Order' })
   orders: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item' })
   cart: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item' })
   wishList: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
   favorites?: Types.ObjectId[];
 
-  @Prop()
   twitter: string;
 
-  @Prop()
   facebook: string;
 
-  @Prop()
   instagram: string;
+
+  gender: 'male' | 'female';
 }

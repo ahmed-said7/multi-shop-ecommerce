@@ -1,10 +1,5 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsArray,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateShopDto {
   // Shop title, must not be empty, and should be a string
@@ -27,7 +22,7 @@ export class CreateShopDto {
 
   categories: string[];
 
-  customers: string[];
+  customers: Types.ObjectId[];
 
-  containers: Object[];
+  containers: Types.ObjectId[];
 }

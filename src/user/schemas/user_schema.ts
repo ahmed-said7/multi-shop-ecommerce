@@ -32,7 +32,6 @@ export type UserDocument = User & Document;
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class User {
-  [x: string]: any;
   @Prop({ required: true }) // Ensure name is required
   name: string;
 
@@ -71,13 +70,13 @@ export class User {
   ready: ReadyOption[];
 
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shop: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'User' })
-  reviews: string[];
+  reviews: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Order' })
-  orders: string[];
+  orders: Types.ObjectId[];
 
   @Prop({ default: 0 })
   wallet: number;
@@ -86,7 +85,7 @@ export class User {
   cart: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  wishList: string[];
+  wishList: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
   favorites?: Types.ObjectId[];

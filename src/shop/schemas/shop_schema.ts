@@ -16,16 +16,16 @@ export class Shop {
   description: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  userID: string;
+  userID: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  itemsIDs: string[];
+  itemsIDs: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'User' })
-  customers: string[];
+  customers: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], ref: 'Category' })
-  categories: string[];
+  categories: Types.ObjectId[];
 
   @Prop({ max: 15, default: [] })
   containers: [
@@ -34,6 +34,7 @@ export class Shop {
       containerType: string;
     },
   ];
+
   @Prop()
   introPages: string[];
 
