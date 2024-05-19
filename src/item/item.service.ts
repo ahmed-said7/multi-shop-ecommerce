@@ -154,23 +154,24 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, userId: string) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
-        new: true,
-      });
+      console.log({ updateItemDto });
 
-      if (!item) {
-        throw new NotFoundException('Item not found');
-      }
+      // const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+      //   new: true,
+      // });
 
-      const user = await this.userModel.findById(userId);
+      // if (!item) {
+      //   throw new NotFoundException('Item not found');
+      // }
+      // const user = await this.userModel.findById(userId);
 
-      if (user.shop != item.shopID) {
-        throw new NotFoundException(
-          'You are not authorized to perform this action',
-        );
-      }
+      // if (user.shop != item.shopID) {
+      //   throw new NotFoundException(
+      //     'You are not authorized to perform this action',
+      //   );
+      // }
 
-      return item;
+      // return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
