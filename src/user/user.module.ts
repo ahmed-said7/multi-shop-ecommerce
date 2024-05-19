@@ -34,6 +34,8 @@ import {
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';
+import { UserTrackController } from './track.controller';
+import { TrackService } from './track.service';
 
 @Module({
   imports: [
@@ -60,13 +62,14 @@ import { Order, OrderSchema } from 'src/order/schemas/order_schema';
     AuthModule,
     ShopModule,
   ],
-  controllers: [UserController, OtpController],
+  controllers: [UserController, OtpController, UserTrackController],
   providers: [
     UserService,
     PassportModule,
     OtpService,
     EmailService,
     ShopService,
+    TrackService,
   ],
 })
 export class UserModule {}
