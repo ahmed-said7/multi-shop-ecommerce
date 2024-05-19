@@ -154,7 +154,6 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, userId: string) {
     try {
-
       let item = await this.itemModel.findById(id);
 
       if (!item) {
@@ -170,8 +169,8 @@ export class ItemService {
       }
 
       item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
-          new: true,
-        });
+        new: true,
+      });
 
       return item;
     } catch (error) {
