@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 
 import { ShopService } from './shop.service';
@@ -14,6 +15,7 @@ import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose from 'mongoose';
+import { Request } from 'express';
 
 @Controller('shop')
 export class ShopController {
@@ -21,7 +23,13 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Body('userId') userId: string, @Body() createShopDto: CreateShopDto) {
+  create(
+    @Req() req: Request,
+    @Body('userId') userId: string,
+    @Body() createShopDto: CreateShopDto,
+  ) {
+    console.log(req.body.userId);
+
     return this.shopService.create(createShopDto, userId);
   }
 

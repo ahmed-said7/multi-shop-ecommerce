@@ -154,9 +154,8 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto, userId: string) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
-        new: true,
-      });
+
+      let item = await this.itemModel.findById(id);
 
       if (!item) {
         throw new NotFoundException('Item not found');
@@ -169,6 +168,10 @@ export class ItemService {
           'You are not authorized to perform this action',
         );
       }
+
+      item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+          new: true,
+        });
 
       return item;
     } catch (error) {

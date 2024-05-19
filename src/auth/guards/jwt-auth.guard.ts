@@ -29,7 +29,6 @@ export class JwtGuard implements CanActivate {
     const decodedToken = this.decodeToken(token);
 
     request.body.userId = decodedToken.userId;
-
     request.body.username = decodedToken.username;
 
     return true;
