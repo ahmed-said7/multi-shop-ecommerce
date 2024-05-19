@@ -2,13 +2,11 @@ import { Module } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CartItem, CartItemSchema } from './schemas/cart-item.schema';
+import { Cart, CartSchema } from './schemas/cart.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: CartItem.name, schema: CartItemSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
   ],
   controllers: [CartController],
   providers: [CartService],

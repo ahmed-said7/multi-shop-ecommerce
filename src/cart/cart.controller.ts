@@ -1,50 +1,53 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
+  Put,
+  Get,
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
-import { UpdateCartDto } from './dto/update-cart.dto';
-import { CreateCartItemDto } from './dto/create-cart.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AddToCartDto } from './dto/add-to-cart.dto';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @UseGuards(JwtGuard)
-  @Post()
-  create(
-    @Body() createCartItemDto: CreateCartItemDto,
-    @Body('userId') userId: string,
-  ) {
-    return this.cartService.create({ ...createCartItemDto, userId });
-  }
-
-  @UseGuards(JwtGuard)
   @Get()
-  findAll(@Body('userId') userId: string, @Body('shopId') shopId: string) {
-    return this.cartService.findAll(userId, shopId);
+  async getUserCart(@Body('userId') userId: string) {
+    return this.cartService.getCart(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(id);
+  // @UseGuards(JwtGuard)
+  @Post()
+  addToCart(
+    @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
+    @Body() addToCartDto: AddToCartDto,
+  ) {
+    return this.cartService.addToCart(userId, shopId, addToCartDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(id, updateCartDto);
+  // @UseGuards(JwtGuard)
+  @Delete('/remove/:itemId')
+  removeFromCart(
+    @Body('userId') userId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    return this.cartService.removeFromCart(userId, itemId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(id);
+  @UseGuards(JwtGuard)
+  @Put(':userId/update/:itemId')
+  updateItemQuantity(
+    @Param('userId') userId: string,
+    @Param('itemId') itemId: string,
+    @Body('quantity') quantity: number,
+  ) {
+    return this.cartService.updateItemQuantity(userId, itemId, quantity);
   }
 }
