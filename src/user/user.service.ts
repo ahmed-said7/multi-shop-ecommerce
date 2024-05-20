@@ -242,7 +242,7 @@ export class UserService {
       }
 
       const updatedUser = await this.userModel
-        .findByIdAndUpdate(updateUserDto, { new: true })
+        .findByIdAndUpdate(userId, updateUserDto, { new: true })
         .populate({ path: 'cart', model: 'Item' });
 
       updatedUser.password = undefined;
@@ -301,17 +301,26 @@ export class UserService {
     }
   }
 
-  async remove(paramId: string, userId: string, deleteId: string) {
+  async remove(paramId: string, userId: string) {
     try {
       const user = await this.userModel.findById(userId);
 
-      if (!user) throw new NotFoundException('This user doesnt exist');
-      if (user.role == UserRole.ADMIN || user.role == UserRole.USER) {
+      if (!user) {
+        throw new NotFoundException('This user doesnt exist');
+      }
+
+      const targetUser = await this.userModel.findById(paramId);
+
+      if (!targetUser) {
+        throw new NotFoundException('This user doesnt exist');
+      }
+
+      if (user.role == UserRole.ADMIN || paramId === userId) {
         for (const orderId of user.orders) {
           await this.orderModel.findByIdAndDelete(orderId);
         }
 
-        const deletedUser = await this.userModel.findByIdAndDelete(deleteId);
+        const deletedUser = await this.userModel.findByIdAndDelete(paramId);
 
         if (!deletedUser) {
           throw new NotFoundException('User to delete not found');
