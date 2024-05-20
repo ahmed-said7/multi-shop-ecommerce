@@ -302,40 +302,44 @@ export class UserService {
   }
 
   async remove(paramId: string, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId);
 
-      if (!user) {
-        throw new NotFoundException('This user doesnt exist');
-      }
-
-      const targetUser = await this.userModel.findById(paramId);
-
-      if (!targetUser) {
-        throw new NotFoundException('This user doesnt exist');
-      }
-
-      if (user.role == UserRole.ADMIN || paramId === userId) {
-        for (const orderId of user.orders) {
-          await this.orderModel.findByIdAndDelete(orderId);
-        }
-
-        const deletedUser = await this.userModel.findByIdAndDelete(paramId);
-
-        if (!deletedUser) {
-          throw new NotFoundException('User to delete not found');
-        }
-
-        return 'User Deleted Successfully';
-      } else {
-        throw new UnauthorizedException(
-          'You dont have the permission to delete this user',
-        );
-      }
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+    if (!user) {
+      throw new NotFoundException('This user doesnt exist');
     }
+
+    const targetUser = await this.userModel.findById(paramId);
+
+    if (!targetUser) {
+      throw new NotFoundException('This user doesnt exist');
+    }
+
+    if (user.role === UserRole.SHOP_OWNER) {
+      throw new UnauthorizedException(
+        'You dont have the permission to delete this user',
+      );
+    }
+
+    if (user.role === UserRole.USER && paramId !== userId) {
+      throw new UnauthorizedException(
+        'You dont have the permission to delete this user',
+      );
+    }
+
+    for (const orderId of user.orders) {
+      await this.orderModel.findByIdAndDelete(orderId);
+    }
+
+    // Remove The User Shop.
+    await this.shopService.remove(targetUser.shop.toString());
+
+    const deletedUser = await this.userModel.findByIdAndDelete(paramId);
+
+    if (!deletedUser) {
+      throw new NotFoundException('User to delete not found');
+    }
+
+    return 'User Deleted Successfully';
   }
 
   private generateToken(user: UserDocument): string {
