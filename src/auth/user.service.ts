@@ -156,14 +156,8 @@ export class UserService {
       if (user.role == 'admin' || userId == deleteId) {
         await this.shopService.remove(user.shop.toString());
 
-        const deletedUser = await this.userModel
-          .findByIdAndDelete(deleteId)
-          .catch((err) => {
-            console.log(err);
-            throw new InternalServerErrorException(
-              'Unexpected error while deleting user',
-            );
-          });
+        const deletedUser = await this.userModel.findByIdAndDelete(deleteId);
+
         if (!deletedUser) {
           throw new NotFoundException('User to delete not found');
         }
