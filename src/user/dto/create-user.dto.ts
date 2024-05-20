@@ -6,14 +6,9 @@ import {
   IsEnum,
   IsEmail,
   Matches,
-  ArrayUnique,
 } from 'class-validator';
 
-import {
-  ReadyOption,
-  UserExperienceType,
-  UserRole,
-} from '../schemas/user_schema';
+import { UserRole } from '../schemas/user_schema';
 import { Types } from 'mongoose';
 
 export class CreateUserDto {
