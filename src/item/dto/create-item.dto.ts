@@ -8,8 +8,6 @@ export class CreateItemDto {
   @IsNumber()
   amount: number;
   @IsString()
-  shopID: string;
-  @IsString()
   description: string;
   @IsArray({ message: 'Item categories must be an array' })
   category: string[];

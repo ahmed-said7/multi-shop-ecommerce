@@ -20,6 +20,4 @@ export class CreateCategoryDto {
 
   @IsArray({ message: 'A Category must have a string array subCategory' })
   subCategory: string[];
-
-  shopID: string;
 }

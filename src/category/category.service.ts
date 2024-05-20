@@ -33,10 +33,15 @@ export class CategoryService {
 
     if (!user) throw new NotFoundException('There is no user with this id');
 
-    const category = await new this.categoryModel(createCategoryDto).save();
+    const payload = {
+      ...createCategoryDto,
+      shopID: user.shop.toString(),
+    };
+
+    const category = await new this.categoryModel(payload).save();
 
     await this.shopModel.findByIdAndUpdate(
-      createCategoryDto.shopID,
+      payload.shopID,
       {
         $push: { categories: category._id },
       },
