@@ -5,31 +5,36 @@ import {
 } from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Coupon } from './schemas/coupon.schema';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
 
 @Injectable()
 export class CouponService {
   constructor(
     @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
+    @InjectModel(User.name)
+    private readonly userModel: mongoose.Model<UserDocument>,
   ) {}
 
-  async create(createCouponDto: CreateCouponDto) {
+  async create(createCouponDto: CreateCouponDto, userId: string) {
     try {
-      const coupon = await new this.couponModel(createCouponDto)
-        .save()
-        .catch((err) => {
-          if (err.code == 11000) {
-            console.log(err);
-            throw new InternalServerErrorException(
-              'This coupon already exists',
-            );
-          } else {
-            console.log(err);
-            throw new InternalServerErrorException(err);
-          }
-        });
+      const user = await this.userModel.findById(userId);
+      if (!user) throw new NotFoundException('There is no user with this id');
+      const payload = {
+        ...createCouponDto,
+        shop: user.shop.toString(),
+      };
+      const coupon = await new this.couponModel(payload).save().catch((err) => {
+        if (err.code == 11000) {
+          console.log(err);
+          throw new InternalServerErrorException('This coupon already exists');
+        } else {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }
+      });
 
       return coupon;
     } catch (error) {

@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { Types } from 'mongoose';
 
@@ -19,9 +21,13 @@ import { Types } from 'mongoose';
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponService.create(createCouponDto);
+  create(
+    @Body() createCouponDto: CreateCouponDto,
+    @Body('userId') userId: string,
+  ) {
+    return this.couponService.create(createCouponDto, userId);
   }
 
   @Get(':id')
@@ -53,7 +59,7 @@ export class CouponController {
     return this.couponService.addItem(id, item);
   }
 
-  @Get(':id')
+  @Get('/one/:id')
   findOne(@Param('id') id: Types.ObjectId) {
     return this.couponService.findOne(id);
   }
