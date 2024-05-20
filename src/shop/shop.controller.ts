@@ -35,8 +35,8 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll() {
-    return this.shopService.findAll();
+  findAll(@Body('userId') userId: string) {
+    return this.shopService.findAll(userId);
   }
 
   @UseGuards(JwtGuard)
