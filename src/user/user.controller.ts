@@ -87,8 +87,8 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(updateUserDto);
+  update(@Body() updateUserDto: UpdateUserDto, @Body('userId') userId: string) {
+    return this.userService.update(userId, updateUserDto);
   }
 
   @UseGuards(JwtGuard)

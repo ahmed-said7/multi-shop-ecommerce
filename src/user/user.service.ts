@@ -195,21 +195,14 @@ export class UserService {
   }
 
   async findOneWithEmail(email: string) {
-    return await this.userModel
-      .findOne({ email })
-      .lean()
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
+    return await this.userModel.findOne({ email }).lean().exec();
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
-      const { currentId, updateId, cart, orders, wishList } = updateUserDto;
+      const { updateId, cart, orders, wishList } = updateUserDto;
 
-      const user = await this.userModel.findById(currentId);
+      const user = await this.userModel.findById(userId);
 
       if (user.role === 'admin') {
         if (cart && cart.length > 0) {
