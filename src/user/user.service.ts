@@ -211,7 +211,7 @@ export class UserService {
 
       const user = await this.userModel.findById(currentId);
 
-      if (updateId === currentId || user.role === 'admin') {
+      if (user.role === 'admin') {
         if (cart && cart.length > 0) {
           const itemToAdd = cart[0];
           const existingItemIndex = user.cart.findIndex(
