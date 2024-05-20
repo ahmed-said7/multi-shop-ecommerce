@@ -93,7 +93,15 @@ export class ShopService {
     }
   }
 
-  async findAll() {
+  async findAll(userId: string) {
+    const user = await this.userModel.findById(userId);
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException(
+        `The user ${userId} is not authrized to view all shops`,
+      );
+    }
+
     try {
       const shops = await this.shopModel.find();
 
