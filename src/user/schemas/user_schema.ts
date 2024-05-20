@@ -89,6 +89,9 @@ export class User {
 
   @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
   favorites?: Types.ObjectId[];
+
+  @Prop({ enum: ['male', 'female'] })
+  gender: string;
 }
 
 // Create the Mongoose schema for the user class
