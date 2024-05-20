@@ -63,8 +63,8 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Param('page') page: number) {
-    return this.userService.findAll(page);
+  findAll(@Param('page') page: number, @Body('userId') userId: string) {
+    return this.userService.findAll(userId, page);
   }
 
   @UseGuards(JwtGuard)

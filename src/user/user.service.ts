@@ -139,7 +139,13 @@ export class UserService {
     }
   }
 
-  async findAll(page?: number) {
+  async findAll(userId: string, page?: number) {
+    const user = await this.userModel.findById(userId);
+
+    if (user.role.toLowerCase() !== 'admin') {
+      throw new UnauthorizedException('User Must Be an Admin');
+    }
+
     try {
       const foundUsers = await this.userModel
         .find()
@@ -147,6 +153,7 @@ export class UserService {
         .skip(page * 10);
 
       const count = await this.userModel.find().countDocuments();
+
       foundUsers.forEach((user) => {
         user.password = undefined;
       });
