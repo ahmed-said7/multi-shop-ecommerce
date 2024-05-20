@@ -195,66 +195,59 @@ export class UserService {
   }
 
   async findOneWithEmail(email: string) {
-    return await this.userModel
-      .findOne({ email })
-      .lean()
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
+    return await this.userModel.findOne({ email }).lean().exec();
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
-      const { currentId, updateId, cart, orders, wishList } = updateUserDto;
+      const { updateId, cart, orders, wishList } = updateUserDto;
 
-      const user = await this.userModel.findById(currentId);
+      // Can't update role
+      delete updateUserDto.role;
 
-      if (updateId === currentId || user.role === 'admin') {
-        if (cart && cart.length > 0) {
-          const itemToAdd = cart[0];
-          const existingItemIndex = user.cart.findIndex(
-            (itemId) => itemId === itemToAdd,
-          );
-          if (existingItemIndex !== -1) {
-            user.cart.splice(existingItemIndex, 1);
-            updateUserDto.cart = undefined;
-          } else {
-            user.cart.push(itemToAdd);
-            updateUserDto.cart = undefined;
-          }
+      const user = await this.userModel.findById(userId);
+
+      if (cart && cart.length > 0) {
+        const itemToAdd = cart[0];
+        const existingItemIndex = user.cart.findIndex(
+          (itemId) => itemId === itemToAdd,
+        );
+        if (existingItemIndex !== -1) {
+          user.cart.splice(existingItemIndex, 1);
+          updateUserDto.cart = undefined;
+        } else {
+          user.cart.push(itemToAdd);
+          updateUserDto.cart = undefined;
         }
-
-        if (wishList && wishList.length > 0) {
-          const itemToAddToWishList = wishList[0];
-          const existingItemIndexWish = user.wishList.findIndex(
-            (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
-          );
-          if (existingItemIndexWish !== -1) {
-            user.wishList.splice(existingItemIndexWish, 1);
-            updateUserDto.wishList = undefined;
-          } else {
-            user.wishList.push(itemToAddToWishList);
-            updateUserDto.wishList = undefined;
-          }
-        }
-        await user.save();
-
-        if (orders) {
-          const updatedOrders = [...user.orders, ...orders];
-          updateUserDto.orders = updatedOrders;
-        }
-
-        const updatedUser = await this.userModel
-          .findByIdAndUpdate(updateId, updateUserDto, { new: true })
-          .populate({ path: 'cart', model: 'Item' });
-
-        updatedUser.password = undefined;
-        return updatedUser;
-      } else {
-        throw new UnauthorizedException('Unauthorized error');
       }
+
+      if (wishList && wishList.length > 0) {
+        const itemToAddToWishList = wishList[0];
+        const existingItemIndexWish = user.wishList.findIndex(
+          (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
+        );
+        if (existingItemIndexWish !== -1) {
+          user.wishList.splice(existingItemIndexWish, 1);
+          updateUserDto.wishList = undefined;
+        } else {
+          user.wishList.push(itemToAddToWishList);
+          updateUserDto.wishList = undefined;
+        }
+      }
+      await user.save();
+
+      if (orders) {
+        const updatedOrders = [...user.orders, ...orders];
+        updateUserDto.orders = updatedOrders;
+      }
+
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(updateId, updateUserDto, { new: true })
+        .populate({ path: 'cart', model: 'Item' });
+
+      updatedUser.password = undefined;
+
+      return updatedUser;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);
