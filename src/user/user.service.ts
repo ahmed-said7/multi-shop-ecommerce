@@ -301,7 +301,7 @@ export class UserService {
     }
   }
 
-  async remove(paramId: string, userId: string, deleteId: string) {
+  async remove(paramId: string, userId: string) {
     try {
       const user = await this.userModel.findById(userId);
 
@@ -320,7 +320,7 @@ export class UserService {
           await this.orderModel.findByIdAndDelete(orderId);
         }
 
-        const deletedUser = await this.userModel.findByIdAndDelete(deleteId);
+        const deletedUser = await this.userModel.findByIdAndDelete(paramId);
 
         if (!deletedUser) {
           throw new NotFoundException('User to delete not found');
