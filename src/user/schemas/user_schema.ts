@@ -54,21 +54,6 @@ export class User {
   @Prop({ unique: true })
   phone: string;
 
-  @Prop({ default: false })
-  experience: boolean;
-
-  @Prop({ default: false })
-  firstShop: boolean;
-
-  @Prop({
-    enum: UserExperienceType,
-    default: UserExperienceType.STORE,
-  })
-  experienceType: UserExperienceType;
-
-  @Prop({ type: [{ type: String, enum: ReadyOption }], isArray: true })
-  ready: ReadyOption[];
-
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shop: Types.ObjectId;
 
