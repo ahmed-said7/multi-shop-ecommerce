@@ -10,10 +10,6 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
   @IsString({ message: 'A user must have a string title' })
   name?: string;
 
-  @IsNotEmpty({ message: 'Please send the ID of the user you want to update' })
-  @IsString()
-  updateId: string;
-
   @IsOptional()
   @IsString({ message: 'A user must have a string password' })
   password?: string;
@@ -31,8 +27,6 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
   @IsOptional()
   @IsString({ message: 'Invalid phone number format' })
   phone?: string;
-
-  wallet?: number;
 
   orders?: Types.ObjectId[];
 
