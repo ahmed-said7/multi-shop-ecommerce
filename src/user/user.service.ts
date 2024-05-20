@@ -301,7 +301,7 @@ export class UserService {
     }
   }
 
-  async remove(userId: string, deleteId: string) {
+  async remove(paramId: string, userId: string, deleteId: string) {
     try {
       const user = await this.userModel.findById(userId);
 
@@ -311,14 +311,8 @@ export class UserService {
           await this.orderModel.findByIdAndDelete(orderId);
         }
 
-        const deletedUser = await this.userModel
-          .findByIdAndDelete(deleteId)
-          .catch((err) => {
-            console.log(err);
-            throw new InternalServerErrorException(
-              'Unexpected error while deleting user',
-            );
-          });
+        const deletedUser = await this.userModel.findByIdAndDelete(deleteId);
+
         if (!deletedUser) {
           throw new NotFoundException('User to delete not found');
         }

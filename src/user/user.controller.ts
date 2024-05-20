@@ -93,11 +93,15 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Delete(':id')
+<<<<<<< HEAD
   remove(
     @Param('id') id: string,
     @Body('id') deleteId: string,
     @Body('userId') userId: string,
   ) {
+=======
+  remove(@Param('id') id: string, @Body('userId') userId: string) {
+>>>>>>> f721c53abe32e9a629b51caba26f34773cea9e39
     return this.userService.remove(id, userId);
   }
 
