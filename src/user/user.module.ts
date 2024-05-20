@@ -56,20 +56,15 @@ import { TrackService } from './track.service';
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
     ]),
     JwtModule.register({
-      secret: `${process.env.SECRET}`,
+      secret: process.env.SECRET,
       signOptions: { expiresIn: '1h' },
     }),
+    PassportModule.register({ defaultStrategy: 'jwt' }), // Import PassportModule
     AuthModule,
     ShopModule,
   ],
   controllers: [UserController, OtpController, UserTrackController],
-  providers: [
-    UserService,
-    PassportModule,
-    OtpService,
-    EmailService,
-    ShopService,
-    TrackService,
-  ],
+  providers: [UserService, OtpService, EmailService, ShopService, TrackService],
+  exports: [MongooseModule], // Export MongooseModule to provide UserModel
 })
 export class UserModule {}
