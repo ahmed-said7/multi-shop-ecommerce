@@ -47,12 +47,12 @@ export class AdminService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const { updateId, ...data } = updateUserDto;
+      const { ...data } = updateUserDto;
       const user = await this.userModel.findById(id);
 
       if (user.role === 'admin') {
         const updatedUser = await this.userModel
-          .findByIdAndUpdate(updateId, data, { new: true })
+          .findByIdAndUpdate(user._id, data, { new: true })
           .catch((err) => {
             console.log(err);
             throw new InternalServerErrorException(

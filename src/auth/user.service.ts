@@ -119,14 +119,16 @@ export class UserService {
   }
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const { updateId, ...data } = updateUserDto;
+      const { ...data } = updateUserDto;
       const user = await this.userModel.findById(id);
 
       if (user.role == UserRole.ADMIN) {
         const updatedUser = await this.userModel.findByIdAndUpdate(
-          updateId,
+          user._id,
           data,
-          { new: true },
+          {
+            new: true,
+          },
         );
 
         updatedUser.password = undefined;

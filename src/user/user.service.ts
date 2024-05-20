@@ -200,7 +200,7 @@ export class UserService {
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
-      const { updateId, cart, orders, wishList } = updateUserDto;
+      const { cart, orders, wishList } = updateUserDto;
 
       // Can't update role
       delete updateUserDto.role;
@@ -242,7 +242,7 @@ export class UserService {
       }
 
       const updatedUser = await this.userModel
-        .findByIdAndUpdate(updateId, updateUserDto, { new: true })
+        .findByIdAndUpdate(userId, updateUserDto, { new: true })
         .populate({ path: 'cart', model: 'Item' });
 
       updatedUser.password = undefined;
