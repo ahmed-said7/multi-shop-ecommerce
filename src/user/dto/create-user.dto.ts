@@ -56,4 +56,6 @@ export class CreateUserDto {
   instagram: string;
 
   gender: 'male' | 'female';
+
+  birthday: string;
 }
