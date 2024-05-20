@@ -49,12 +49,6 @@ export class CreateUserDto {
 
   favorites?: Types.ObjectId[];
 
-  twitter: string;
-
-  facebook: string;
-
-  instagram: string;
-
   gender: 'male' | 'female';
 
   birthday: string;
