@@ -48,6 +48,9 @@ export class Shop {
   instagram: string;
 
   @Prop()
+  whatsapp?: string;
+
+  @Prop()
   logo: string;
 }
 

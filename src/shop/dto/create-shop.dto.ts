@@ -25,4 +25,12 @@ export class CreateShopDto {
   customers: Types.ObjectId[];
 
   containers: Types.ObjectId[];
+
+  twitter?: string;
+
+  facebook?: string;
+
+  instagram?: string;
+
+  whatsapp?: string;
 }

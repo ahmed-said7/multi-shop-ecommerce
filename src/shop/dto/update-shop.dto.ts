@@ -25,4 +25,10 @@ export class UpdateShopDto extends PartialType(CreateShopDto) {
   containers: Types.ObjectId[];
 
   customers: Types.ObjectId[];
+
+  twitter?: string;
+
+  facebook?: string;
+
+  instagram?: string;
 }

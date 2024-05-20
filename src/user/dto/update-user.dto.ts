@@ -55,12 +55,6 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
 
   wishList?: Types.ObjectId[];
 
-  twitter?: string;
-
-  facebook?: string;
-
-  instagram?: string;
-
   gender: 'male' | 'female';
 
   birthday: string;
