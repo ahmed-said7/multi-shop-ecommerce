@@ -18,8 +18,8 @@ import { Types } from 'mongoose';
 
 export class CreateUserDto {
   // Shop title, must not be empty, and should be a string
-  @IsNotEmpty({ message: 'A user must have a title' })
-  @IsString({ message: 'A user must have a string title' })
+  @IsNotEmpty({ message: 'A user must have a name' })
+  @IsString({ message: 'A user must have a string name' })
   name: string;
 
   // User password, must not be empty, and should be a valid date string
@@ -42,21 +42,7 @@ export class CreateUserDto {
   })
   phone: string;
 
-  experince: boolean;
-
-  @IsNotEmpty({
-    message: 'It must be known if the user had a first store or not',
-  })
-  firstShop: boolean;
-
   shop: Types.ObjectId;
-
-  @IsEnum(UserExperienceType, { message: 'Invalid Experience Type' })
-  userExperienceType: UserExperienceType;
-
-  @IsEnum(ReadyOption, { each: true, message: 'Invalid ready option' })
-  @ArrayUnique({ message: 'Duplicate ready options are not allowed' })
-  ready: ReadyOption[];
 
   wallet: number;
 
