@@ -31,4 +31,6 @@ export class UpdateShopDto extends PartialType(CreateShopDto) {
   facebook?: string;
 
   instagram?: string;
+
+  whatsapp?: string;
 }
