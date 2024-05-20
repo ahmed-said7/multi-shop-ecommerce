@@ -77,6 +77,9 @@ export class User {
 
   @Prop({ enum: ['male', 'female'] })
   gender: string;
+
+  @Prop({ default: Date.now().toLocaleString() })
+  birthday: string;
 }
 
 // Create the Mongoose schema for the user class
