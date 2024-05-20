@@ -45,15 +45,12 @@ export class AdminService {
     }
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const { currentId, updateId, ...data } = updateUserDto;
-      const user = await this.userModel.findById(currentId).catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
+      const { updateId, ...data } = updateUserDto;
+      const user = await this.userModel.findById(id);
 
-      if (updateId === currentId || user.role === 'admin') {
+      if (user.role === 'admin') {
         const updatedUser = await this.userModel
           .findByIdAndUpdate(updateId, data, { new: true })
           .catch((err) => {
