@@ -306,11 +306,7 @@ export class UserService {
       const user = await this.userModel.findById(userId);
 
       if (!user) throw new NotFoundException('This user doesnt exist');
-      if (user.role == 'admin' || userId == deleteId) {
-        if (user.role == UserRole.SHOP_OWNER) {
-          await this.shopService.remove(user.shop.toString());
-        }
-
+      if (user.role == UserRole.ADMIN || user.role == UserRole.USER) {
         for (const orderId of user.orders) {
           await this.orderModel.findByIdAndDelete(orderId);
         }
@@ -328,10 +324,11 @@ export class UserService {
         }
 
         return 'User Deleted Successfully';
-      } else
+      } else {
         throw new UnauthorizedException(
           'You dont have the permission to delete this user',
         );
+      }
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
