@@ -202,52 +202,52 @@ export class UserService {
     try {
       const { updateId, cart, orders, wishList } = updateUserDto;
 
+      // Can't update role
+      delete updateUserDto.role;
+
       const user = await this.userModel.findById(userId);
 
-      if (user.role === 'admin') {
-        if (cart && cart.length > 0) {
-          const itemToAdd = cart[0];
-          const existingItemIndex = user.cart.findIndex(
-            (itemId) => itemId === itemToAdd,
-          );
-          if (existingItemIndex !== -1) {
-            user.cart.splice(existingItemIndex, 1);
-            updateUserDto.cart = undefined;
-          } else {
-            user.cart.push(itemToAdd);
-            updateUserDto.cart = undefined;
-          }
+      if (cart && cart.length > 0) {
+        const itemToAdd = cart[0];
+        const existingItemIndex = user.cart.findIndex(
+          (itemId) => itemId === itemToAdd,
+        );
+        if (existingItemIndex !== -1) {
+          user.cart.splice(existingItemIndex, 1);
+          updateUserDto.cart = undefined;
+        } else {
+          user.cart.push(itemToAdd);
+          updateUserDto.cart = undefined;
         }
-
-        if (wishList && wishList.length > 0) {
-          const itemToAddToWishList = wishList[0];
-          const existingItemIndexWish = user.wishList.findIndex(
-            (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
-          );
-          if (existingItemIndexWish !== -1) {
-            user.wishList.splice(existingItemIndexWish, 1);
-            updateUserDto.wishList = undefined;
-          } else {
-            user.wishList.push(itemToAddToWishList);
-            updateUserDto.wishList = undefined;
-          }
-        }
-        await user.save();
-
-        if (orders) {
-          const updatedOrders = [...user.orders, ...orders];
-          updateUserDto.orders = updatedOrders;
-        }
-
-        const updatedUser = await this.userModel
-          .findByIdAndUpdate(updateId, updateUserDto, { new: true })
-          .populate({ path: 'cart', model: 'Item' });
-
-        updatedUser.password = undefined;
-        return updatedUser;
-      } else {
-        throw new UnauthorizedException('Unauthorized error');
       }
+
+      if (wishList && wishList.length > 0) {
+        const itemToAddToWishList = wishList[0];
+        const existingItemIndexWish = user.wishList.findIndex(
+          (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
+        );
+        if (existingItemIndexWish !== -1) {
+          user.wishList.splice(existingItemIndexWish, 1);
+          updateUserDto.wishList = undefined;
+        } else {
+          user.wishList.push(itemToAddToWishList);
+          updateUserDto.wishList = undefined;
+        }
+      }
+      await user.save();
+
+      if (orders) {
+        const updatedOrders = [...user.orders, ...orders];
+        updateUserDto.orders = updatedOrders;
+      }
+
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(updateId, updateUserDto, { new: true })
+        .populate({ path: 'cart', model: 'Item' });
+
+      updatedUser.password = undefined;
+
+      return updatedUser;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);
