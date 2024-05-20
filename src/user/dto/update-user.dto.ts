@@ -47,23 +47,6 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
   @IsString({ message: 'Invalid phone number format' })
   phone?: string;
 
-  @IsOptional()
-  @IsBoolean({ message: 'Invalid value for experience' })
-  experince?: boolean;
-
-  @IsOptional()
-  @IsBoolean({ message: 'Invalid value for firstShop' })
-  firstShop?: boolean;
-
-  @IsOptional()
-  @IsEnum(UserExperienceType, { message: 'Invalid Experience Type' })
-  userExperienceType?: UserExperienceType;
-
-  @IsOptional()
-  @IsEnum(ReadyOption, { each: true, message: 'Invalid ready option' })
-  @ArrayUnique({ message: 'Duplicate ready options are not allowed' })
-  ready?: ReadyOption[];
-
   wallet?: number;
 
   orders?: Types.ObjectId[];
@@ -77,4 +60,8 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
   facebook?: string;
 
   instagram?: string;
+
+  gender: 'male' | 'female';
+
+  birthday: string;
 }
