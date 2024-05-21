@@ -21,8 +21,8 @@ export class ItemController {
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createItemDto: CreateItemDto, @Body('userId') userId: string) {
-    return this.itemService.create(createItemDto, userId);
+  create(@Body() createItemDto: CreateItemDto, @Body('shopId') shopId: string) {
+    return this.itemService.create(createItemDto, shopId);
   }
 
   @Get('all-items/:shop/')

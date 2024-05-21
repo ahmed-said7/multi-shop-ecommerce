@@ -42,10 +42,8 @@ export class JwtGuard implements CanActivate {
     }
 
     request.body.userId = decodedToken.userId;
-    request.body.shopId = user.shop.toString();
+    if (user.role === 'shop_owner') request.body.shopId = user.shop.toString();
     request.body.userRole = user.role;
-    request.body.username = decodedToken.username;
-
     return true;
   }
 
@@ -59,6 +57,8 @@ export class JwtGuard implements CanActivate {
   }
 
   private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
+    return this.jwtService.decode<{
+      userId: string;
+    }>(token);
   }
 }

@@ -26,16 +26,13 @@ export class ItemService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async create(createItemDto: CreateItemDto, userId: string) {
+  async create(createItemDto: CreateItemDto, shopID: string) {
     try {
-      const user = await this.userModel.findById(userId);
-
-      if (!user) throw new NotFoundException('There is no user with this id');
       const payload = {
         ...createItemDto,
-        shopID: user.shop.toString(),
+        shopID,
       };
-      const item = await new this.itemModel(payload).save();
+      const item = await new this.itemModel(createItemDto).save();
 
       const shop = await this.shopModel.findById(item.shopID);
 

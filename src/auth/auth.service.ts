@@ -25,11 +25,7 @@ export class AuthService {
 
   async login(user: User) {
     const payload = {
-      username: user.email,
       userId: user?.['_id'],
-      sub: {
-        name: user.name,
-      },
     };
 
     user.password = undefined;
@@ -42,10 +38,7 @@ export class AuthService {
   }
   async refreshToken(user: User) {
     const payload = {
-      username: user.email,
-      sub: {
-        name: user.name,
-      },
+      userId: user?.['_id'],
     };
 
     return {

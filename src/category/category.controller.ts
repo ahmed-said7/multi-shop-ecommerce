@@ -20,10 +20,10 @@ export class CategoryController {
   @UseGuards(JwtGuard)
   @Post('')
   create(
-    @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
     @Body() createCategoryDto: CreateCategoryDto,
   ) {
-    return this.categoryService.create(userId, createCategoryDto);
+    return this.categoryService.create(shopId, createCategoryDto);
   }
 
   @UseGuards(JwtGuard)

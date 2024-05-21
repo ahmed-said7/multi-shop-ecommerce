@@ -28,14 +28,10 @@ export class CategoryService {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 
-  async create(userId: string, createCategoryDto: CreateCategoryDto) {
-    const user = await this.userModel.findById(userId);
-
-    if (!user) throw new NotFoundException('There is no user with this id');
-
+  async create(shopID: string, createCategoryDto: CreateCategoryDto) {
     const payload = {
       ...createCategoryDto,
-      shopID: user.shop.toString(),
+      shopID,
     };
 
     const category = await new this.categoryModel(payload).save();
