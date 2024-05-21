@@ -20,10 +20,10 @@ export class VideoContainerController {
   @UseGuards(JwtGuard)
   @Post()
   create(
-    @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
-    return this.videoContainerService.create(userId, createVideoContainerDto);
+    return this.videoContainerService.create(shopId, createVideoContainerDto);
   }
 
   @UseGuards(JwtGuard)

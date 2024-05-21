@@ -16,8 +16,11 @@ export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
   @Post()
-  create(@Body() createProductSliderDto: CreateProductSliderDto) {
-    return this.productSliderService.create(createProductSliderDto);
+  create(
+    @Body() createProductSliderDto: CreateProductSliderDto,
+    @Body('shopId') shopId: string,
+  ) {
+    return this.productSliderService.create(createProductSliderDto, shopId);
   }
 
   @Get('shop/:id')

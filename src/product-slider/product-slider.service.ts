@@ -17,17 +17,19 @@ export class ProductSliderService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
   ) {}
 
-  async create(createProductSliderDto: CreateProductSliderDto) {
+  async create(createProductSliderDto: CreateProductSliderDto, shop: string) {
     try {
-      const productSlider = await new this.productSliderModel(
-        createProductSliderDto,
-      ).save();
-      const shop = await this.shopModel.findById(createProductSliderDto.shop);
-      shop.containers.push({
+      const payload = {
+        ...createProductSliderDto,
+        shop,
+      };
+      const productSlider = await new this.productSliderModel(payload).save();
+      const Shop = await this.shopModel.findById(shop);
+      Shop.containers.push({
         containerID: productSlider.id,
         containerType: 'product slider',
       });
-      await shop.save();
+      await Shop.save();
       return productSlider;
     } catch (err) {
       console.log(err);

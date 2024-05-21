@@ -29,38 +29,27 @@ export class VideoContainerService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async create(
-    userId: string,
-    createVideoContainerDto: CreateVideoContainerDto,
-  ) {
-    const user = await this.userModel.findById(userId);
+  async create(shop: string, createVideoContainerDto: CreateVideoContainerDto) {
+    const payload = {
+      ...createVideoContainerDto,
+      shop,
+    };
 
-    if (!user) {
-      throw new NotFoundException('There is no user with this id');
-    }
+    const videoContainer = await new this.videoContainerModel(payload).save();
 
-    if (!user.shop) {
-      throw new BadRequestException("You don't have a shop");
-    }
-    const videoContainer = await new this.videoContainerModel(
-      createVideoContainerDto,
-    ).save();
+    const Shop = await this.shopModel.findById(shop);
 
-    const shop = await this.shopModel.findById(
-      createVideoContainerDto?.['shop'],
-    );
-
-    if (!shop) {
+    if (!Shop) {
       throw new NotFoundException("Couldn't find the shop");
     }
 
-    if (shop?.containers) {
-      shop.containers.push({
+    if (Shop?.containers) {
+      Shop.containers.push({
         containerID: videoContainer.id,
         containerType: 'video container',
       });
     } else {
-      shop.$set('containers', [
+      Shop.$set('containers', [
         {
           containerID: videoContainer.id,
           containerType: 'video container',
@@ -68,7 +57,7 @@ export class VideoContainerService {
       ]);
     }
 
-    await shop.save();
+    await Shop.save();
     return videoContainer;
   }
 
