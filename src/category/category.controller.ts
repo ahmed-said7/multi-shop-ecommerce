@@ -12,6 +12,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import mongoose, { Types } from 'mongoose';
 
 @Controller('category')
 export class CategoryController {
@@ -28,8 +29,8 @@ export class CategoryController {
 
   @UseGuards(JwtGuard)
   @Get('/shop/:shopId')
-  findAll(@Param('shopId') shopId: string) {
-    return this.categoryService.findAll(shopId);
+  findAll(@Param('shopId') shopId: Types.ObjectId) {
+    return this.categoryService.findAll(new Types.ObjectId(shopId));
   }
 
   @UseGuards(JwtGuard)

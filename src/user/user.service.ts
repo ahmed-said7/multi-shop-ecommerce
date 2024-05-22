@@ -81,7 +81,7 @@ export class UserService {
       const updatedUser = await this.userModel.findByIdAndUpdate(
         savedUser._id,
         {
-          shop: shop._id,
+          shopId: shop._id,
         },
         { new: true },
       );

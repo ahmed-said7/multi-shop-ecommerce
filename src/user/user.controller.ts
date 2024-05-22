@@ -68,7 +68,7 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
-  @Get('one')
+  @Get('me')
   findOneUser(@Body('userId') userId: string) {
     return this.userService.findOne(userId);
   }

@@ -6,7 +6,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category_schema';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 
@@ -40,13 +40,15 @@ export class CategoryService {
     return category;
   }
 
-  async findAll(shopId: string) {
+  async findAll(shopId: Types.ObjectId) {
     try {
-      const categories = await this.categoryModel.find({ shopID: shopId });
+      const categories = await this.categoryModel.find({
+        shopId,
+      });
 
       return categories;
     } catch (error) {
-      console.log(error);
+      console.error('Error finding categories:', error);
       throw new InternalServerErrorException(error);
     }
   }
