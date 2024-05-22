@@ -7,7 +7,7 @@ import {
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item, ItemDocument } from './schemas/item-schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, MongooseError } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { JwtService } from '@nestjs/jwt';
@@ -184,25 +184,12 @@ export class ItemService {
 
   async remove(id: string, userId: string) {
     try {
-      const item = await this.itemModel.findById(id);
-
-      const user = await this.userModel.findById(userId);
-
-      if (!user) {
-        throw new NotFoundException('There is no user with this id');
-      }
-
-      if (user.shopId != item.shopId) {
-        throw new NotFoundException(
-          'You are not authorized to perform this action',
-        );
-      }
-
       const deletedItem = await this.itemModel.findByIdAndDelete(id);
 
       return deletedItem;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
+    } catch (error: any) {
+      // 500.
+      throw new InternalServerErrorException(error?.message);
     }
   }
 }

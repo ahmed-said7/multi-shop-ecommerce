@@ -67,13 +67,14 @@ export class CouponController {
   @Patch(':id')
   update(
     @Param('id') id: Types.ObjectId,
+    @Body('shopId') shopId: string,
     @Body() updateCouponDto: UpdateCouponDto,
   ) {
-    return this.couponService.update(id, updateCouponDto);
+    return this.couponService.update(id, shopId, updateCouponDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: Types.ObjectId) {
-    return this.couponService.remove(id);
+  remove(@Param('id') id: Types.ObjectId, @Body('shopId') shopId: string) {
+    return this.couponService.remove(id, shopId);
   }
 }

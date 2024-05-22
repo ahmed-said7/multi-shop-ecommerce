@@ -71,10 +71,14 @@ export class CouponService {
     }
   }
 
-  async update(id: Types.ObjectId, updateCouponDto: UpdateCouponDto) {
+  async update(
+    id: Types.ObjectId,
+    shopId: string,
+    updateCouponDto: UpdateCouponDto,
+  ) {
     try {
-      const coupon = await this.couponModel.findByIdAndUpdate(
-        id,
+      const coupon = await this.couponModel.updateOne(
+        { id, shopId },
         updateCouponDto,
         { new: true },
       );
@@ -85,9 +89,9 @@ export class CouponService {
     }
   }
 
-  async remove(id: Types.ObjectId) {
+  async remove(id: Types.ObjectId, shopId: string) {
     try {
-      const coupon = await this.couponModel.findByIdAndDelete(id);
+      await this.couponModel.deleteOne({ id, shopId });
 
       return 'The coupon was deleted successfully';
     } catch (error) {
