@@ -20,8 +20,8 @@ export class Cart extends Document {
     colors: string;
   }[];
 
-  @Prop({ required: true })
-  shopId: string;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
+  shopId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;

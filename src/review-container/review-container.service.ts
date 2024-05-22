@@ -42,7 +42,7 @@ export class ReviewContainerService {
           throw new InternalServerErrorException(err);
         });
       if (!review) throw new NotFoundException("This review doesn't exist");
-      const shop = await this.shopModel.findById(review.shop).catch((err) => {
+      const shop = await this.shopModel.findById(review.shopId).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });
@@ -124,7 +124,7 @@ export class ReviewContainerService {
           throw new InternalServerErrorException(err);
         });
       if (!review) throw new NotFoundException("This review doesn't exist");
-      const shop = await this.shopModel.findById(review.shop).catch((err) => {
+      const shop = await this.shopModel.findById(review.shopId).catch((err) => {
         console.log(err);
         throw new InternalServerErrorException(err);
       });

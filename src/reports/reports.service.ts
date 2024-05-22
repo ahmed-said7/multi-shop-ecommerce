@@ -30,7 +30,7 @@ export class ReportsService {
         throw new UnauthorizedException("You don't have a shop");
       }
 
-      const shopId = user.shop;
+      const shopId = user.shopId;
 
       let result: any;
 

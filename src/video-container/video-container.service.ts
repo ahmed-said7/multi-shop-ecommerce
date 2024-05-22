@@ -68,11 +68,11 @@ export class VideoContainerService {
       if (!user) {
         throw new NotFoundException('There is no user with this id');
       }
-      if (!user.shop) {
+      if (!user.shopId) {
         throw new BadRequestException("You don't have a shop");
       }
 
-      return await this.videoContainerModel.find({ shop: user.shop });
+      return await this.videoContainerModel.find({ shop: user.shopId });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);

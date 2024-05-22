@@ -42,7 +42,7 @@ export class JwtGuard implements CanActivate {
     }
 
     request.body.userId = decodedToken.userId;
-    if (user.role === 'shop_owner') request.body.shopId = user.shop.toString();
+    if (user.role === 'shop_owner') request.body.shopId = user.shopId;
     request.body.userRole = user.role;
     return true;
   }

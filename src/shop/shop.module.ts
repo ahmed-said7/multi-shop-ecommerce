@@ -13,11 +13,7 @@ import {
   PhotoSlider,
   PhotoSliderSchema,
 } from 'src/photo-slider/schemas/photo-slider_schema';
-import {
-  CardSlider,
-  CardSliderSchema,
-} from 'src/card-slider/schemas/cardSlider_schema';
-import { CardSliderModule } from 'src/card-slider/card-slider.module';
+
 import { PhotoSliderModule } from 'src/photo-slider/photo-slider.module';
 import { ProductSliderModule } from 'src/product-slider/product-slider.module';
 import { Category, CategorySchema } from 'src/category/schemas/category_schema';
@@ -31,7 +27,6 @@ import {
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { ReviewContainerModule } from 'src/review-container/review-container.module';
-import { Card, CardSchema } from 'src/card/schemas/card_schema';
 import {
   VideoContainer,
   VideoContainerSchema,
@@ -46,11 +41,9 @@ import { JwtModule } from '@nestjs/jwt';
       { name: User.name, schema: UserSchema },
       { name: Category.name, schema: CategorySchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
-      { name: CardSlider.name, schema: CardSliderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: Review.name, schema: ReviewSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
-      { name: Card.name, schema: CardSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
     JwtModule.register({
@@ -62,11 +55,11 @@ import { JwtModule } from '@nestjs/jwt';
     ProductSliderModule,
     CategoryModule,
     ItemModule,
-    CardSliderModule,
     ReviewModule,
     PhotoSliderModule,
   ],
   controllers: [ShopController],
   providers: [ShopService],
+  exports: [MongooseModule], // Export MongooseModule to make ShopModel available in other modules
 })
 export class ShopModule {}

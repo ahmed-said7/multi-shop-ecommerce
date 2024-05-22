@@ -9,7 +9,7 @@ export type ReviewContainerDocument = ReviewContainer & Document;
 })
 export class ReviewContainer {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shopId: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Review' })
   review: string[];

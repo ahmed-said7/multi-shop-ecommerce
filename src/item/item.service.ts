@@ -26,15 +26,15 @@ export class ItemService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async create(createItemDto: CreateItemDto, shopID: string) {
+  async create(createItemDto: CreateItemDto, shopId: string) {
     try {
       const payload = {
         ...createItemDto,
-        shopID,
+        shopId,
       };
-      const item = await new this.itemModel(createItemDto).save();
+      const item = await new this.itemModel(payload).save();
 
-      const shop = await this.shopModel.findById(item.shopID);
+      const shop = await this.shopModel.findById(item.shopId);
 
       shop?.itemsIDs?.push(item.id);
 
@@ -48,7 +48,7 @@ export class ItemService {
 
   async findAll(
     page?: number,
-    shopID?: string,
+    shopId?: string,
     category?: string,
     subCategory?: string,
     sortOrder?: string,
@@ -59,7 +59,7 @@ export class ItemService {
     limitParam?: number,
   ) {
     try {
-      const query: any = { shopID, category, subCategories: subCategory };
+      const query: any = { shopId, category, subCategories: subCategory };
 
       // Remove undefined or null values from the query object
       Object.keys(query).forEach(
@@ -166,7 +166,7 @@ export class ItemService {
 
       const user = await this.userModel.findById(userId);
 
-      if (user.shop != item.shopID) {
+      if (user.shopId != item.shopId) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );
@@ -192,7 +192,7 @@ export class ItemService {
         throw new NotFoundException('There is no user with this id');
       }
 
-      if (user.shop != item.shopID) {
+      if (user.shopId != item.shopId) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );

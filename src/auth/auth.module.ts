@@ -18,10 +18,6 @@ import {
   ProductSliderSchema,
 } from 'src/product-slider/schemas/productSlider_schema';
 import {
-  CardSlider,
-  CardSliderSchema,
-} from 'src/card-slider/schemas/cardSlider_schema';
-import {
   PhotoSlider,
   PhotoSliderSchema,
 } from 'src/photo-slider/schemas/photo-slider_schema';
@@ -47,7 +43,6 @@ import {
       { name: Item.name, schema: ItemSchema },
       { name: Category.name, schema: CategorySchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
-      { name: CardSlider.name, schema: CardSliderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: Review.name, schema: ReviewSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },

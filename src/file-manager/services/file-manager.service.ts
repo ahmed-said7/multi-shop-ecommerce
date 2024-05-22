@@ -5,8 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { CloudflareR2Communicator } from '../communicators/cloudflare-r2.communicator';
 import { ItemService } from 'src/item/item.service';
 import { UpdateItemDto } from 'src/item/dto/update-item.dto';
-import { PhotoSlideService } from 'src/photo-slide/photo-slide.service';
-import { UpdatePhotoSlideDto } from 'src/photo-slide/dto/update-photo-slide.dto';
 
 @Injectable()
 export class FileManagerService {
@@ -14,7 +12,6 @@ export class FileManagerService {
     private config: ConfigService,
     private cloudflareR2Communicator: CloudflareR2Communicator,
     private readonly itemService: ItemService,
-    private readonly photoSlideService: PhotoSlideService,
   ) {}
 
   async uploadFile(
@@ -64,8 +61,6 @@ export class FileManagerService {
         updateItemDto,
         request,
       );
-    } else {
-      await this.photoSlideService.updatePhoto(itemID, uploadResponse);
     }
     return uploadResponse;
   }

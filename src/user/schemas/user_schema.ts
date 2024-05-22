@@ -55,7 +55,7 @@ export class User {
   phone: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: Types.ObjectId;
+  shopId: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'User' })
   reviews: Types.ObjectId[];

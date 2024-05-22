@@ -16,7 +16,7 @@ export class Category {
   subCategory: string[];
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
-  shopID: string;
+  shopId: Types.ObjectId;
 }
 
 // Create the Mongoose schema for the Movie class

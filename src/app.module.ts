@@ -13,13 +13,10 @@ import { AuthModule } from './auth/auth.module';
 import { CouponModule } from './coupon/coupon.module';
 import { ReportsModule } from './reports/reports.module';
 import { AdminModule } from './admin/admin.module';
-import { PhotoSlideModule } from './photo-slide/photo-slide.module';
 import { ProductSliderModule } from './product-slider/product-slider.module';
 import { ReviewContainerModule } from './review-container/review-container.module';
-import { CardSliderModule } from './card-slider/card-slider.module';
 import { CategoryModule } from './category/category.module';
 import { ReviewModule } from './review/review.module';
-import { CardModule } from './card/card.module';
 import { IntroPageModule } from './intro-page/intro-page.module';
 import { AdminRequestsModule } from './admin-requests/admin-requests.module';
 import { VideoContainerModule } from './video-container/video-container.module';
@@ -49,17 +46,14 @@ import { CartModule } from './cart/cart.module';
     OrderModule,
     CouponModule,
     ReportsModule,
-    CardSliderModule,
     ProductSliderModule,
     PhotoSliderModule,
     CategoryModule,
     ReviewModule,
     PassportModule,
-    CardModule,
     IntroPageModule,
     AdminRequestsModule,
     VideoContainerModule,
-    PhotoSlideModule,
     ThemesModule,
     FileManagerModule,
     CartModule,

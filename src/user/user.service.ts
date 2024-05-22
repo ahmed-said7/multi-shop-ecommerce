@@ -266,7 +266,7 @@ export class UserService {
         .find({ _id: { $in: user.cart } })
         .exec();
       const shop = await this.shopService
-        .findOne(itemsInCart[0].shopID.toString())
+        .findOne(itemsInCart[0].shopId.toString())
         .catch((err) => {
           console.log(err);
           throw new InternalServerErrorException('Failed to find shop');
@@ -284,7 +284,7 @@ export class UserService {
         paid: false,
         status: OrderStatusTypes.INPROGRESS,
         comments: 'Sample comment',
-        shopId: itemsInCart[0].shopID,
+        shopId: itemsInCart[0].shopId,
         priceTotal: totalPrice,
       };
 
@@ -331,7 +331,7 @@ export class UserService {
     }
 
     // Remove The User Shop.
-    await this.shopService.remove(targetUser.shop.toString());
+    await this.shopService.remove(targetUser.shopId.toString());
 
     const deletedUser = await this.userModel.findByIdAndDelete(paramId);
 

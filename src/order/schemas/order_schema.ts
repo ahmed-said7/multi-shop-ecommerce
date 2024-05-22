@@ -43,7 +43,7 @@ export class Order {
   comments: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
-  shopId: string;
+  shopId: Types.ObjectId;
 
   @Prop({
     type: {

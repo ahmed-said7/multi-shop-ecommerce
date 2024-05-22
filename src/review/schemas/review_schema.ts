@@ -16,7 +16,7 @@ export class Review {
   @Prop({ required: true })
   title: string;
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shopId: Types.ObjectId;
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: string;
 }

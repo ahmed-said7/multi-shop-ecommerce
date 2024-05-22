@@ -1,12 +1,22 @@
-import { IsNotEmpty, IsArray } from 'class-validator';
-import mongoose, { Types } from 'mongoose';
-import { PhotoSlide } from 'src/photo-slide/schemas/photoSlide_schema';
+import { IsNotEmpty, IsArray, IsString } from 'class-validator';
 
 export class CreatePhotoSliderDto {
-  @IsArray({
-    message: 'A PhotoSlider must have an array of photoSlides Objects',
-  })
-  photoSlides: PhotoSlide[];
+  @IsArray()
+  @IsNotEmpty()
+  photoSlides: {
+    title: string;
+    subTitle: string;
+    titleAndSubTitlePostion: string;
+    titleAndSubTitleColor: string;
+    buttonText: string;
+    buttonLink: string;
+    buttonColor: string;
+    buttonTextColor: string;
+    buttonPosition: string;
+    photo: string;
+  }[];
 
+  @IsString()
+  @IsNotEmpty()
   shop: string;
 }

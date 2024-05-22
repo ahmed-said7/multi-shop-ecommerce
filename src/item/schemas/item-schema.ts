@@ -19,7 +19,7 @@ export class Item {
   amount: number;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
-  shopID: Types.ObjectId;
+  shopId: Types.ObjectId;
 
   @Prop({ required: true })
   description: string;

@@ -27,7 +27,7 @@ export class CategoryController {
   }
 
   @UseGuards(JwtGuard)
-  @Get(':shopId')
+  @Get('/shop/:shopId')
   findAll(@Param('shopId') shopId: string) {
     return this.categoryService.findAll(shopId);
   }
@@ -43,8 +43,10 @@ export class CategoryController {
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @Body('shopId') shopId: string,
+    @Body('userRole') userRole: string,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto, shopId, userRole);
   }
 
   @UseGuards(JwtGuard)

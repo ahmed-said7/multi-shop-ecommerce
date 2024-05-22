@@ -3,66 +3,46 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
+  Patch,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PhotoSlider } from './schemas/photo-slider_schema';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
   constructor(private readonly photoSliderService: PhotoSliderService) {}
 
-  @UseGuards(JwtGuard)
   @Post()
   create(
-    @Body('userId') userId: string,
     @Body() createPhotoSliderDto: CreatePhotoSliderDto,
-  ) {
-    return this.photoSliderService.create(userId, createPhotoSliderDto);
+  ): Promise<PhotoSlider> {
+    return this.photoSliderService.create(createPhotoSliderDto);
   }
 
-  @UseGuards(JwtGuard)
   @Get()
-  findAll(@Body('userId') userId: string) {
-    return this.photoSliderService.findAll(userId);
+  findAll(): Promise<PhotoSlider[]> {
+    return this.photoSliderService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.photoSliderService.findOne(+id);
-  }
-
-  @Patch('add/:id')
-  addPhotoSlide(
-    @Param('id') id: string,
-    @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ) {
-    return this.photoSliderService.addPhotoSlide(+id, updatePhotoSliderDto);
-  }
-
-  @Patch('remove/:id')
-  removePhotoSlides(
-    @Param('id') id: string,
-    @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ) {
-    return this.photoSliderService.removePhotoSlide(+id, updatePhotoSliderDto);
+  findOne(@Param('id') id: string): Promise<PhotoSlider | null> {
+    return this.photoSliderService.findOne(id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ) {
+  ): Promise<PhotoSlider | null> {
     return this.photoSliderService.update(id, updatePhotoSliderDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<void> {
     return this.photoSliderService.remove(id);
   }
 }

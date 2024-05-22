@@ -22,10 +22,6 @@ import {
   PhotoSliderDocument,
 } from 'src/photo-slider/schemas/photo-slider_schema';
 import {
-  CardSlider,
-  CardSliderDocument,
-} from 'src/card-slider/schemas/cardSlider_schema';
-import {
   Category,
   CategoryDocument,
 } from 'src/category/schemas/category_schema';
@@ -35,7 +31,6 @@ import {
   ReviewContainer,
   ReviewContainerDocument,
 } from 'src/review-container/schemas/reviewContainer_schema';
-import { Card, CardDocument } from 'src/card/schemas/card_schema';
 import {
   VideoContainer,
   VideoContainerDocument,
@@ -54,10 +49,6 @@ export class ShopService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(ProductSlider.name)
     private readonly productSliderModel: mongoose.Model<ProductSliderDocument>,
-    @InjectModel(Card.name)
-    private readonly cardModel: mongoose.Model<CardDocument>,
-    @InjectModel(CardSlider.name)
-    private readonly cardSliderModel: mongoose.Model<CardSliderDocument>,
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
     @InjectModel(ReviewContainer.name)
@@ -76,7 +67,7 @@ export class ShopService {
       const user = await this.userModel.findById(userId);
 
       if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.shop) throw new BadRequestException('You already have a shop');
+      if (user.shopId) throw new BadRequestException('You already have a shop');
 
       createShopDto.userID = user.id;
 
@@ -221,7 +212,7 @@ export class ShopService {
       let shopId = new mongoose.Types.ObjectId(id);
 
       if (!shopId && user.role == UserRole.SHOP_OWNER) {
-        shopId = user.shop;
+        shopId = user.shopId;
       }
 
       const shop = await this.shopModel
@@ -268,9 +259,6 @@ export class ShopService {
               container.containerID,
             );
             break;
-          case 'card slider':
-            await this.cardSliderModel.findByIdAndDelete(container.containerID);
-            break;
           case 'photo slider':
             await this.photoSliderModel.findByIdAndDelete(
               container.containerID,
@@ -290,7 +278,7 @@ export class ShopService {
         }
       }
 
-      await this.shopModel.findByIdAndDelete(user.shop);
+      await this.shopModel.findByIdAndDelete(user.shopId);
 
       return 'Shop was deleted successfully';
     } catch (error) {
@@ -340,19 +328,6 @@ export class ShopService {
             );
             if (photoSlider) {
               containers.push({ type: 'photo slider', container: photoSlider });
-            }
-            break;
-          case 'card slider':
-            let cardSlider = await this.cardSliderModel.findById(
-              container.containerID,
-            );
-            if (cardSlider) {
-              cardSlider = await cardSlider.populate({
-                path: 'cards',
-                model: 'Card',
-              });
-
-              containers.push({ type: 'card slider', container: cardSlider });
             }
             break;
           case 'video container':

@@ -82,7 +82,7 @@ export class IntroPageService {
           console.log(err);
           throw new InternalServerErrorException(err);
         });
-      const shop = await this.shopModel.findById(introPage.shop);
+      const shop = await this.shopModel.findById(introPage.shopId);
       for (let i = 0; i < shop.introPages.length; i++) {
         if (id == shop.introPages[i]) shop.introPages.splice(i, 1);
       }

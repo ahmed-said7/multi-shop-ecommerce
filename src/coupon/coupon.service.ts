@@ -24,7 +24,7 @@ export class CouponService {
       if (!user) throw new NotFoundException('There is no user with this id');
       const payload = {
         ...createCouponDto,
-        shop: user.shop.toString(),
+        shop: user.shopId,
       };
       const coupon = await new this.couponModel(payload).save().catch((err) => {
         if (err.code == 11000) {

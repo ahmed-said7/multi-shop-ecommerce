@@ -15,7 +15,7 @@ export class ProductSlider {
   @Prop()
   isSlider: boolean = false;
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shop: Types.ObjectId;
 }
 
 export const ProductSliderSchema = SchemaFactory.createForClass(ProductSlider);

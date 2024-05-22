@@ -12,10 +12,11 @@ export class IntroPage {
   title: string;
   @Prop()
   paragraph: string;
-  @Prop()
+
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   @IsNotEmpty()
   @IsString()
-  shop: string;
+  shopId: Types.ObjectId;
 }
 
 export const IntroPageSchema = SchemaFactory.createForClass(IntroPage);

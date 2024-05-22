@@ -18,10 +18,6 @@ import {
   PhotoSliderDocument,
 } from 'src/photo-slider/schemas/photo-slider_schema';
 import {
-  CardSlider,
-  CardSliderDocument,
-} from 'src/card-slider/schemas/cardSlider_schema';
-import {
   Category,
   CategoryDocument,
 } from 'src/category/schemas/category_schema';
@@ -45,8 +41,6 @@ export class ShopService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(ProductSlider.name)
     private readonly productSliderModel: mongoose.Model<ProductSliderDocument>,
-    @InjectModel(CardSlider.name)
-    private readonly cardSliderModel: mongoose.Model<CardSliderDocument>,
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
     @InjectModel(Review.name)
@@ -173,9 +167,6 @@ export class ShopService {
               container.containerID,
             );
             break;
-          case 'cardslider':
-            await this.cardSliderModel.findByIdAndDelete(container.containerID);
-            break;
           case 'photoslider':
             await this.photoSliderModel.findByIdAndDelete(
               container.containerID,
@@ -245,12 +236,6 @@ export class ShopService {
                 );
               });
             containers.push(photoSlider);
-          case 'card slider':
-            const cardSlider = await this.cardSliderModel.findById(
-              container.containerID,
-            );
-
-            containers.push(cardSlider);
         }
       });
       return containers;

@@ -9,8 +9,6 @@ import { Category, CategoryDocument } from './schemas/category_schema';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 
 @Injectable()
 export class CategoryService {
@@ -19,25 +17,18 @@ export class CategoryService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<UserDocument>,
-    private readonly jwtService: JwtService,
   ) {}
 
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
-  }
-
-  async create(shopID: string, createCategoryDto: CreateCategoryDto) {
+  async create(shopId: string, createCategoryDto: CreateCategoryDto) {
     const payload = {
       ...createCategoryDto,
-      shopID,
+      shopId,
     };
 
     const category = await new this.categoryModel(payload).save();
 
     await this.shopModel.findByIdAndUpdate(
-      payload.shopID,
+      payload.shopId,
       {
         $push: { categories: category._id },
       },
@@ -70,7 +61,14 @@ export class CategoryService {
     }
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+    shopId: string,
+    userRole: string,
+  ) {
+    const categoryShop = (await this.categoryModel.findById(id)).shopId;
+
     try {
       const category = await this.categoryModel
         .findByIdAndUpdate(id, updateCategoryDto, { new: true })
