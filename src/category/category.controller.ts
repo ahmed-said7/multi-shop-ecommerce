@@ -12,7 +12,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 @Controller('category')
 export class CategoryController {
@@ -45,13 +45,14 @@ export class CategoryController {
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
     @Body('shopId') shopId: string,
+    @Body('userRole') userRole: string,
   ) {
-    return this.categoryService.update(id, shopId, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto, shopId, userRole);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('shopId') shopId: string) {
-    return this.categoryService.remove(id, shopId);
+  remove(@Param('id') id: string) {
+    return this.categoryService.remove(id);
   }
 }

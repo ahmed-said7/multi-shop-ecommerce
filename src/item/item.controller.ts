@@ -14,6 +14,7 @@ import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import mongoose, { Types } from 'mongoose';
 
 @Controller('item')
 export class ItemController {
@@ -27,7 +28,7 @@ export class ItemController {
 
   @Get('all-items/:shop/')
   findAll(
-    @Param('shop') shopID: string,
+    @Param('shop') shopId: Types.ObjectId,
     @Query('page') page: number,
     @Query('limitParam') limitParam: number,
     @Query('category') category: string,
@@ -39,7 +40,7 @@ export class ItemController {
   ) {
     return this.itemService.findAll(
       page,
-      shopID,
+      new mongoose.Types.ObjectId(shopId),
       category,
       subCategory,
       sortOrder,

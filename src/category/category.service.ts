@@ -1,11 +1,13 @@
-import mongoose, { Types } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-
 import { Category, CategoryDocument } from './schemas/category_schema';
+import mongoose, { Types } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 
 @Injectable()
@@ -63,18 +65,17 @@ export class CategoryService {
 
   async update(
     id: string,
-    shopId: string,
     updateCategoryDto: UpdateCategoryDto,
+    shopId: string,
+    userRole: string,
   ) {
     try {
-      const category = await this.categoryModel.updateOne(
-        {
-          shopId,
-          id,
-        },
-        updateCategoryDto,
-        { new: true },
-      );
+      const category = await this.categoryModel
+        .findByIdAndUpdate(id, updateCategoryDto, { new: true })
+        .catch((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        });
 
       return category;
     } catch (error) {
@@ -83,11 +84,11 @@ export class CategoryService {
     }
   }
 
-  async remove(id: string, shopId: string) {
+  async remove(id: string) {
     try {
-      await this.categoryModel.deleteOne({
-        shopId,
-        id,
+      await this.categoryModel.findByIdAndDelete(id).catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
       });
       return 'Category has been deleted successfully';
     } catch (error) {

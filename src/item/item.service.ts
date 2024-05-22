@@ -7,7 +7,7 @@ import {
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item, ItemDocument } from './schemas/item-schema';
-import mongoose, { Model, MongooseError } from 'mongoose';
+import mongoose, { Model, MongooseError, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { JwtService } from '@nestjs/jwt';
@@ -48,7 +48,7 @@ export class ItemService {
 
   async findAll(
     page?: number,
-    shopId?: string,
+    shopId?: Types.ObjectId,
     category?: string,
     subCategory?: string,
     sortOrder?: string,
@@ -166,7 +166,7 @@ export class ItemService {
 
       const user = await this.userModel.findById(userId);
 
-      if (user.shopId != item.shopId) {
+      if (user.shopId.toString() != item.shopId.toString()) {
         throw new NotFoundException(
           'You are not authorized to perform this action',
         );

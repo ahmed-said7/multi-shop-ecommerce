@@ -16,8 +16,7 @@ export class UpdateItemDto extends PartialType(CreateItemDto) {
   category?: string[];
   @IsString()
   brand?: string;
-  @IsNumber()
-  rating?: number;
+
   @IsArray({ message: 'Item sizes must be an array' })
   sizes?: string[];
   @IsArray({ message: 'Item images must be an array' })
