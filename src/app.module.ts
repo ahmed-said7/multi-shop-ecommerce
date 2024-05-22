@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -35,7 +35,7 @@ import { CartModule } from './cart/cart.module';
       isGlobal: true,
     }),
     JwtModule.register({
-      secret: `${process.env.SECRET}`,
+      secret: process.env.SECRET,
       signOptions: { expiresIn: '1d' },
       global: true,
     }),

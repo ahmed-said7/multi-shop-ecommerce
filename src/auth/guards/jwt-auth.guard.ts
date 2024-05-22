@@ -49,7 +49,7 @@ export class JwtGuard implements CanActivate {
 
   async validate(token: string): Promise<boolean> {
     try {
-      await this.jwtService.verifyAsync(token);
+      await this.jwtService.verifyAsync(token, { secret: process.env.SECRET });
       return true; // Token is valid
     } catch (error) {
       return false; // Token is invalid
