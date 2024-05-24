@@ -12,13 +12,14 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import mongoose, { Types } from 'mongoose';
+import  { Types } from 'mongoose';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post('')
   create(
     @Body('shopId') shopId: string,
@@ -27,19 +28,19 @@ export class CategoryController {
     return this.categoryService.create(shopId, createCategoryDto);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Get('/shop/:shopId')
   findAll(@Param('shopId') shopId: Types.ObjectId) {
     return this.categoryService.findAll(new Types.ObjectId(shopId));
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Get('/one/:id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -50,7 +51,7 @@ export class CategoryController {
     return this.categoryService.update(id, updateCategoryDto, shopId, userRole);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);

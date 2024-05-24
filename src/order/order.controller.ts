@@ -15,12 +15,13 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   create(
     @Body('userId') userId: string,
@@ -43,7 +44,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Body('userId') userId: string,
@@ -53,7 +54,7 @@ export class OrderController {
     return this.orderService.update(userId, id, updateOrderDto);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('userId') userId: string) {
     return this.orderService.remove(id, userId);

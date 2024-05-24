@@ -15,12 +15,13 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose, { Types } from 'mongoose';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('item')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   create(@Body() createItemDto: CreateItemDto, @Body('shopId') shopId: string) {
     return this.itemService.create(createItemDto, shopId);
@@ -56,7 +57,7 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +67,7 @@ export class ItemController {
     return this.itemService.update(id, updateItemDto, userId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('userId') userId: string) {
     return this.itemService.remove(id, userId);

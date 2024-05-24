@@ -3,11 +3,12 @@ import { ThemesService } from './themes.service';
 import { ThemeDocument } from './schemas/theme.schema';
 import { CreateThemeDto } from './dto/create-themes.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('themes')
 export class ThemesController {
   constructor(private readonly themesService: ThemesService) {}
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   async createTheme(
     @Body('userId') userId: string,

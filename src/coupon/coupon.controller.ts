@@ -16,12 +16,13 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { Types } from 'mongoose';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   create(
     @Body() createCouponDto: CreateCouponDto,
