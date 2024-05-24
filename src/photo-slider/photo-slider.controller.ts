@@ -21,7 +21,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class PhotoSliderController {
   constructor(private readonly photoSliderService: PhotoSliderService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(
     @Body('shopId') shopId: Types.ObjectId,
@@ -40,6 +40,7 @@ export class PhotoSliderController {
     return this.photoSliderService.findOne(id);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -48,6 +49,7 @@ export class PhotoSliderController {
     return this.photoSliderService.update(id, updatePhotoSliderDto);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<string> {
     return this.photoSliderService.remove(id);

@@ -32,6 +32,7 @@ export class CartController {
     return this.cartService.addToCart(userId, shopId, addToCartDto);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete('/remove/:itemId')
   removeFromCart(
     @Body('userId') userId: string,

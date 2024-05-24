@@ -21,7 +21,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(
     @Body('userId') userId: string,

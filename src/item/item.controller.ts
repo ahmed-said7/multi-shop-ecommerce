@@ -21,7 +21,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(@Body() createItemDto: CreateItemDto, @Body('shopId') shopId: string) {
     return this.itemService.create(createItemDto, shopId);

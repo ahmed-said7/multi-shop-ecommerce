@@ -32,6 +32,9 @@ import {
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
 import { JwtModule } from '@nestjs/jwt';
+import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
+import { Order, OrderSchema } from 'src/order/schemas/order_schema';
+import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { JwtModule } from '@nestjs/jwt';
       { name: Review.name, schema: ReviewSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: Coupon.name, schema: CouponSchema },
+      { name: Order.name, schema: OrderSchema },
+      { name: Cart.name, schema: CartSchema },
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,

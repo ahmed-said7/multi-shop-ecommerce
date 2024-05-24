@@ -22,7 +22,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(
     @Body() createCouponDto: CreateCouponDto,
@@ -65,6 +65,7 @@ export class CouponController {
     return this.couponService.findOne(id);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: Types.ObjectId,
@@ -74,6 +75,7 @@ export class CouponController {
     return this.couponService.update(id, shopId, updateCouponDto);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: Types.ObjectId, @Body('shopId') shopId: string) {
     return this.couponService.remove(id, shopId);

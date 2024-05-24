@@ -31,6 +31,9 @@ import { EmailService } from './email/email.service';
 import { ShopService } from './shop.service';
 import { UserTrackController } from './track.controller';
 import { TrackService } from './track.service';
+import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
+import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
+import { VideoContainer, VideoContainerSchema } from 'src/video-container/schemas/videoContainer-schema';
 
 @Module({
   imports: [
@@ -48,6 +51,10 @@ import { TrackService } from './track.service';
       { name: Review.name, schema: ReviewSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: Coupon.name, schema: CouponSchema },
+
+      { name: Cart.name, schema: CartSchema },
+      { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
     JwtModule.register({
       secret: process.env.SECRET,

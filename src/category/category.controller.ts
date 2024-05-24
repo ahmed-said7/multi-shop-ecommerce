@@ -19,7 +19,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post('')
   create(
     @Body('shopId') shopId: string,
@@ -28,7 +28,7 @@ export class CategoryController {
     return this.categoryService.create(shopId, createCategoryDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Get('/shop/:shopId')
   findAll(@Param('shopId') shopId: Types.ObjectId) {
     return this.categoryService.findAll(new Types.ObjectId(shopId));

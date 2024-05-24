@@ -18,7 +18,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard,)
   @Post()
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
@@ -37,6 +37,7 @@ export class ProductSliderController {
     return this.productSliderService.findOne(id);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -45,6 +46,7 @@ export class ProductSliderController {
     return this.productSliderService.update(id, updateProductSliderDto);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productSliderService.remove(id);

@@ -9,6 +9,13 @@ import {
 } from './schemas/videoContainer-schema';
 import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
+import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
+import { Item, ItemSchema } from 'src/item/schemas/item-schema';
+import { Order, OrderSchema } from 'src/order/schemas/order_schema';
+import { PhotoSlider, PhotoSliderSchema } from 'src/photo-slider/schemas/photo-slider_schema';
+import { ProductSlider, ProductSliderSchema } from 'src/product-slider/schemas/productSlider_schema';
+import { Category, CategorySchema } from 'src/category/schemas/category_schema';
+import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
 
 @Module({
   imports: [
@@ -16,6 +23,13 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
+      { name: Coupon.name, schema: CouponSchema },
+      { name: Item.name, schema: ItemSchema },
+      { name: Order.name, schema: OrderSchema },
+      { name: PhotoSlider.name, schema: PhotoSliderSchema },
+      { name: ProductSlider.name, schema: ProductSliderSchema },
+      { name: Category.name, schema: CategorySchema },
+      { name: Cart.name, schema: CartSchema },
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,

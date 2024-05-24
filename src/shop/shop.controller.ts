@@ -22,7 +22,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class ShopController {
   constructor(private readonly shopService: ShopService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(
     @Req() req: Request,
@@ -34,13 +34,13 @@ export class ShopController {
     return this.shopService.create(createShopDto, userId);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Get()
   findAll(@Body('userId') userId: string) {
     return this.shopService.findAll(userId);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Get('items')
   findShopItems(@Body('userId') userId: string, @Param('id') id?: string) {
     return this.shopService.findShopItems(userId, id);
@@ -61,7 +61,7 @@ export class ShopController {
     return this.shopService.userJoin(id, userId);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Get('user/:id')
   findUserShops(@Param('id') id: string) {
     return this.shopService.findUserShops(id);
@@ -74,12 +74,12 @@ export class ShopController {
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
-  @Delete('/:shopId')
-  remove(@Body('userId') userId: string, @Param('shopId') shopId: string) {
+  @Delete('/:id')
+  remove(@Body('userId') userId: string, @Param('id') shopId: string) {
     return this.shopService.remove(userId, shopId);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Get('containers/:id')
   findShopContainers(@Param('id') id: string) {
     return this.shopService.findShopContainers(id);
