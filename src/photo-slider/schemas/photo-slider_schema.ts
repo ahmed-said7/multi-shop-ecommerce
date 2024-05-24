@@ -28,11 +28,8 @@ export class PhotoSlider {
   @Prop({ default: true })
   isContainer: boolean;
 
-  @Prop({ default: true })
-  isSlider: boolean;
-
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: mongoose.Types.ObjectId;
+  shopId: mongoose.Types.ObjectId;
 }
 
 // Create the Mongoose schema for the Movie class

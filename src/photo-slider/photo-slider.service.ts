@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
@@ -19,13 +23,18 @@ export class PhotoSliderService {
   ) {}
 
   async create(
+    shopId: Types.ObjectId,
     createPhotoSliderDto: CreatePhotoSliderDto,
   ): Promise<PhotoSlider> {
     let createdPhotoSlider = await new this.photoSliderModel(
       createPhotoSliderDto,
     ).save();
 
-    const Shop = await this.shopModel.findById(createPhotoSliderDto.shop);
+    const payload = {
+      createPhotoSliderDto,
+      shopId,
+    };
+    const Shop = await this.shopModel.findById(payload);
 
     if (!Shop) {
       throw new NotFoundException("Couldn't find the shop");
@@ -66,7 +75,33 @@ export class PhotoSliderService {
       .exec();
   }
 
-  async remove(id: string): Promise<void> {
-    await this.photoSliderModel.findByIdAndDelete(id).exec();
+  async remove(id: string): Promise<string> {
+    const photoSlider = await this.photoSliderModel
+      .findById(id)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+    if (!photoSlider)
+      throw new InternalServerErrorException("this slider doesn't exist");
+
+    const shop = await this.shopModel
+      .findById(photoSlider.shopId)
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(err);
+      });
+    for (let i = 0; i < shop.containers.length; i++) {
+      if (shop.containers[i].containerID === id) {
+        shop.containers.splice(i, 1);
+        break;
+      }
+    }
+    await shop.save();
+    await this.photoSliderModel.findByIdAndDelete(id).catch((err) => {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    });
+    return 'Prouct Slider has been deleted successfully!';
   }
 }

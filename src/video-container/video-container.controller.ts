@@ -12,6 +12,7 @@ import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import mongoose, { Types } from 'mongoose';
 
 @Controller('video-container')
 export class VideoContainerController {
@@ -20,20 +21,20 @@ export class VideoContainerController {
   @UseGuards(JwtGuard)
   @Post()
   create(
-    @Body('shopId') shopId: string,
+    @Body('shopId') shopId: Types.ObjectId,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
     return this.videoContainerService.create(shopId, createVideoContainerDto);
   }
 
   @UseGuards(JwtGuard)
-  @Get()
-  findAll(@Body('userId') userId: string) {
-    return this.videoContainerService.findAll(userId);
+  @Get(':id')
+  findAll(@Param('id') id: Types.ObjectId) {
+    return this.videoContainerService.findAll(new Types.ObjectId(id));
   }
 
   @UseGuards(JwtGuard)
-  @Get(':id')
+  @Get('/one/:id')
   findOne(@Param('id') id: string) {
     return this.videoContainerService.findOne(id);
   }

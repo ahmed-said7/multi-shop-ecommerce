@@ -15,8 +15,5 @@ export class CreatePhotoSliderDto {
     buttonPosition: string;
     photo: string;
   }[];
-
-  @IsString()
-  @IsNotEmpty()
-  shop: string;
+  isContainer: boolean;
 }

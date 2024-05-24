@@ -33,7 +33,7 @@ export class CouponController {
 
   @Get(':id')
   findAll(@Param('id') id: Types.ObjectId, @Query('page') page?: number) {
-    return this.couponService.findAll(id, page);
+    return this.couponService.findAll(new Types.ObjectId(id), page);
   }
 
   @Patch('/discount/:id')

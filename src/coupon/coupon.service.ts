@@ -42,11 +42,11 @@ export class CouponService {
     }
   }
 
-  async findAll(shop: Types.ObjectId, page: number = 0) {
+  async findAll(shopId: Types.ObjectId, page: number = 0) {
     try {
       const coupons = await this.couponModel
         .find({
-          shop,
+          shopId,
         })
         .limit(10)
         .skip(10 * page)
