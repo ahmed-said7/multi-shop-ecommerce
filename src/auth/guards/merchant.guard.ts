@@ -62,9 +62,6 @@ export class MerchantGuard implements CanActivate {
 
     const routeName = path.match(routePattern)?.[0]?.replaceAll('/', '');
 
-    console.log({routeName, id});
-
-
     if(!routeName) {
         return false;
     }
