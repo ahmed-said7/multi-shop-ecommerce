@@ -12,7 +12,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import  { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('category')
