@@ -12,12 +12,13 @@ import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('product-slider')
 export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,

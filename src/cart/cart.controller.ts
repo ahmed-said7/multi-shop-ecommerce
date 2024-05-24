@@ -12,6 +12,7 @@ import {
 import { CartService } from './cart.service';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('cart')
 export class CartController {
@@ -22,7 +23,6 @@ export class CartController {
     return this.cartService.getCart(userId);
   }
 
-  // @UseGuards(JwtGuard)
   @Post()
   addToCart(
     @Body('userId') userId: string,
@@ -32,7 +32,6 @@ export class CartController {
     return this.cartService.addToCart(userId, shopId, addToCartDto);
   }
 
-  // @UseGuards(JwtGuard)
   @Delete('/remove/:itemId')
   removeFromCart(
     @Body('userId') userId: string,
@@ -41,7 +40,7 @@ export class CartController {
     return this.cartService.removeFromCart(userId, itemId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Put(':userId/update/:itemId')
   updateItemQuantity(
     @Param('userId') userId: string,

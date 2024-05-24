@@ -22,6 +22,7 @@ import { EmailService } from './email/email.service';
 import { User } from './schemas/user_schema';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('user')
 export class UserController {
@@ -67,7 +68,7 @@ export class UserController {
     return this.userService.findAll(userId, page);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Get('me')
   findOneUser(@Body('userId') userId: string) {
     return this.userService.findOne(userId);

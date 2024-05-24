@@ -15,11 +15,13 @@ import { PhotoSlider } from './schemas/photo-slider_schema';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+
 @Controller('photo-slider')
 export class PhotoSliderController {
   constructor(private readonly photoSliderService: PhotoSliderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, MerchantGuard)
   @Post()
   create(
     @Body('shopId') shopId: Types.ObjectId,
