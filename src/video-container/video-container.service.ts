@@ -15,6 +15,7 @@ import {
 } from './schemas/videoContainer-schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { JwtService } from '@nestjs/jwt';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class VideoContainerService {
@@ -29,7 +30,10 @@ export class VideoContainerService {
   private decodeToken(token: string) {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
-  async create(shop: string, createVideoContainerDto: CreateVideoContainerDto) {
+  async create(
+    shop: Types.ObjectId,
+    createVideoContainerDto: CreateVideoContainerDto,
+  ) {
     const payload = {
       ...createVideoContainerDto,
       shop,
@@ -61,18 +65,9 @@ export class VideoContainerService {
     return videoContainer;
   }
 
-  async findAll(userId: string) {
+  async findAll(id: Types.ObjectId) {
     try {
-      const user = await this.userModel.findById(userId);
-
-      if (!user) {
-        throw new NotFoundException('There is no user with this id');
-      }
-      if (!user.shopId) {
-        throw new BadRequestException("You don't have a shop");
-      }
-
-      return await this.videoContainerModel.find({ shop: user.shopId });
+      return await this.videoContainerModel.find({ shopId: id });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);
@@ -112,7 +107,7 @@ export class VideoContainerService {
       throw new InternalServerErrorException("this slider doesn't exist");
     }
 
-    const shop = await this.shopModel.findById(videoContainer.shop);
+    const shop = await this.shopModel.findById(videoContainer.shopId);
 
     for (let i = 0; i < shop.containers.length; i++) {
       if (shop.containers[i].containerID === id) {

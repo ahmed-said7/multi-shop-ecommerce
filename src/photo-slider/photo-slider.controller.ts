@@ -6,21 +6,26 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import { PhotoSlider } from './schemas/photo-slider_schema';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Types } from 'mongoose';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
   constructor(private readonly photoSliderService: PhotoSliderService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
   create(
+    @Body('shopId') shopId: Types.ObjectId,
     @Body() createPhotoSliderDto: CreatePhotoSliderDto,
   ): Promise<PhotoSlider> {
-    return this.photoSliderService.create(createPhotoSliderDto);
+    return this.photoSliderService.create(shopId, createPhotoSliderDto);
   }
 
   @Get()
@@ -42,7 +47,7 @@ export class PhotoSliderController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: string): Promise<string> {
     return this.photoSliderService.remove(id);
   }
 }

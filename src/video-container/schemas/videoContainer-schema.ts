@@ -11,7 +11,7 @@ export class VideoContainer {
   link: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shopId: string;
 }
 
 export const VideoContainerSchema =
