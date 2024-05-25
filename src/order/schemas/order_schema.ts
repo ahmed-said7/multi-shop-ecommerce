@@ -15,10 +15,7 @@ export enum OrderStatusTypes {
 })
 export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  sellerId: string;
-
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  buyerId: string;
+  userId: string;
 
   @Prop({ type: [Types.ObjectId], default: [] })
   items: Types.ObjectId;

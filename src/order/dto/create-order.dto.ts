@@ -11,9 +11,7 @@ import { OrderStatusTypes } from '../schemas/order_schema';
 import { Types } from 'mongoose';
 
 export class CreateOrderDto {
-  buyerId: string;
-
-  sellerId: Types.ObjectId;
+  userId: string;
 
   @IsNotEmpty({ message: 'An order must have at least one item' })
   @IsArray({ message: 'An order must have a string array of items' })
@@ -29,7 +27,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty({ message: 'An order must have a status' })
   @IsEnum(OrderStatusTypes, { message: 'Invalid order status' })
-  status: string;
+  status: OrderStatusTypes;
 
   @IsString({ message: 'An order must have a string comment' })
   @MinLength(10, {

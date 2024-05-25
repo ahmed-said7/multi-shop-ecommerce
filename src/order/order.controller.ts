@@ -32,11 +32,10 @@ export class OrderController {
 
   @Get()
   findAll(
-    @Query('buyerId') buyerId?: string,
     @Query('sellerId') sellerId?: string,
     @Query('shopId') shopId?: string,
   ) {
-    return this.orderService.findAll(buyerId, sellerId, shopId);
+    return this.orderService.findAll(sellerId, shopId);
   }
 
   @Get(':id')
@@ -46,12 +45,8 @@ export class OrderController {
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
-  update(
-    @Body('userId') userId: string,
-    @Param('id') id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
-  ) {
-    return this.orderService.update(userId, id, updateOrderDto);
+  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+    return this.orderService.update(id, updateOrderDto);
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
