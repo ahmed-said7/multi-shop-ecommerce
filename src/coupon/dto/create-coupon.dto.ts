@@ -1,11 +1,6 @@
-import {
-  IsArray,
-  IsDate,
-  IsDateString,
-  IsNumber,
-  IsString,
-} from 'class-validator';
 import { Types } from 'mongoose';
+
+import { IsArray, IsDateString, IsNumber, IsString } from 'class-validator';
 
 export class CreateCouponDto {
   @IsString({ message: 'text must be string' })
@@ -18,4 +13,6 @@ export class CreateCouponDto {
   discountPercentage: number;
   @IsArray()
   items: Types.ObjectId[];
+
+  subscriptCustomers?: Types.ObjectId[];
 }

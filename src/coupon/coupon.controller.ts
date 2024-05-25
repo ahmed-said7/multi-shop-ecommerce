@@ -16,6 +16,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { Types } from 'mongoose';
+
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('coupon')
@@ -51,9 +52,15 @@ export class CouponController {
     return this.couponService.update(id, updateCouponDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Patch('use/:id')
+  useCoupon(@Param('id') id: string, @Body('userId') userId: string) {
+    return this.couponService.removeUser(id, userId);
+  }
+
   @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: Types.ObjectId, @Body('shopId') shopId: string) {
+  remove(@Param('id') id: Types.ObjectId) {
     return this.couponService.remove(id);
   }
 }

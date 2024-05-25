@@ -2,10 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
+
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
+
 import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Coupon } from './schemas/coupon.schema';
@@ -25,12 +26,15 @@ export class CouponService {
         ...createCouponDto,
         shopId,
       };
+
       const checkCoupon = await this.couponModel.findOne({
         text: createCouponDto.text,
       });
+
       if (checkCoupon) {
         throw new BadRequestException('this coupon already exists');
       }
+
       const coupon = await new this.couponModel(payload).save();
       return coupon;
     } catch (error) {
@@ -87,5 +91,19 @@ export class CouponService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+  }
+
+  async removeUser(id: string, couponUser: string) {
+    await this.couponModel.findByIdAndUpdate(
+      id,
+      {
+        $pull: {
+          subscriptCustomers: couponUser,
+        },
+      },
+      {
+        new: true,
+      },
+    );
   }
 }
