@@ -19,10 +19,10 @@ export class Cart {
   quantity: number;
 
   @Prop({ required: true, minlength: 1 })
-  size: string;
+  sizes: string;
 
   @Prop({ required: true, minlength: 1 })
-  color: string;
+  colors: string;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
