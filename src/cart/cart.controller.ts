@@ -38,7 +38,7 @@ export class CartController {
   }
 
   @UseGuards(JwtGuard)
-  @Put(':userId/update/:id')
+  @Put(':id')
   updateItemQuantity(
     @Param('id') itemId: string,
     @Body('quantity') quantity: number,
