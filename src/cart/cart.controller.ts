@@ -17,7 +17,8 @@ import { CreateCartItemDto } from './dto/create-cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Get()
+  @UseGuards(JwtGuard)
+  @Post()
   async getUserCart(
     @Body('userId') userId: string,
     @Body('shopId') shopId: string,
@@ -38,7 +39,7 @@ export class CartController {
   }
 
   @UseGuards(JwtGuard)
-  @Put(':userId/update/:id')
+  @Put('/update/:id')
   updateItemQuantity(
     @Param('id') itemId: string,
     @Body('quantity') quantity: number,

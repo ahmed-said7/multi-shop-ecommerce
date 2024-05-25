@@ -61,7 +61,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
 
-    return await this.cartModel.findByIdAndDelete(cartItemId);
+    return 'item deleted successfully';
   }
 
   // update item quantity in global (not needed at now)
