@@ -49,44 +49,34 @@ export class UserService {
         password: hashedPassword,
       });
 
-      const savedUser = await createdUser.save().catch((err) => {
-        console.log(err);
-        if (err && err.code == 11000) {
-          console.log(err);
-
-          throw new BadRequestException(
-            'There is a user with the same phone number!',
-          );
-        } else
-          throw new InternalServerErrorException(
-            'Unexpected error while creating the user',
-          );
-      });
+      const savedUser = await createdUser.save();
 
       const userResponse = { ...savedUser.toObject(), password: undefined };
 
       const token = this.generateToken(savedUser);
 
-      // Creating a shop on regsiter, CR.
-      const shop = await this.shopService.create({
-        categories: [],
-        containers: [],
-        customers: [],
-        description: 'Add Description',
-        title: `${userResponse.email.split('@')[0]} shop`,
-        userID: userResponse._id,
-      });
+      if (savedUser.role === 'shop_owner') {
+        const shop = await this.shopService.create({
+          categories: [],
+          containers: [],
+          customers: [],
+          description: 'Add Description',
+          title: `${userResponse.email.split('@')[0]} shop`,
+          userID: userResponse._id,
+        });
+        const updatedUser = await this.userModel.findByIdAndUpdate(
+          savedUser._id,
+          {
+            shopId: shop._id,
+          },
+          { new: true },
+        );
+        return { token, user: updatedUser };
+      }
 
       // Save shopID in user document
-      const updatedUser = await this.userModel.findByIdAndUpdate(
-        savedUser._id,
-        {
-          shopId: shop._id,
-        },
-        { new: true },
-      );
 
-      return { token, user: updatedUser, shop };
+      return { token, user: savedUser };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);

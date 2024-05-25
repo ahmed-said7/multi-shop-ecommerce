@@ -26,12 +26,8 @@ export class CartService {
     }
   }
   // create cart and add or edit item in cart
-  async addToCart(
-    userId: string,
-    shopId: string,
-    addToCartDto: AddToCartDto,
-  ): Promise<Cart> {
-    const { itemId, quantity, sizes, colors } = addToCartDto;
+  async addToCart(userId: string, addToCartDto: AddToCartDto): Promise<Cart> {
+    const { itemId, quantity, sizes, colors, shopId } = addToCartDto;
     const itemObjectId = new Types.ObjectId(itemId);
     const cart = await this.cartModel.findOne({ userId, shopId });
 

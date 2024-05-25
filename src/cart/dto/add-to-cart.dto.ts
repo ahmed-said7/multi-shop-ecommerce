@@ -1,6 +1,7 @@
 export class AddToCartDto {
-  readonly itemId: string;
-  readonly quantity: number;
-  readonly sizes?: string;
-  readonly colors?: string;
+  shopId: string;
+  itemId: string;
+  quantity: number;
+  sizes?: string;
+  colors?: string;
 }

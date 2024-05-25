@@ -23,16 +23,16 @@ export class CartController {
     return this.cartService.getCart(userId);
   }
 
+  @UseGuards(JwtGuard)
   @Post()
   addToCart(
     @Body('userId') userId: string,
-    @Body('shopId') shopId: string,
     @Body() addToCartDto: AddToCartDto,
   ) {
-    return this.cartService.addToCart(userId, shopId, addToCartDto);
+    return this.cartService.addToCart(userId, addToCartDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Delete('/remove/:itemId')
   removeFromCart(
     @Body('userId') userId: string,
@@ -41,7 +41,7 @@ export class CartController {
     return this.cartService.removeFromCart(userId, itemId);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Put(':userId/update/:itemId')
   updateItemQuantity(
     @Param('userId') userId: string,
