@@ -18,8 +18,11 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
-  async getUserCart(@Body('userId') userId: string) {
-    return this.cartService.getCart(userId);
+  async getUserCart(
+    @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
+  ) {
+    return this.cartService.getCart(userId, shopId);
   }
 
   @UseGuards(JwtGuard)

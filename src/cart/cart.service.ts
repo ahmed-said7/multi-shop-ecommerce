@@ -14,13 +14,13 @@ export class CartService {
   constructor(@InjectModel(Cart.name) private cartModel: Model<Cart>) {}
 
   // get user cart
-  async getCart(userId: string) {
+  async getCart(userId: string, shopId: string) {
     try {
-      const cart = await this.cartModel.findOne({ userId });
-      if (!cart) {
+      const items = await this.cartModel.find({ userId, shopId });
+      if (!items.length) {
         throw new NotFoundException(`Cart not found`);
       }
-      return cart;
+      return items;
     } catch (error) {
       throw new BadRequestException(`cannot found cart ${error}`);
     }
@@ -28,11 +28,11 @@ export class CartService {
   // create cart and add or edit item in cart
   async addToCart(userId: string, item: CreateCartItemDto) {
     const cartItem = await this.cartModel.findOne({
+      userId,
       sizes: item.sizes,
       colors: item.colors,
       itemId: item.itemId,
       shopId: item.shopId,
-      userId: userId,
     });
 
     // Update The Exsiting Item if it exisists.
