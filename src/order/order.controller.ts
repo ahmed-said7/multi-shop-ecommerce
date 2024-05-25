@@ -30,12 +30,22 @@ export class OrderController {
     return this.orderService.create(userId, createOrderDto);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   findAll(
     @Query('sellerId') sellerId?: string,
     @Query('shopId') shopId?: string,
   ) {
     return this.orderService.findAll(sellerId, shopId);
+  }
+
+  @UseGuards(JwtGuard, MerchantGuard)
+  @Get('my-orders')
+  findShopOrders(
+    @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
+  ) {
+    return this.orderService.findAll(userId, shopId);
   }
 
   @Get(':id')
