@@ -54,7 +54,7 @@ export class CouponController {
 
   @UseGuards(JwtGuard)
   @Patch('use/:id')
-  useCoupon(@Param('id') id: string, @Body('userId') userId: string) {
+  consumeCoupon(@Param('id') id: string, @Body('userId') userId: string) {
     return this.couponService.removeUser(id, userId);
   }
 
