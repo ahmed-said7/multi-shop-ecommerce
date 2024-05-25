@@ -28,11 +28,11 @@ export class CartService {
   // create cart and add or edit item in cart
   async addToCart(userId: string, item: CreateCartItemDto) {
     const cartItem = await this.cartModel.findOne({
+      userId,
       size: item.size,
       color: item.color,
       itemId: item.itemId,
       shopId: item.shopId,
-      userId: userId,
     });
 
     // Update The Exsiting Item if it exisists.
