@@ -145,34 +145,17 @@ export class ItemService {
 
   async findOne(id: string) {
     try {
-      const item = await this.itemModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      if (!item) throw new InternalServerErrorException('Item not found!');
+      const item = await this.itemModel.findById(id);
+      if (!item) throw new NotFoundException('Item not found!');
       return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  async update(id: string, updateItemDto: UpdateItemDto, userId: string) {
+  async update(id: string, updateItemDto: UpdateItemDto) {
     try {
-      let item = await this.itemModel.findById(id);
-
-      if (!item) {
-        throw new NotFoundException('Item not found');
-      }
-
-      const user = await this.userModel.findById(userId);
-
-      if (user.shopId.toString() != item.shopId.toString()) {
-        throw new NotFoundException(
-          'You are not authorized to perform this action',
-        );
-      }
-
-      item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
       });
 
@@ -182,11 +165,11 @@ export class ItemService {
     }
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string) {
     try {
-      const deletedItem = await this.itemModel.findByIdAndDelete(id);
+      await this.itemModel.findByIdAndDelete(id);
 
-      return deletedItem;
+      return 'deleted item successfully';
     } catch (error: any) {
       // 500.
       throw new InternalServerErrorException(error?.message);

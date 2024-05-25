@@ -6,7 +6,7 @@ import {
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import {
@@ -24,29 +24,21 @@ export class ReviewContainerService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
   ) {}
-  async create(createReviewContainerDto: CreateReviewContainerDto) {
+  async create(
+    createReviewContainerDto: CreateReviewContainerDto,
+    shopId: string,
+  ) {
     try {
+      const payload = {
+        ...createReviewContainerDto,
+        shopId,
+      };
       const reviewContainer = await new this.reviewContainerModel(
-        createReviewContainerDto,
-      )
-        .save()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        payload,
+      ).save();
 
-      const review = await this.reviewModel
-        .findById(reviewContainer.review[0])
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!review) throw new NotFoundException("This review doesn't exist");
-      const shop = await this.shopModel.findById(review.shopId).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      if (!shop) throw new NotFoundException("This shop doesn't exist");
+      const shop = await this.shopModel.findById(shopId);
+
       shop.containers.push({
         containerID: reviewContainer.id,
         containerType: 'review container',
@@ -60,16 +52,9 @@ export class ReviewContainerService {
     }
   }
 
-  async findAll(shop?: string) {
+  async findAll(id: Types.ObjectId) {
     try {
-      const query = {};
-      if (shop != undefined) {
-        query['shop'] = shop;
-      }
-      return await this.reviewContainerModel.find(query).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      return await this.reviewContainerModel.find({ shopId: id });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);

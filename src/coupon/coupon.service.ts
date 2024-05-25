@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -18,26 +19,24 @@ export class CouponService {
     private readonly userModel: mongoose.Model<UserDocument>,
   ) {}
 
-  async create(createCouponDto: CreateCouponDto, userId: string) {
+  async create(createCouponDto: CreateCouponDto, shopId: string) {
     try {
-      const user = await this.userModel.findById(userId);
-      if (!user) throw new NotFoundException('There is no user with this id');
       const payload = {
         ...createCouponDto,
-        shop: user.shopId,
+        shopId,
       };
-      const coupon = await new this.couponModel(payload).save().catch((err) => {
-        if (err.code == 11000) {
-          console.log(err);
-          throw new InternalServerErrorException('This coupon already exists');
-        } else {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        }
+      const checkCoupon = await this.couponModel.findOne({
+        text: createCouponDto.text,
       });
-
+      if (checkCoupon) {
+        throw new BadRequestException('this coupon already exists');
+      }
+      const coupon = await new this.couponModel(payload).save();
       return coupon;
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error);
     }
   }
@@ -49,11 +48,7 @@ export class CouponService {
           shopId,
         })
         .limit(10)
-        .skip(10 * page)
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        .skip(10 * page);
 
       return coupons;
     } catch (error) {
@@ -64,21 +59,16 @@ export class CouponService {
   async findOne(id: Types.ObjectId) {
     try {
       const coupon = await this.couponModel.findById(id);
-
       return coupon;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  async update(
-    id: Types.ObjectId,
-    shopId: string,
-    updateCouponDto: UpdateCouponDto,
-  ) {
+  async update(id: Types.ObjectId, updateCouponDto: UpdateCouponDto) {
     try {
-      const coupon = await this.couponModel.updateOne(
-        { id, shopId },
+      const coupon = await this.couponModel.findByIdAndUpdate(
+        id,
         updateCouponDto,
         { new: true },
       );
@@ -89,56 +79,13 @@ export class CouponService {
     }
   }
 
-  async remove(id: Types.ObjectId, shopId: string) {
+  async remove(id: Types.ObjectId) {
     try {
-      await this.couponModel.deleteOne({ id, shopId });
+      await this.couponModel.findByIdAndDelete(id);
 
       return 'The coupon was deleted successfully';
     } catch (error) {
       throw new InternalServerErrorException(error);
-    }
-  }
-
-  async addCustomer(id: Types.ObjectId, customer: Types.ObjectId) {
-    try {
-      const updatedCoupon = await this.couponModel.findByIdAndUpdate(id, {
-        $push: {
-          subscriptCustomers: customer,
-        },
-      });
-      if (!updatedCoupon)
-        throw new NotFoundException("This coupon doesn't exist!");
-      return updatedCoupon;
-    } catch (error) {
-      throw new InternalServerErrorException(error, "Can't Add Customer");
-    }
-  }
-
-  async addItem(id: Types.ObjectId, item: Types.ObjectId) {
-    try {
-      const updatedCoupon = await this.couponModel.findByIdAndUpdate(id, {
-        $push: {
-          items: item,
-        },
-      });
-      if (!updatedCoupon)
-        throw new NotFoundException("This coupon doesn't exist!");
-      return updatedCoupon;
-    } catch (error) {
-      throw new InternalServerErrorException(error, "Can't Add Item");
-    }
-  }
-
-  async changeDiscount(id: string, discount: number) {
-    try {
-      const updatedCoupon = await this.couponModel.findByIdAndUpdate(id, {
-        discountPercentage: discount,
-      });
-      if (!updatedCoupon)
-        throw new NotFoundException("This coupon doesn't exist!");
-      return updatedCoupon;
-    } catch (error) {
-      throw new InternalServerErrorException(error, "Can't Add Item");
     }
   }
 }

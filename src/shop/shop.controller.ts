@@ -9,7 +9,6 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
@@ -30,7 +29,6 @@ export class ShopController {
     @Body() createShopDto: CreateShopDto,
   ) {
     console.log(req.body.userId);
-
     return this.shopService.create(createShopDto, userId);
   }
 
@@ -46,7 +44,6 @@ export class ShopController {
     return this.shopService.findShopItems(userId, id);
   }
 
-  // @UseGuards(JwtGuard)
   @Get('one/:id')
   findOne(@Param('id') id: string) {
     return this.shopService.findOne(id);
@@ -57,6 +54,7 @@ export class ShopController {
   userJoin(
     @Param('id') id: mongoose.Types.ObjectId,
     @Body('userId') userId: string,
+    @Body('shopId') shopId: string,
   ) {
     return this.shopService.userJoin(id, userId);
   }
@@ -69,14 +67,18 @@ export class ShopController {
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShopDto: UpdateShopDto) {
+  update(
+    @Param('id') id: string,
+    @Body('shopId') shopId: string,
+    @Body() updateShopDto: UpdateShopDto,
+  ) {
     return this.shopService.update(id, updateShopDto);
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Delete('/:id')
-  remove(@Body('userId') userId: string, @Param('id') shopId: string) {
-    return this.shopService.remove(userId, shopId);
+  remove(@Body('shopId') shopId: string, @Param('id') id: string) {
+    return this.shopService.remove(shopId, id);
   }
 
   @UseGuards(JwtGuard)

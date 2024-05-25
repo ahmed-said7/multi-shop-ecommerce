@@ -51,6 +51,7 @@ import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
       { name: Coupon.name, schema: CouponSchema },
       { name: Order.name, schema: OrderSchema },
       { name: Cart.name, schema: CartSchema },
+      { name: ReviewContainer.name, schema: ReviewContainerSchema },
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,

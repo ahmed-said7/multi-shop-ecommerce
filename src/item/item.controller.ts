@@ -59,17 +59,13 @@ export class ItemController {
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateItemDto: UpdateItemDto,
-    @Body('userId') userId: string,
-  ) {
-    return this.itemService.update(id, updateItemDto, userId);
+  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
+    return this.itemService.update(id, updateItemDto);
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('userId') userId: string) {
-    return this.itemService.remove(id, userId);
+  remove(@Param('id') id: string) {
+    return this.itemService.remove(id);
   }
 }

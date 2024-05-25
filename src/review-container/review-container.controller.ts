@@ -6,31 +6,37 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ReviewContainerService } from './review-container.service';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
+import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Types } from 'mongoose';
+import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('review-container')
 export class ReviewContainerController {
   constructor(private readonly reviewService: ReviewContainerService) {}
-
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createReviewDto: CreateReviewContainerDto) {
-    return this.reviewService.create(createReviewDto);
+  create(
+    @Body() createReviewDto: CreateReviewContainerDto,
+    @Body('shopId') shopId: string,
+  ) {
+    return this.reviewService.create(createReviewDto, shopId);
   }
 
-  @Get()
-  findAll(@Query('shop') shop?: string) {
-    return this.reviewService.findAll(shop);
+  @Get('/shop/:id')
+  findAll(@Param('id') id: Types.ObjectId) {
+    return this.reviewService.findAll(new Types.ObjectId(id));
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
   }
-
+  @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,

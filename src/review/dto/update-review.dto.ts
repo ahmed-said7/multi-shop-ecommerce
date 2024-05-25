@@ -8,7 +8,7 @@ export class UpdateReviewDto extends PartialType(CreateReviewDto) {
 
   description: string;
 
-  shop: Types.ObjectId;
+  shopId: Types.ObjectId;
 
   user: Types.ObjectId;
   item: string;

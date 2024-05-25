@@ -7,7 +7,7 @@ export class CreateReviewDto {
   @IsNotEmpty({ message: 'A review must have a description!' })
   description: string;
   @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  shop: Types.ObjectId;
+  shopId: Types.ObjectId;
   @IsNotEmpty({ message: 'A review must belong to a shop!' })
   user: Types.ObjectId;
   @IsNotEmpty({ message: 'A review must have an item!' })

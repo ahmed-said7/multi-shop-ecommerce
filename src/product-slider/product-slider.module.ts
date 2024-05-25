@@ -14,10 +14,20 @@ import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';
-import { PhotoSlider, PhotoSliderSchema } from 'src/photo-slider/schemas/photo-slider_schema';
+import {
+  PhotoSlider,
+  PhotoSliderSchema,
+} from 'src/photo-slider/schemas/photo-slider_schema';
 import { Category, CategorySchema } from 'src/category/schemas/category_schema';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
-import { VideoContainer, VideoContainerSchema } from 'src/video-container/schemas/videoContainer-schema';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from 'src/video-container/schemas/videoContainer-schema';
+import {
+  ReviewContainer,
+  ReviewContainerSchema,
+} from 'src/review-container/schemas/reviewContainer_schema';
 
 @Module({
   imports: [
@@ -32,6 +42,7 @@ import { VideoContainer, VideoContainerSchema } from 'src/video-container/schema
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: ReviewContainer.name, schema: ReviewContainerSchema },
     ]),
     UserModule, // Import UserModule
   ],

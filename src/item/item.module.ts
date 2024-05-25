@@ -9,11 +9,24 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';
-import { PhotoSlider, PhotoSliderSchema } from 'src/photo-slider/schemas/photo-slider_schema';
-import { ProductSlider, ProductSliderSchema } from 'src/product-slider/schemas/productSlider_schema';
+import {
+  PhotoSlider,
+  PhotoSliderSchema,
+} from 'src/photo-slider/schemas/photo-slider_schema';
+import {
+  ProductSlider,
+  ProductSliderSchema,
+} from 'src/product-slider/schemas/productSlider_schema';
 import { Category, CategorySchema } from 'src/category/schemas/category_schema';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
-import { VideoContainer, VideoContainerSchema } from 'src/video-container/schemas/videoContainer-schema';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from 'src/video-container/schemas/videoContainer-schema';
+import {
+  ReviewContainer,
+  ReviewContainerSchema,
+} from 'src/review-container/schemas/reviewContainer_schema';
 
 @Module({
   imports: [
@@ -25,6 +38,7 @@ import { VideoContainer, VideoContainerSchema } from 'src/video-container/schema
       { name: Order.name, schema: OrderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
+      { name: ReviewContainer.name, schema: ReviewContainerSchema },
 
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },
