@@ -15,7 +15,7 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   paid: boolean;
 
   @IsEnum(OrderStatusTypes, { message: 'Invalid order Status' })
-  status: string;
+  status: OrderStatusTypes;
 
   @IsString({ message: 'An order must have a string comment' })
   @MinLength(10, {

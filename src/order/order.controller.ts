@@ -60,6 +60,12 @@ export class OrderController {
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
+  @Patch('confirm/:id')
+  confirmDeliver(@Param('id') id: string) {
+    return this.orderService.confimeDelivery(id);
+  }
+
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('userId') userId: string) {
     return this.orderService.remove(id, userId);

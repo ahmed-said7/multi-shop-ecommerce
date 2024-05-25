@@ -123,4 +123,20 @@ export class OrderService {
       throw new InternalServerErrorException(error);
     }
   }
+
+  async confimeDelivery(id: string) {
+    const order = await this.orderModel.findById(id);
+
+    if (!order._id) {
+      throw new NotFoundException('No order with such a string');
+    }
+
+    await this.cartModel.deleteMany({
+      _id: { $in: order.items },
+    });
+
+    return await this.orderModel.findByIdAndUpdate(order._id, {
+      status: OrderStatusTypes.DELIVERED,
+    });
+  }
 }

@@ -255,20 +255,14 @@ export class UserService {
       const itemsInCart = await this.itemModel
         .find({ _id: { $in: user.cart } })
         .exec();
-      const shop = await this.shopService
-        .findOne(itemsInCart[0].shopId.toString())
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException('Failed to find shop');
-        });
+
       let totalPrice = 0;
       itemsInCart.forEach((item) => {
         totalPrice += item.price;
       });
 
       const orderDto: CreateOrderDto = {
-        buyerId: id,
-        sellerId: new Types.ObjectId(shop.userID),
+        userId: id,
         items: user.cart,
         deliveryType: false,
         paid: false,
