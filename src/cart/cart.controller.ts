@@ -11,8 +11,7 @@ import {
 
 import { CartService } from './cart.service';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { CreateCartItemDto } from './dto/create-cart.dto';
 
 @Controller('cart')
 export class CartController {
@@ -25,29 +24,22 @@ export class CartController {
 
   @UseGuards(JwtGuard)
   @Post()
-  addToCart(
-    @Body('userId') userId: string,
-    @Body() addToCartDto: AddToCartDto,
-  ) {
-    return this.cartService.addToCart(userId, addToCartDto);
+  addToCart(@Body('userId') userId: string, @Body() item: CreateCartItemDto) {
+    return this.cartService.addToCart(userId, item);
   }
 
   @UseGuards(JwtGuard)
-  @Delete('/remove/:itemId')
-  removeFromCart(
-    @Body('userId') userId: string,
-    @Param('itemId') itemId: string,
-  ) {
-    return this.cartService.removeFromCart(userId, itemId);
+  @Delete('/remove/:id')
+  removeFromCart(@Param('id') cartItemId: string) {
+    return this.cartService.removeFromCart(cartItemId);
   }
 
   @UseGuards(JwtGuard)
-  @Put(':userId/update/:itemId')
+  @Put(':userId/update/:id')
   updateItemQuantity(
-    @Param('userId') userId: string,
-    @Param('itemId') itemId: string,
+    @Param('id') itemId: string,
     @Body('quantity') quantity: number,
   ) {
-    return this.cartService.updateItemQuantity(userId, itemId, quantity);
+    return this.cartService.updateItemQuantity(itemId, quantity);
   }
 }

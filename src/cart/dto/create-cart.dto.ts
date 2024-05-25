@@ -9,7 +9,7 @@ export class CreateCartItemDto extends CreateCartDto {
   /**The Item Quantity */
   quantity: number;
 
-  sizes?: string[];
+  size: string;
 
-  colors?: string[];
+  color: string;
 }

@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import {
   BadRequestException,
   Injectable,
@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Cart } from './schemas/cart.schema';
-import { AddToCartDto } from './dto/add-to-cart.dto';
+import { CreateCartItemDto } from './dto/create-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -26,77 +26,56 @@ export class CartService {
     }
   }
   // create cart and add or edit item in cart
-  async addToCart(userId: string, addToCartDto: AddToCartDto): Promise<Cart> {
-    const { itemId, quantity, sizes, colors, shopId } = addToCartDto;
-    const itemObjectId = new Types.ObjectId(itemId);
-    const cart = await this.cartModel.findOne({ userId, shopId });
+  async addToCart(userId: string, item: CreateCartItemDto) {
+    const cartItem = await this.cartModel.findOne({
+      size: item.size,
+      color: item.color,
+      itemId: item.itemId,
+      shopId: item.shopId,
+      userId: userId,
+    });
 
-    if (cart) {
-      const itemIndex = cart.items.findIndex(
-        (item) =>
-          item.item.equals(itemObjectId) &&
-          item.sizes === sizes &&
-          item.colors === colors,
+    // Update The Exsiting Item if it exisists.
+    if (cartItem.id) {
+      return await this.cartModel.findByIdAndUpdate(
+        cartItem.id,
+        {
+          $inc: {
+            quantity: 1,
+          },
+        },
+        {
+          new: true,
+        },
       );
-      if (itemIndex > -1) {
-        cart.items[itemIndex].quantity += quantity;
-      } else {
-        cart.items.push({ item: itemObjectId, quantity, sizes, colors });
-      }
-      return cart.save();
-    } else {
-      const newCart = new this.cartModel({
-        userId: new Types.ObjectId(userId),
-        shopId,
-        items: [{ item: itemObjectId, quantity, sizes, colors }],
-      });
-      return newCart.save();
     }
+
+    return await new this.cartModel({ ...item, userId, quantity: 1 }).save();
   }
 
   // remove item from cart
-  async removeFromCart(userId: string, itemId: string): Promise<Cart> {
-    const itemObjectId = new Types.ObjectId(itemId);
-    const cart = await this.cartModel.findOne({ userId });
+  async removeFromCart(cartItemId: string) {
+    const cart = await this.cartModel.findById(cartItemId);
 
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
 
-    const itemIndex = cart.items.findIndex((item) =>
-      item.item.equals(itemObjectId),
-    );
-
-    if (itemIndex > -1) {
-      cart.items.splice(itemIndex, 1);
-      return cart.save();
-    } else {
-      throw new NotFoundException('Item not found in cart');
-    }
+    return await this.cartModel.findByIdAndDelete(cartItemId);
   }
 
   // update item quantity in global (not needed at now)
-  async updateItemQuantity(
-    userId: string,
-    itemId: string,
-    newQuantity: number,
-  ): Promise<Cart> {
-    const itemObjectId = new Types.ObjectId(itemId);
-    const cart = await this.cartModel.findOne({ userId });
+  async updateItemQuantity(itemId: string, quantity: number) {
+    const cart = await this.cartModel.findById(itemId);
 
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
 
-    const itemIndex = cart.items.findIndex((item) =>
-      item.item.equals(itemObjectId),
+    return await this.cartModel.findByIdAndUpdate(
+      itemId,
+      { quantity },
+      { new: true },
     );
-
-    if (itemIndex > -1) {
-      cart.items[itemIndex].quantity = newQuantity;
-      return cart.save();
-    } else {
-      throw new NotFoundException('Item not found in cart');
-    }
   }
 }
