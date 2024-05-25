@@ -91,29 +91,10 @@ export class ReviewContainerService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, shopId) {
     try {
-      const reviewContainer = await this.reviewContainerModel
-        .findById(id)
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shop = await this.shopModel.findById(shopId);
 
-      if (!reviewContainer)
-        throw new NotFoundException("This container doesn't exist");
-      const review = await this.reviewModel
-        .findById(reviewContainer.review[0])
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      if (!review) throw new NotFoundException("This review doesn't exist");
-      const shop = await this.shopModel.findById(review.shopId).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      if (!shop) throw new NotFoundException("This shop doesn't exist");
       if (shop) {
         for (let i = 0; i < shop.containers.length; i++) {
           if (shop.containers[i].containerID === id) {
@@ -123,24 +104,7 @@ export class ReviewContainerService {
         }
         await shop.save();
       }
-      const user = await this.userModel.findById(review.user).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      if (!user) throw new NotFoundException("This user doesn't exist");
-      if (user) {
-        for (let i = 0; i < user.reviews.length; i++) {
-          if (user.reviews[i].toString() === id) {
-            user.reviews.splice(i, 1);
-            break;
-          }
-        }
-        await user.save();
-      }
-      await this.reviewContainerModel.findByIdAndDelete(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      await this.reviewContainerModel.findByIdAndDelete(id);
       return 'Review container deleted successfully';
     } catch (error) {
       console.log(error);

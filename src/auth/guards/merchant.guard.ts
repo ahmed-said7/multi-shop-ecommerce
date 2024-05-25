@@ -108,6 +108,9 @@ export class MerchantGuard implements CanActivate {
         case 'video-container':
           model = this.videoContainerModel;
           break;
+        case 'review-container':
+          model = this.reviewContainerModel;
+          break;
         default:
           throw new NotFoundException(`Unsupported route: ${routeName}`);
       }

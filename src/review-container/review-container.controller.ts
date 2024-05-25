@@ -45,8 +45,9 @@ export class ReviewContainerController {
     return this.reviewService.update(id, updateReviewDto);
   }
 
+  @UseGuards(JwtGuard, MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewService.remove(id);
+  remove(@Param('id') id: string, @Body('shopId') shopId: string) {
+    return this.reviewService.remove(id, shopId);
   }
 }
