@@ -29,14 +29,14 @@ export class CartService {
   async addToCart(userId: string, item: CreateCartItemDto) {
     const cartItem = await this.cartModel.findOne({
       userId,
-      size: item.size,
-      color: item.color,
+      sizes: item.sizes,
+      colors: item.colors,
       itemId: item.itemId,
       shopId: item.shopId,
     });
 
     // Update The Exsiting Item if it exisists.
-    if (cartItem.id) {
+    if (cartItem?.id) {
       return await this.cartModel.findByIdAndUpdate(
         cartItem.id,
         {
@@ -61,7 +61,7 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
 
-    return await this.cartModel.findByIdAndDelete(cartItemId);
+    return 'item deleted successfully';
   }
 
   // update item quantity in global (not needed at now)
