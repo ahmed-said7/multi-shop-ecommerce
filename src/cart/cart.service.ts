@@ -11,6 +11,13 @@ import { CreateCartItemDto } from './dto/create-cart.dto';
 
 @Injectable()
 export class CartService {
+  applyCoupon(
+    userId: string,
+    shopId: string,
+    couponName: string,
+  ): { finalPrice: any } | PromiseLike<{ finalPrice: any }> {
+    throw new Error('Method not implemented.');
+  }
   constructor(@InjectModel(Cart.name) private cartModel: Model<Cart>) {}
 
   // get user cart
@@ -50,7 +57,7 @@ export class CartService {
         cartItem.id,
         {
           $inc: {
-            quantity: 1,
+            quantity: item.quantity,
           },
         },
         {
@@ -59,7 +66,11 @@ export class CartService {
       );
     }
 
-    return await new this.cartModel({ ...item, userId, quantity: 1 }).save();
+    return await new this.cartModel({
+      ...item,
+      userId,
+      quantity: item.quantity,
+    }).save();
   }
 
   // remove item from cart

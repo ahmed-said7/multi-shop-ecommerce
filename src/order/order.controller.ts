@@ -16,6 +16,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { Types } from 'mongoose';
+import { UserRole } from 'src/user/schemas/user_schema';
 
 @Controller('order')
 export class OrderController {
@@ -31,23 +33,24 @@ export class OrderController {
   }
 
   @UseGuards(JwtGuard)
-  @Get()
-  findAll(
-    @Query('sellerId') sellerId?: string,
-    @Query('shopId') shopId?: string,
+  @Get('/shop')
+  findShopOrders(
+    @Body('shopId') shopId: string,
+    @Body('userRole') userRole: string,
   ) {
-    return this.orderService.findAll(sellerId, shopId);
+    return this.orderService.findAllShopOrder(shopId, userRole);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
-  @Get('my-orders')
-  findShopOrders(
+  @UseGuards(JwtGuard)
+  @Get('/me')
+  findUserOrders(
     @Body('userId') userId: string,
     @Body('shopId') shopId: string,
   ) {
-    return this.orderService.findAll(userId, shopId);
+    return this.orderService.findAllUserOrder(userId, shopId);
   }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderService.findOne(id);

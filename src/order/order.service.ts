@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -13,7 +14,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, OrderDocument, OrderStatusTypes } from './schemas/order_schema';
 
-import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
@@ -93,10 +94,14 @@ export class OrderService {
       const order = await new this.orderModel({
         ...createOrderDto,
         userId,
-        items: items.map((item) => item._id),
+        items: items.map(
+          (item) => new mongoose.Types.ObjectId(item._id as string),
+        ),
         priceTotal: finalTotalPrice,
         status: OrderStatusTypes.INPROGRESS,
       }).save();
+
+      await this.cartModel.deleteMany({ userId, shopId });
 
       // Clear the user'suserId: string, shopId: string, couponName: string, applyCoupon: applyCouponme: string, applyCoupon: applyCouponMany({ userId, shopId });
 
@@ -107,8 +112,22 @@ export class OrderService {
     }
   }
 
-  async findAll(userId: string, shopId: string) {
-    return await this.orderModel.find({ userId, shopId });
+  async findAllShopOrder(shopId: string, userRole: string) {
+    if (userRole !== 'shop_owner') {
+      throw new ForbiddenException("you don't have permission ");
+    }
+    return await this.orderModel
+      .find({ shopId: shopId.toString() })
+      .populate('items');
+  }
+
+  async findAllUserOrder(userId: string, shopId: string) {
+    return await this.orderModel
+      .find({
+        shopId: shopId.toString(),
+        userId,
+      })
+      .populate('items');
   }
 
   async findOne(id: string) {
