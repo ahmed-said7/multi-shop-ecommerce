@@ -14,6 +14,4 @@ export class UpdateCouponDto extends PartialType(CreateCouponDto) {
   discountPercentage: number;
   @IsArray()
   items: Types.ObjectId[];
-  @IsArray()
-  subscriptCustomers?: Types.ObjectId[];
 }

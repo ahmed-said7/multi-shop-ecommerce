@@ -26,7 +26,7 @@ export class CartController {
   }
 
   @UseGuards(JwtGuard)
-  @Post()
+  @Post('/add')
   addToCart(@Body('userId') userId: string, @Body() item: CreateCartItemDto) {
     return this.cartService.addToCart(userId, item);
   }

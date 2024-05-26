@@ -11,8 +11,4 @@ export class CreateCouponDto {
   numOfTimes: number;
   @IsNumber()
   discountPercentage: number;
-  @IsArray()
-  items: Types.ObjectId[];
-
-  subscriptCustomers?: Types.ObjectId[];
 }

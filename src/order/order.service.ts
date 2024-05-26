@@ -35,15 +35,10 @@ export class OrderService {
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
     try {
-      const user = await this.userModel.findById(userId);
       const items = await this.cartModel.find({
         userId,
         shopId: createOrderDto.shopId,
       });
-
-      if (!user) {
-        throw new NotFoundException("This user doesn't exist");
-      }
 
       if (!items.length) {
         throw new BadRequestException('You should add items to make order');

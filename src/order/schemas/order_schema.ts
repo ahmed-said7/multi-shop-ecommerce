@@ -36,9 +36,6 @@ export class Order {
   })
   status: string;
 
-  @Prop()
-  comments: string;
-
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;
 

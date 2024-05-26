@@ -16,11 +16,20 @@ export class CartService {
   // get user cart
   async getCart(userId: string, shopId: string) {
     try {
-      const items = await this.cartModel.find({ userId, shopId });
-      if (!items.length) {
-        throw new NotFoundException(`Cart not found`);
+      const items = await this.cartModel
+        .find({ userId, shopId })
+        .populate('itemId', 'name price images');
+
+      if (items.length < 1) {
+        return `no item in cart`;
       }
-      return items;
+
+      const totalPrice = items.reduce((total, item) => {
+        const itemPrice = (item.itemId as any).price;
+        return total + itemPrice * item.quantity;
+      }, 0);
+
+      return { items, totalPrice };
     } catch (error) {
       throw new BadRequestException(`cannot found cart ${error}`);
     }
@@ -55,7 +64,7 @@ export class CartService {
 
   // remove item from cart
   async removeFromCart(cartItemId: string) {
-    const cart = await this.cartModel.findById(cartItemId);
+    const cart = await this.cartModel.findByIdAndDelete(cartItemId);
 
     if (!cart) {
       throw new NotFoundException('Cart not found');

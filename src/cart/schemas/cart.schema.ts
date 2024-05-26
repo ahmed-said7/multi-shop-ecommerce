@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 })
 export class Cart {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Item' })
-  itemId: string;
+  itemId: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;
