@@ -17,6 +17,10 @@ import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
+import { Coupon } from 'src/coupon/schemas/coupon.schema';
+import { CouponService } from 'src/coupon/coupon.service';
+import { CartService } from 'src/cart/cart.service';
+import { applyCoupon } from 'src/coupon/dto/apply-coupon.dto';
 
 @Injectable()
 export class OrderService {
@@ -31,51 +35,70 @@ export class OrderService {
     private readonly itemModel: mongoose.Model<ItemDocument>,
     @InjectModel(Cart.name)
     private readonly cartModel: mongoose.Model<Cart>,
+    @InjectModel(Coupon.name)
+    private readonly couponModel: mongoose.Model<Coupon>,
+    private readonly couponService: CouponService,
+    private readonly cartService: CartService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
     try {
-      const items = await this.cartModel.find({
-        userId,
-        shopId: createOrderDto.shopId,
-      });
+      const { shopId, couponName } = createOrderDto;
+
+      // Validate user cart and get items and total price
+      const cart = await this.couponService.calculateTotalPrice(userId, shopId);
+      const { items, totalPrice: originalTotalPrice } = cart;
 
       if (!items.length) {
-        throw new BadRequestException('You should add items to make order');
+        throw new BadRequestException('Your cart is empty');
       }
 
-      const shop = await this.shopModel.findById(createOrderDto.shopId);
+      // Validate shop existence
+      const shop = await this.shopModel.findById(shopId);
+      if (!shop) {
+        throw new NotFoundException("This shop doesn't exist");
+      }
 
-      if (!shop) throw new NotFoundException("This shop doesn't exist");
-
-      const sellerId = shop.userID;
-
-      if (userId === sellerId.toString()) {
+      // Prevent users from ordering from their own shop
+      if (userId === shop.userID.toString()) {
         throw new UnauthorizedException(
-          'You cant make an order from your own shop',
+          "You can't make an order from your own shop",
         );
       }
 
-      createOrderDto.items = items.map((v) => v._id);
+      // Apply coupon if provided
+      let finalTotalPrice = originalTotalPrice;
+      const applyCoupon: applyCoupon = {
+        shopId,
+        text: couponName,
+      };
+      if (couponName) {
+        const { finalPrice } = await this.couponService.applyCoupon(
+          userId,
+          applyCoupon,
+        );
+        finalTotalPrice = finalPrice;
 
-      await this.itemModel.updateMany(
-        {
-          _id: { $in: createOrderDto.items },
-        },
-        {
-          $inc: {
-            soldTimes: 1,
+        // Decrement the coupon usage count
+        await this.couponModel.findOneAndUpdate(
+          { text: couponName },
+          {
+            $inc: { usageLimit: -1 },
           },
-        },
-        {
-          new: true,
-        },
-      );
+          { new: true },
+        );
+      }
 
+      // Create and save the order
       const order = await new this.orderModel({
         ...createOrderDto,
+        userId,
+        items: items.map((item) => item._id),
+        priceTotal: finalTotalPrice,
         status: OrderStatusTypes.INPROGRESS,
       }).save();
+
+      // Clear the user'suserId: string, shopId: string, couponName: string, applyCoupon: applyCouponme: string, applyCoupon: applyCouponMany({ userId, shopId });
 
       return order;
     } catch (error) {

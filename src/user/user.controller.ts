@@ -80,12 +80,6 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
-  @Patch('/checkout/:id')
-  checkout(@Param('id') id: string) {
-    return this.userService.checkOut(id);
-  }
-
-  @UseGuards(JwtGuard)
   @Patch()
   update(@Body() updateUserDto: UpdateUserDto, @Body('userId') userId: string) {
     return this.userService.update(userId, updateUserDto);

@@ -26,7 +26,7 @@ export class Order {
   @Prop({ required: true })
   priceTotal: number;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
   paid: boolean;
 
   @Prop({
@@ -44,24 +44,16 @@ export class Order {
       city: String,
       country: String,
       streetName: String,
-      nighborhood: String,
+
       zipCode: Number,
-      isWorkplace: Boolean,
-      isApartment: Boolean,
-      appratmentNumber: Number,
-      floorNumber: Number,
     },
   })
   userAddress: {
     city: string;
     country?: string;
     streetName: string;
-    nighborhood: string;
+
     zipCode: number;
-    isWorkplace?: boolean;
-    isApartment?: boolean;
-    appratmentNumber: number;
-    floorNumber: number;
   };
 }
 

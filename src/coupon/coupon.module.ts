@@ -38,12 +38,12 @@ import {
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: Cart.name, schema: CartSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
-
       { name: Category.name, schema: CategorySchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
   ],
   controllers: [CouponController],
   providers: [CouponService],
+  exports: [CouponService],
 })
 export class CouponModule {}

@@ -26,6 +26,8 @@ import {
   ReviewContainer,
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
+import { CouponModule } from 'src/coupon/coupon.module';
+import { CartModule } from 'src/cart/cart.module';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import {
       { name: Item.name, schema: ItemSchema },
 
       { name: Coupon.name, schema: CouponSchema },
+
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
@@ -51,6 +54,8 @@ import {
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
     }),
+    CouponModule,
+    CartModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

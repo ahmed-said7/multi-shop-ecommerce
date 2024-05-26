@@ -245,46 +245,6 @@ export class UserService {
     }
   }
 
-  async checkOut(id: string) {
-    try {
-      const user = await this.userModel.findById(id).exec();
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      const itemsInCart = await this.itemModel
-        .find({ _id: { $in: user.cart } })
-        .exec();
-
-      let totalPrice = 0;
-      itemsInCart.forEach((item) => {
-        totalPrice += item.price;
-      });
-
-      const orderDto: CreateOrderDto = {
-        userId: id,
-        items: user.cart,
-        deliveryType: false,
-        paid: false,
-        status: OrderStatusTypes.INPROGRESS,
-        comments: 'Sample comment',
-        shopId: itemsInCart[0].shopId,
-        priceTotal: totalPrice,
-      };
-
-      const createdOrder = await this.orderModel.create(orderDto);
-
-      user.orders.push(createdOrder._id);
-      user.cart = [];
-      await user.save();
-
-      return 'Order created successfully!';
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException('Failed to create order');
-    }
-  }
-
   async remove(paramId: string, userId: string) {
     const user = await this.userModel.findById(userId);
 
