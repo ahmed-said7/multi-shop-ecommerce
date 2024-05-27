@@ -14,13 +14,11 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, OrderDocument, OrderStatusTypes } from './schemas/order_schema';
 
-import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
 import { Coupon } from 'src/coupon/schemas/coupon.schema';
 import { CouponService } from 'src/coupon/coupon.service';
-import { CartService } from 'src/cart/cart.service';
 import { applyCoupon } from 'src/coupon/dto/apply-coupon.dto';
 
 @Injectable()
@@ -32,14 +30,11 @@ export class OrderService {
     private readonly orderModel: mongoose.Model<OrderDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    @InjectModel(Item.name)
-    private readonly itemModel: mongoose.Model<ItemDocument>,
     @InjectModel(Cart.name)
     private readonly cartModel: mongoose.Model<Cart>,
     @InjectModel(Coupon.name)
     private readonly couponModel: mongoose.Model<Coupon>,
     private readonly couponService: CouponService,
-    private readonly cartService: CartService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -116,9 +111,15 @@ export class OrderService {
     if (userRole !== 'shop_owner') {
       throw new ForbiddenException("you don't have permission ");
     }
-    return await this.orderModel
+
+    const orders = await this.orderModel
       .find({ shopId: shopId.toString() })
-      .populate('items');
+      .populate('items')
+      .exec();
+
+    console.log({ orders });
+
+    return orders;
   }
 
   async findAllUserOrder(userId: string, shopId: string) {

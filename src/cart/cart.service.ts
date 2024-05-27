@@ -53,7 +53,7 @@ export class CartService {
 
     // Update The Exsiting Item if it exisists.
     if (cartItem?.id) {
-      return await this.cartModel.findByIdAndUpdate(
+      const updateCartItem = await this.cartModel.findByIdAndUpdate(
         cartItem.id,
         {
           $inc: {
@@ -64,13 +64,17 @@ export class CartService {
           new: true,
         },
       );
+
+      return updateCartItem;
     }
 
-    return await new this.cartModel({
+    const addedCartItem = await new this.cartModel({
       ...item,
       userId,
       quantity: item.quantity,
     }).save();
+
+    return addedCartItem;
   }
 
   // remove item from cart
