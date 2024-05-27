@@ -164,7 +164,12 @@ export class OrderService {
       return order;
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException(error);
+
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error);
+      } else {
+        throw error;
+      }
     }
   }
 
