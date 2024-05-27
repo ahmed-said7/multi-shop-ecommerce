@@ -103,7 +103,13 @@ export class OrderService {
       return order;
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException(error);
+
+      // Prevent Creation of Existing Errors
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error);
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -123,12 +129,12 @@ export class OrderService {
   }
 
   async findAllUserOrder(userId: string, shopId: string) {
-    return await this.orderModel
-      .find({
-        shopId: shopId.toString(),
-        userId,
-      })
-      .populate('items');
+    const orders = await this.orderModel.find({
+      shopId: shopId.toString(),
+      userId,
+    });
+
+    return orders;
   }
 
   async findOne(id: string) {

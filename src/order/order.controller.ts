@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -16,8 +15,6 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { Types } from 'mongoose';
-import { UserRole } from 'src/user/schemas/user_schema';
 
 @Controller('order')
 export class OrderController {

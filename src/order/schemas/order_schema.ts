@@ -17,7 +17,7 @@ export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Cart' }], default: [] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Item' }], default: [] })
   items: Types.ObjectId[];
 
   @Prop({ required: true })

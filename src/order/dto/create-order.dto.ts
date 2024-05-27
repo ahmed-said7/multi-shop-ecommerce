@@ -1,14 +1,5 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsArray,
-  MinLength,
-  MaxLength,
-  IsBoolean,
-  IsEnum,
-} from 'class-validator';
+import { IsNotEmpty, IsBoolean, IsEnum } from 'class-validator';
 import { OrderStatusTypes } from '../schemas/order_schema';
-import { Types } from 'mongoose';
 
 export class CreateOrderDto {
   userId: string;
