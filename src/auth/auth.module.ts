@@ -32,6 +32,10 @@ import {
   VideoContainer,
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   providers: [
@@ -54,6 +58,7 @@ import {
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: Banner.name, schema: BannerSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
     ]),
 
     PassportModule,

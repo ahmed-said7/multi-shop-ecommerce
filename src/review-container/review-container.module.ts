@@ -27,6 +27,10 @@ import {
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   imports: [
@@ -44,6 +48,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
     ]),
   ],
   controllers: [ReviewContainerController],

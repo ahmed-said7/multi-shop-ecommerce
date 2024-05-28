@@ -38,6 +38,10 @@ import {
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   imports: [
@@ -56,6 +60,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: Order.name, schema: OrderSchema },
       { name: Coupon.name, schema: CouponSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
 
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },

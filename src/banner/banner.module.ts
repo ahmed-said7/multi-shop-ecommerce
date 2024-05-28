@@ -27,6 +27,7 @@ import {
   PhotoSlider,
   PhotoSliderSchema,
 } from 'src/photo-slider/schemas/photo-slider_schema';
+import { IntroPage, IntroPageSchema } from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import {
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
 
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },

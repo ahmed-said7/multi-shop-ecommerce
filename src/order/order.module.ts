@@ -29,6 +29,10 @@ import {
 import { CouponModule } from 'src/coupon/coupon.module';
 import { CartModule } from 'src/cart/cart.module';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   imports: [
@@ -46,6 +50,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
 
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },

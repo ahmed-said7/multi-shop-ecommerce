@@ -26,6 +26,10 @@ import {
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
 
 @Module({
   imports: [
@@ -42,6 +46,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: Category.name, schema: CategorySchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
+      { name: IntroPage.name, schema: IntroPageSchema },
     ]),
   ],
   controllers: [CouponController],
