@@ -17,8 +17,25 @@ export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Item' }], default: [] })
-  items: Types.ObjectId[];
+  @Prop({
+    type: [
+      {
+        product: { type: Types.ObjectId, ref: 'Item' },
+        quantity: Number,
+        size: String,
+        colors: String,
+      },
+    ],
+    default: [],
+  })
+  carItems: [
+    {
+      product: Types.ObjectId;
+      quantity: number;
+      size: string;
+      colors: string;
+    },
+  ];
 
   @Prop({ required: true })
   deliveryType: boolean;

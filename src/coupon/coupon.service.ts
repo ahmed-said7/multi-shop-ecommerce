@@ -103,7 +103,7 @@ export class CouponService {
       .populate('itemId', 'name price images');
 
     if (items.length < 1) {
-      return `no item in cart`;
+      throw new NotFoundException(`no item in cart`);
     }
 
     const totalPrice = items.reduce((total, item) => {

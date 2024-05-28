@@ -42,12 +42,9 @@ export class OrderService {
       const { shopId, couponName } = createOrderDto;
 
       // Validate user cart and get items and total price
+
       const cart = await this.couponService.calculateTotalPrice(userId, shopId);
       const { items, totalPrice: originalTotalPrice } = cart;
-
-      if (!items.length) {
-        throw new BadRequestException('Your cart is empty');
-      }
 
       // Validate shop existence
       const shop = await this.shopModel.findById(shopId);
@@ -89,9 +86,14 @@ export class OrderService {
       const order = await new this.orderModel({
         ...createOrderDto,
         userId,
-        items: items.map(
-          (item) => new mongoose.Types.ObjectId(item._id as string),
-        ),
+        carItems: items?.map((item) => {
+          return {
+            product: item.itemId,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+          };
+        }),
         priceTotal: finalTotalPrice,
         status: OrderStatusTypes.INPROGRESS,
       }).save();
@@ -102,8 +104,6 @@ export class OrderService {
 
       return order;
     } catch (error) {
-      console.log(error);
-
       // Prevent Creation of Existing Errors
       if (error instanceof InternalServerErrorException) {
         throw new InternalServerErrorException(error);
@@ -120,7 +120,7 @@ export class OrderService {
 
     const orders = await this.orderModel
       .find({ shopId: shopId.toString() })
-      .populate('items')
+      .populate('carItems.product', 'name price images')
       .exec();
 
     console.log({ orders });
@@ -129,10 +129,12 @@ export class OrderService {
   }
 
   async findAllUserOrder(userId: string, shopId: string) {
-    const orders = await this.orderModel.find({
-      shopId: shopId.toString(),
-      userId,
-    });
+    const orders = await this.orderModel
+      .find({
+        shopId: shopId.toString(),
+        userId,
+      })
+      .populate('carItems.product', 'name price images');
 
     return orders;
   }
@@ -179,10 +181,6 @@ export class OrderService {
     if (!order._id) {
       throw new NotFoundException('No order with such a string');
     }
-
-    await this.cartModel.deleteMany({
-      _id: { $in: order.items },
-    });
 
     return await this.orderModel.findByIdAndUpdate(order._id, {
       status: OrderStatusTypes.DELIVERED,
