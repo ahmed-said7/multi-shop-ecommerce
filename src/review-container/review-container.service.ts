@@ -39,10 +39,20 @@ export class ReviewContainerService {
 
       const shop = await this.shopModel.findById(shopId);
 
-      shop.containers.push({
-        containerID: reviewContainer.id,
-        containerType: 'review container',
-      });
+      if (shop?.containers) {
+        shop.containers.push({
+          containerID: reviewContainer.id,
+          containerType: 'ReviewContainer',
+        });
+      } else {
+        shop.$set('containers', [
+          {
+            containerID: reviewContainer.id,
+            containerType: 'ProductSlider',
+          },
+        ]);
+      }
+
       await shop.save();
 
       return reviewContainer;

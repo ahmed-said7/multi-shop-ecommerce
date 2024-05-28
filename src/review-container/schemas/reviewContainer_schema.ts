@@ -12,7 +12,7 @@ export class ReviewContainer {
   shopId: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Review' })
-  review: string[];
+  reviews: string[];
 }
 
 export const ReviewContainerSchema =

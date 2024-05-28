@@ -28,7 +28,6 @@ export class VideoContainerController {
     return this.videoContainerService.create(shopId, createVideoContainerDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
   @Get(':id')
   findAll(@Param('id') id: Types.ObjectId) {
     return this.videoContainerService.findAll(new Types.ObjectId(id));

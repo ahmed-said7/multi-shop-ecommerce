@@ -28,13 +28,13 @@ export class ProductSliderService {
       if (Shop.containers) {
         Shop.containers.push({
           containerID: productSlider.id,
-          containerType: 'product-slider',
+          containerType: 'ProductSlider',
         });
       } else {
         Shop.$set('containers', [
           {
             containerID: productSlider.id,
-            containerType: 'photo-slider',
+            containerType: 'ProductSlider',
           },
         ]);
       }

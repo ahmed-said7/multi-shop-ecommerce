@@ -38,13 +38,13 @@ export class BannerService {
     if (Shop?.containers) {
       Shop.containers.push({
         containerID: createdBanner.id,
-        containerType: 'banner',
+        containerType: 'Banner',
       });
     } else {
       Shop.$set('containers', [
         {
           containerID: createdBanner.id,
-          containerType: 'banner',
+          containerType: 'Banner',
         },
       ]);
     }

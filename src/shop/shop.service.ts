@@ -282,7 +282,22 @@ export class ShopService {
     try {
       const shop = await this.shopModel
         .findById(id)
-        .populate('containers.containerID');
+        .populate({
+          path: 'containers.containerID',
+          populate: [
+            {
+              path: 'products',
+              model: 'Item',
+              options: { strictPopulate: false },
+            },
+            {
+              path: 'reviews',
+              model: 'Review',
+              options: { strictPopulate: false },
+            },
+          ],
+        })
+        .exec();
       if (!shop) {
         throw new NotFoundException('shop not found');
       }

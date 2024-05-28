@@ -43,13 +43,13 @@ export class PhotoSliderService {
     if (Shop?.containers) {
       Shop.containers.push({
         containerID: createdPhotoSlider.id,
-        containerType: 'photo-slider',
+        containerType: 'PhotoSlider',
       });
     } else {
       Shop.$set('containers', [
         {
           containerID: createdPhotoSlider.id,
-          containerType: 'photo-slider',
+          containerType: 'PhotoSlider',
         },
       ]);
     }
