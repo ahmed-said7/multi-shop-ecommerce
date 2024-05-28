@@ -50,13 +50,13 @@ export class VideoContainerService {
     if (Shop?.containers) {
       Shop.containers.push({
         containerID: videoContainer.id,
-        containerType: 'video container',
+        containerType: 'VideoContainer',
       });
     } else {
       Shop.$set('containers', [
         {
           containerID: videoContainer.id,
-          containerType: 'video container',
+          containerType: 'VideoContainer',
         },
       ]);
     }
@@ -110,7 +110,7 @@ export class VideoContainerService {
     const shop = await this.shopModel.findById(videoContainer.shopId);
 
     for (let i = 0; i < shop.containers.length; i++) {
-      if (shop.containers[i].containerID === id) {
+      if (shop.containers[i].containerID.toString() === id) {
         shop.containers.splice(i, 1);
         break;
       }

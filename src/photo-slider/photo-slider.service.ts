@@ -43,13 +43,13 @@ export class PhotoSliderService {
     if (Shop?.containers) {
       Shop.containers.push({
         containerID: createdPhotoSlider.id,
-        containerType: 'photo slider',
+        containerType: 'photo-slider',
       });
     } else {
       Shop.$set('containers', [
         {
           containerID: createdPhotoSlider.id,
-          containerType: 'photo slider',
+          containerType: 'photo-slider',
         },
       ]);
     }
@@ -76,32 +76,19 @@ export class PhotoSliderService {
   }
 
   async remove(id: string): Promise<string> {
-    const photoSlider = await this.photoSliderModel
-      .findById(id)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    const photoSlider = await this.photoSliderModel.findById(id);
     if (!photoSlider)
       throw new InternalServerErrorException("this slider doesn't exist");
 
-    const shop = await this.shopModel
-      .findById(photoSlider.shopId)
-      .catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+    const shop = await this.shopModel.findById(photoSlider.shopId);
     for (let i = 0; i < shop.containers.length; i++) {
-      if (shop.containers[i].containerID === id) {
+      if (shop.containers[i].containerID.toString() === id) {
         shop.containers.splice(i, 1);
         break;
       }
     }
     await shop.save();
-    await this.photoSliderModel.findByIdAndDelete(id).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
+    await this.photoSliderModel.findByIdAndDelete(id);
     return 'Prouct Slider has been deleted successfully!';
   }
 }

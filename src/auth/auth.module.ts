@@ -26,6 +26,12 @@ import {
   ReviewContainer,
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
+import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import { VideoContainerModule } from 'src/video-container/video-container.module';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from 'src/video-container/schemas/videoContainer-schema';
 
 @Module({
   providers: [
@@ -46,7 +52,10 @@ import {
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
       { name: Review.name, schema: ReviewSchema },
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
+      { name: Banner.name, schema: BannerSchema },
+      { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
+
     PassportModule,
   ],
   exports: [AuthService],

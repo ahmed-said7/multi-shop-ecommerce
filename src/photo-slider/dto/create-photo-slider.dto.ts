@@ -16,4 +16,5 @@ export class CreatePhotoSliderDto {
     photo: string;
   }[];
   isContainer: boolean;
+  isRounded: boolean;
 }

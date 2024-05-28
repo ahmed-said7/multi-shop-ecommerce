@@ -33,7 +33,11 @@ import { UserTrackController } from './track.controller';
 import { TrackService } from './track.service';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
-import { VideoContainer, VideoContainerSchema } from 'src/video-container/schemas/videoContainer-schema';
+import {
+  VideoContainer,
+  VideoContainerSchema,
+} from 'src/video-container/schemas/videoContainer-schema';
+import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 
 @Module({
   imports: [
@@ -55,6 +59,7 @@ import { VideoContainer, VideoContainerSchema } from 'src/video-container/schema
 
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: Banner.name, schema: BannerSchema },
     ]),
     JwtModule.register({
       secret: process.env.SECRET,

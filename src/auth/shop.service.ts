@@ -27,6 +27,11 @@ import {
 } from 'src/category/schemas/category_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { Banner, BannerDocument } from 'src/banner/schemas/banner_schema';
+import {
+  VideoContainer,
+  VideoContainerDocument,
+} from 'src/video-container/schemas/videoContainer-schema';
 
 @Injectable()
 export class ShopService {
@@ -45,6 +50,10 @@ export class ShopService {
     private readonly photoSliderModel: mongoose.Model<PhotoSliderDocument>,
     @InjectModel(Review.name)
     private readonly reviewModel: mongoose.Model<ReviewDocument>,
+    @InjectModel(Banner.name)
+    private readonly bannerModel: mongoose.Model<BannerDocument>,
+    @InjectModel(VideoContainer.name)
+    private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
   ) {}
 
   async create(createShopDto: CreateShopDto) {
@@ -102,21 +111,16 @@ export class ShopService {
       return foundShop;
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      console.log(error);
+
       throw new InternalServerErrorException(error);
     }
   }
 
   async findUserShops(userId: string) {
     try {
-      const shops = await this.shopModel
-        .find({
-          userID: userId,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shops = await this.shopModel.find({
+        userID: userId,
+      });
 
       return shops;
     } catch (error) {
@@ -141,29 +145,17 @@ export class ShopService {
       const shop = await this.shopModel
         .findById(id)
         .populate('itemsIDs')
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(
-            'An expected error happened while finding shop items',
-          );
-        });
+        .exec();
       const items = shop.itemsIDs;
       return items;
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }
 
   async remove(id: string) {
     try {
-      const shop = await this.shopModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'An unexpected error happened while finding the shop',
-        );
-      });
+      const shop = await this.shopModel.findById(id);
 
       if (!shop) {
         throw new NotFoundException('Shop not found');
@@ -177,18 +169,27 @@ export class ShopService {
 
       for (const container of shop.containers) {
         switch (container.containerType) {
-          case 'productslider':
+          case 'ProductSlider':
             await this.productSliderModel.findByIdAndDelete(
               container.containerID,
             );
             break;
-          case 'photoslider':
+          case 'PhotoSlider':
             await this.photoSliderModel.findByIdAndDelete(
               container.containerID,
             );
             break;
-          case 'review':
+          case 'ReviewContainer':
             await this.reviewModel.findByIdAndDelete(container.containerID);
+            break;
+          case 'Banner':
+            await this.bannerModel.findByIdAndDelete(container.containerID);
+            break;
+
+          case 'VideoContainer':
+            await this.videoContainerModel.findByIdAndDelete(
+              container.containerID,
+            );
             break;
         }
       }
@@ -211,49 +212,14 @@ export class ShopService {
 
   async findShopContainers(id: string): Promise<any> {
     try {
-      const shop = await this.shopModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(
-          'An expected error happened while finding shop containers',
-        );
-      });
-      const containers = [];
-      shop.containers.forEach(async (container) => {
-        switch (container.containerType) {
-          case 'review':
-            const review = await this.reviewModel
-              .findById(container.containerID)
-              .catch((err) => {
-                console.log(err);
-                throw new InternalServerErrorException(
-                  'An expected error happened while finding shop containers',
-                );
-              });
-            containers.push(review);
-          case 'product slider':
-            const productSlider = await this.productSliderModel
-              .findById(container.containerID)
-              .catch((err) => {
-                console.log(err);
-                throw new InternalServerErrorException(
-                  'An expected error happened while finding shop containers',
-                );
-              });
-            containers.push(productSlider);
+      const shop = await this.shopModel
+        .findById(id)
+        .populate('containers.containerID');
+      if (!shop) {
+        throw new NotFoundException('shop not found');
+      }
 
-          case 'photo slider':
-            const photoSlider = await this.photoSliderModel
-              .findById(container.containerID)
-              .catch((err) => {
-                console.log(err);
-                throw new InternalServerErrorException(
-                  'An expected error happened while finding shop containers',
-                );
-              });
-            containers.push(photoSlider);
-        }
-      });
-      return containers;
+      return { containers: shop.containers };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);

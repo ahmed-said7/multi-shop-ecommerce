@@ -27,6 +27,7 @@ import {
   ReviewContainer,
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
+import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import {
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: Banner.name, schema: BannerSchema },
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,

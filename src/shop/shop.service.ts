@@ -35,6 +35,7 @@ import {
   VideoContainer,
   VideoContainerDocument,
 } from 'src/video-container/schemas/videoContainer-schema';
+import { Banner, BannerDocument } from 'src/banner/schemas/banner_schema';
 
 @Injectable()
 export class ShopService {
@@ -55,12 +56,9 @@ export class ShopService {
     private reviewContainerModel: mongoose.Model<ReviewContainerDocument>,
     @InjectModel(VideoContainer.name)
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
-    private readonly jwtService: JwtService,
+    @InjectModel(Banner.name)
+    private readonly bannerModel: mongoose.Model<BannerDocument>,
   ) {}
-
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ sub: string; email: string }>(token);
-  }
 
   async create(createShopDto: CreateShopDto, userId: string) {
     try {
@@ -121,12 +119,7 @@ export class ShopService {
           path: 'categories',
           model: 'Category',
           select: 'name subCategory',
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
         });
-
       if (!foundShop)
         throw new NotFoundException('There is no shop with this id');
 
@@ -140,14 +133,9 @@ export class ShopService {
 
   async findUserShops(userId: string) {
     try {
-      const shops = await this.shopModel
-        .find({
-          userID: userId,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+      const shops = await this.shopModel.find({
+        userID: userId,
+      });
 
       return shops;
     } catch (error) {
@@ -254,26 +242,29 @@ export class ShopService {
 
       for (const container of shop.containers) {
         switch (container.containerType) {
-          case 'product slider':
+          case 'ProductSlider':
             await this.productSliderModel.findByIdAndDelete(
               container.containerID,
             );
             break;
-          case 'photo slider':
+          case 'PhotoSlider':
             await this.photoSliderModel.findByIdAndDelete(
               container.containerID,
             );
             break;
-          case 'review container':
+          case 'ReviewContainer':
             await this.reviewContainerModel.findByIdAndDelete(
               container.containerID,
             );
             break;
 
-          case 'video container':
+          case 'VideoContainer':
             await this.videoContainerModel.findByIdAndDelete(
               container.containerID,
             );
+            break;
+          case 'Banner':
+            await this.bannerModel.findByIdAndDelete(container.containerID);
             break;
         }
       }
@@ -289,63 +280,14 @@ export class ShopService {
 
   async findShopContainers(id: string): Promise<any> {
     try {
-      const shop = await this.shopModel.findById(id);
-
-      const containers = [];
-
-      for (const container of shop.containers) {
-        switch (container.containerType) {
-          case 'review container':
-            const reviewContainer = await this.reviewContainerModel.findById(
-              container.containerID,
-            );
-            if (reviewContainer) {
-              await reviewContainer.populate({
-                path: 'review',
-                model: 'Review',
-              });
-              containers.push({
-                type: 'review container',
-                container: reviewContainer,
-              });
-            }
-            break;
-          case 'product slider':
-            const productSlider = await this.productSliderModel.findById(
-              container.containerID,
-            );
-            if (productSlider) {
-              await productSlider.populate({ path: 'products', model: 'Item' });
-              containers.push({
-                type: 'product slider',
-                container: productSlider,
-              });
-            }
-            break;
-          case 'photo slider':
-            const photoSlider = await this.photoSliderModel.findById(
-              container.containerID,
-            );
-            if (photoSlider) {
-              containers.push({ type: 'photo slider', container: photoSlider });
-            }
-            break;
-          case 'video container':
-            const videoContainer = await this.videoContainerModel
-              .findById(container.containerID)
-              .catch((err) => {
-                console.log(err);
-                throw new InternalServerErrorException(err);
-              });
-            containers.push({
-              type: 'video container',
-              container: videoContainer,
-            });
-            break;
-        }
+      const shop = await this.shopModel
+        .findById(id)
+        .populate('containers.containerID');
+      if (!shop) {
+        throw new NotFoundException('shop not found');
       }
 
-      return containers;
+      return { containers: shop.containers };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error);

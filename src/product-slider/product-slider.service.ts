@@ -25,10 +25,20 @@ export class ProductSliderService {
       };
       const productSlider = await new this.productSliderModel(payload).save();
       const Shop = await this.shopModel.findById(shopId);
-      Shop.containers.push({
-        containerID: productSlider.id,
-        containerType: 'product slider',
-      });
+      if (Shop.containers) {
+        Shop.containers.push({
+          containerID: productSlider.id,
+          containerType: 'product-slider',
+        });
+      } else {
+        Shop.$set('containers', [
+          {
+            containerID: productSlider.id,
+            containerType: 'photo-slider',
+          },
+        ]);
+      }
+
       await Shop.save();
       return productSlider;
     } catch (err) {
@@ -97,7 +107,7 @@ export class ProductSliderService {
       const shop = await this.shopModel.findById(shopId);
 
       for (let i = 0; i < shop.containers.length; i++) {
-        if (shop.containers[i].containerID === id) {
+        if (shop.containers[i].containerID.toString() === id) {
           shop.containers.splice(i, 1);
           break;
         }

@@ -24,6 +24,7 @@ import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 import { ThemesModule } from './themes-req/themes.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { CartModule } from './cart/cart.module';
+import { BannerModule } from './banner/banner.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CartModule } from './cart/cart.module';
     CouponModule,
     ReportsModule,
     ProductSliderModule,
+    BannerModule,
     PhotoSliderModule,
     CategoryModule,
     ReviewModule,
@@ -60,5 +62,6 @@ import { CartModule } from './cart/cart.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [MongooseModule],
 })
 export class AppModule {}

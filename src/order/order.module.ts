@@ -28,6 +28,7 @@ import {
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { CouponModule } from 'src/coupon/coupon.module';
 import { CartModule } from 'src/cart/cart.module';
+import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CartModule } from 'src/cart/cart.module';
       { name: Category.name, schema: CategorySchema },
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
+      { name: Banner.name, schema: BannerSchema },
     ]),
     JwtModule.register({
       secret: `${process.env.SECRET}`,

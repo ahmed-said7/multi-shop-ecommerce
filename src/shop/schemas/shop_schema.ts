@@ -27,14 +27,29 @@ export class Shop {
   @Prop({ type: [Types.ObjectId], ref: 'Category' })
   categories: Types.ObjectId[];
 
-  @Prop({ max: 15, default: [] })
-  containers: [
-    {
-      containerID: string;
-      containerType: string;
-    },
-  ];
-
+  @Prop({
+    type: [
+      {
+        containerID: {
+          type: Types.ObjectId,
+          refPath: 'containers.containerType',
+        },
+        containerType: {
+          type: String,
+          required: true,
+          enum: [
+            'VideoContainer',
+            'ProductSlider',
+            'Banner',
+            'ReviewContainer',
+            'PhotoSlider',
+          ],
+        },
+      },
+    ],
+    default: [],
+  })
+  containers: { containerID: Types.ObjectId; containerType: string }[];
   @Prop()
   introPages: string[];
 

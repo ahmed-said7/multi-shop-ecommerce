@@ -19,7 +19,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 export class VideoContainerController {
   constructor(private readonly videoContainerService: VideoContainerService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(JwtGuard)
   @Post()
   create(
     @Body('shopId') shopId: Types.ObjectId,
