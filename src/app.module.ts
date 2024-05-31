@@ -25,6 +25,7 @@ import { ThemesModule } from './themes-req/themes.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { CartModule } from './cart/cart.module';
 import { BannerModule } from './banner/banner.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BannerModule } from './banner/banner.module';
       global: true,
     }),
     MongooseModule.forRoot(process.env.DB_URI),
+
     ShopModule,
     UserModule,
     AuthModule,
@@ -59,6 +61,7 @@ import { BannerModule } from './banner/banner.module';
     ThemesModule,
     FileManagerModule,
     CartModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

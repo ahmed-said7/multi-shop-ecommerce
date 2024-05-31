@@ -7,6 +7,8 @@ import {
   Patch,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
@@ -16,14 +18,21 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from '../upload/upload.service';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
-  constructor(private readonly photoSliderService: PhotoSliderService) {}
+  constructor(
+    private readonly photoSliderService: PhotoSliderService,
+    private readonly uploadService: UploadService,
+  ) {}
 
+  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(JwtGuard)
   @Post()
   create(
+    @UploadedFile() file: Express.Multer.File,
     @Body('shopId') shopId: Types.ObjectId,
     @Body() createPhotoSliderDto: CreatePhotoSliderDto,
   ): Promise<PhotoSlider> {

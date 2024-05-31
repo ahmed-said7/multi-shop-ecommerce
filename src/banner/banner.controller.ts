@@ -7,6 +7,8 @@ import {
   Patch,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
@@ -16,17 +18,29 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from '../upload/upload.service';
 
 @Controller('banner')
 export class BannerController {
-  constructor(private readonly bannerService: BannerService) {}
+  constructor(
+    private readonly bannerService: BannerService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post()
-  create(
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
     @Body('shopId') shopId: Types.ObjectId,
     @Body() createBannerDto: CreateBannerDto,
-  ): Promise<Banner> {
+  ) {
+    const destination = `${Date.now()}-${file.originalname}`;
+    const url = await this.uploadService.uploadFile(file, destination);
+    createBannerDto.image = url as string;
+    console.log(createBannerDto.image);
+
     return this.bannerService.create(shopId, createBannerDto);
   }
 

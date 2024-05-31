@@ -32,6 +32,9 @@ export class ItemService {
         ...createItemDto,
         shopId,
       };
+
+      console.log(payload);
+
       const item = await new this.itemModel(payload).save();
 
       const shop = await this.shopModel.findById(item.shopId);
@@ -155,10 +158,29 @@ export class ItemService {
 
   async update(id: string, updateItemDto: UpdateItemDto) {
     try {
-      const item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
+      let item = await this.itemModel.findById(id);
+      if (!item) throw new NotFoundException('Item not found!');
+      updateItemDto.images = item.images.concat(updateItemDto.images);
+      item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
       });
 
+      return item;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  // remove image from item.images
+  async removeImage(id: string, image: string) {
+    try {
+      const item = await this.itemModel.findById(id);
+      if (!item) throw new NotFoundException('Item not found!');
+      const index = item.images.indexOf(image);
+      if (index > -1) {
+        item.images.splice(index, 1);
+      }
+      await item.save();
       return item;
     } catch (error) {
       throw new InternalServerErrorException(error);
