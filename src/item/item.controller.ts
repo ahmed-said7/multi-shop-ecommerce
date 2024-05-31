@@ -8,6 +8,9 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+  Req,
 } from '@nestjs/common';
 
 import { ItemService } from './item.service';
@@ -16,14 +19,26 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose, { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { UploadService } from 'src/upload/upload.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('item')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(
+    private readonly itemService: ItemService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createItemDto: CreateItemDto, @Body('shopId') shopId: string) {
+  @UseInterceptors(FilesInterceptor('images'))
+  async create(
+    @Body() createItemDto: CreateItemDto,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('shopId') shopId: string,
+  ) {
+    const imageUrls = await this.uploadService.uploadFiles(files);
+    createItemDto.images = imageUrls;
     return this.itemService.create(createItemDto, shopId);
   }
 
@@ -59,7 +74,17 @@ export class ItemController {
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
+  @UseInterceptors(FilesInterceptor('images'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateItemDto: any,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
+  ) {
+    console.log(req);
+
+    const imageUrls = await this.uploadService.uploadFiles(files);
+    updateItemDto.images = imageUrls;
     return this.itemService.update(id, updateItemDto);
   }
 
@@ -67,5 +92,11 @@ export class ItemController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.itemService.remove(id);
+  }
+
+  @UseGuards(JwtGuard, MerchantGuard)
+  @Delete('/image/:id')
+  removeImage(@Param('id') id: string, @Body('image') image: string) {
+    return this.itemService.removeImage(id, image);
   }
 }

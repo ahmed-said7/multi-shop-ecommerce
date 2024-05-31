@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
@@ -16,10 +18,15 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose from 'mongoose';
 import { Request } from 'express';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { UploadService } from 'src/upload/upload.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('shop')
 export class ShopController {
-  constructor(private readonly shopService: ShopService) {}
+  constructor(
+    private readonly shopService: ShopService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post()
@@ -67,11 +74,16 @@ export class ShopController {
 
   @UseGuards(JwtGuard, MerchantGuard)
   @Patch(':id')
-  update(
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
     @Param('id') id: string,
     @Body('shopId') shopId: string,
     @Body() updateShopDto: UpdateShopDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
+    const destination = `${Date.now()}-${file.originalname}`;
+    const url = await this.uploadService.uploadFile(file, destination);
+    updateShopDto.logo = url;
     return this.shopService.update(id, updateShopDto);
   }
 

@@ -20,9 +20,9 @@ export class CreateBannerDto {
   @IsString()
   buttonPosition: string;
   @IsString()
-  photo: string;
-  @IsBoolean()
-  isContainer: boolean;
-  @IsBoolean()
-  isRounded: boolean;
+  image: string;
+  // @IsBoolean()
+  // isContainer: boolean;
+  // @IsBoolean()
+  // isRounded: boolean;
 }

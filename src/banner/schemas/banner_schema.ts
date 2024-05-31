@@ -28,7 +28,7 @@ export class Banner {
   @Prop({ type: String })
   buttonPosition: string;
   @Prop({ type: String })
-  photo: string;
+  image: string;
 
   @Prop({ default: true })
   isContainer: boolean;

@@ -27,7 +27,12 @@ import {
   PhotoSlider,
   PhotoSliderSchema,
 } from 'src/photo-slider/schemas/photo-slider_schema';
-import { IntroPage, IntroPageSchema } from 'src/intro-page/schemas/intro_page_schema';
+import {
+  IntroPage,
+  IntroPageSchema,
+} from 'src/intro-page/schemas/intro_page_schema';
+import { UploadService } from 'src/upload/upload.service';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -51,6 +56,7 @@ import { IntroPage, IntroPageSchema } from 'src/intro-page/schemas/intro_page_sc
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
     }),
+    UploadModule,
   ],
   controllers: [BannerController],
   providers: [BannerService],

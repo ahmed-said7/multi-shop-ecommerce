@@ -23,13 +23,14 @@ export class BannerService {
     shopId: Types.ObjectId,
     createBannerDto: CreateBannerDto,
   ): Promise<Banner> {
-    let createdBanner = await new this.bannerModel(createBannerDto).save();
-
     const payload = {
-      createBannerDto,
+      ...createBannerDto,
       shopId,
     };
-    const Shop = await this.shopModel.findById(payload);
+
+    let createdBanner = await new this.bannerModel(payload).save();
+
+    const Shop = await this.shopModel.findById(shopId);
 
     if (!Shop) {
       throw new NotFoundException("Couldn't find the shop");

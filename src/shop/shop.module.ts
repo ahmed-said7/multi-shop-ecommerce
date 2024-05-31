@@ -42,6 +42,7 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import {
     PhotoSliderModule,
     BannerModule,
     VideoContainerModule,
+    UploadModule,
   ],
   controllers: [ShopController],
   providers: [ShopService],
