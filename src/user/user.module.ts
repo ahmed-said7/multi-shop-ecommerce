@@ -28,7 +28,6 @@ import { Order, OrderSchema } from 'src/order/schemas/order_schema';
 import { OtpService } from './otp/otp.service';
 import { OtpController } from './otp/otp.controller';
 import { EmailService } from './email/email.service';
-import { ShopService } from './shop.service';
 import { UserTrackController } from './track.controller';
 import { TrackService } from './track.service';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
@@ -42,6 +41,7 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { ShopService } from 'src/shop/shop.service';
 
 @Module({
   imports: [

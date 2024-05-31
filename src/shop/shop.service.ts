@@ -72,7 +72,7 @@ export class ShopService {
       const shop = await this.shopModel.create(createShopDto);
 
       await this.userModel.findByIdAndUpdate(user.id, {
-        role: UserRole.SHOP_OWNER,
+        role: UserRole.merchant,
         shop: shop.id,
       });
 
@@ -199,7 +199,7 @@ export class ShopService {
 
       let shopId = new mongoose.Types.ObjectId(id);
 
-      if (!shopId && user.role == UserRole.SHOP_OWNER) {
+      if (!shopId && user.role == UserRole.merchant) {
         shopId = user.shopId;
       }
 

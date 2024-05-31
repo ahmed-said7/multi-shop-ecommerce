@@ -41,17 +41,6 @@ export class UserController {
     return this.userService.register(createUserDto);
   }
 
-  @Post('register/shop')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async registerShop(@Body() registerData: any) {
-    await this.emailService.emailOTPCode(
-      registerData.user.email,
-      registerData.user.name,
-    );
-
-    return this.userService.registerShop(registerData);
-  }
-
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @UsePipes(ValidationPipe)
@@ -95,23 +84,5 @@ export class UserController {
   @Patch('/fav/:id')
   addFavoriute(@Param('id') itemId: string, @Body('userId') userId: string) {
     return this.userService.addFav(itemId, userId);
-  }
-
-  @UseGuards(JwtGuard)
-  @Patch('/cart/add')
-  addToCart(
-    @Body() itemId: mongoose.Types.ObjectId,
-    @Body('userId') userId: string,
-  ) {
-    return this.userService.addToCart(itemId, userId);
-  }
-
-  @UseGuards(JwtGuard)
-  @Patch('/cart/remove')
-  removeFromCart(
-    @Body() itemId: mongoose.Types.ObjectId,
-    @Body('userId') userId: string,
-  ) {
-    return this.userService.removeItemCart(itemId, userId);
   }
 }

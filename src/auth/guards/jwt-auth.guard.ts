@@ -47,7 +47,7 @@ export class JwtGuard implements CanActivate {
 
     request.body.userId = decodedToken.userId;
 
-    if (user.role === 'shop_owner') {
+    if (user.role === 'merchant') {
       const shop = await this.shopModel.findById(user.shopId);
       if (shop) {
         request.body.shopId = user.shopId;

@@ -7,7 +7,7 @@ import validator from 'validator';
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
-  SHOP_OWNER = 'shop_owner',
+  merchant = 'merchant',
 }
 
 export enum UserExperienceType {

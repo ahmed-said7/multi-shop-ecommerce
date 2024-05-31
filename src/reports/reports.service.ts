@@ -26,7 +26,7 @@ export class ReportsService {
     try {
       const user = await this.userModel.findById(userId);
 
-      if (user.role != 'shop_owner') {
+      if (user.role != 'merchant') {
         throw new UnauthorizedException("You don't have a shop");
       }
 

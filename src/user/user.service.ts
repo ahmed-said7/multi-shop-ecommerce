@@ -14,7 +14,7 @@ import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
-import { ShopService } from 'src/user/shop.service';
+
 import {
   Order,
   OrderDocument,
@@ -22,12 +22,14 @@ import {
 } from 'src/order/schemas/order_schema';
 import { CreateOrderDto } from 'src/order/dto/create-order.dto';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
+import { ShopService } from 'src/shop/shop.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly shopService: ShopService,
+
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
@@ -35,11 +37,14 @@ export class UserService {
 
   async register(createUserDto: CreateUserDto) {
     try {
-      const { email } = createUserDto;
+      const { email, phone } = createUserDto;
       const foundUser = await this.userModel.findOne({ email });
-
+      const foundUserPhone = await this.userModel.findOne({ phone });
       if (foundUser) {
         throw new BadRequestException('There is a user with the same email!');
+      }
+      if (foundUserPhone) {
+        throw new BadRequestException('There is a user with the same phone!');
       }
 
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -55,15 +60,17 @@ export class UserService {
 
       const token = this.generateToken(savedUser);
 
-      if (savedUser.role === 'shop_owner') {
-        const shop = await this.shopService.create({
-          categories: [],
-          containers: [],
-          customers: [],
-          description: 'Add Description',
-          title: `${userResponse.email.split('@')[0]} shop`,
-          userID: userResponse._id,
-        });
+      if (savedUser.role === 'merchant') {
+        const shop = await this.shopService.create(
+          {
+            categories: [],
+            containers: [],
+            customers: [],
+            description: 'Add Description',
+            title: `${userResponse.email.split('@')[0]} shop`,
+          },
+          savedUser._id,
+        ); // Include user ID here
         const updatedUser = await this.userModel.findByIdAndUpdate(
           savedUser._id,
           {
@@ -74,54 +81,7 @@ export class UserService {
         return { token, user: updatedUser };
       }
 
-      // Save shopID in user document
-
       return { token, user: savedUser };
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async registerShop(registerData: any) {
-    try {
-      const createUserDto = registerData.user;
-      const createShopDto = registerData.shop;
-      const { email } = createUserDto;
-      const foundUser = await this.userModel.findOne({ email });
-      if (foundUser) {
-        throw new UnauthorizedException('There is a user with the same email!');
-      }
-
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-      const createdUser = new this.userModel({
-        ...createUserDto,
-        password: hashedPassword,
-      });
-
-      const savedUser = await createdUser.save().catch((err) => {
-        console.log(err);
-        if (err && err.code == 11000) {
-          console.log(err);
-
-          throw new BadRequestException(
-            'There is a user with the same phone number!',
-          );
-        } else
-          throw new InternalServerErrorException(
-            'Unexpected error while creating the user',
-          );
-      });
-
-      const shop = await this.shopService.create(createShopDto);
-
-      const userResponse = { ...savedUser.toObject(), password: undefined };
-
-      const token = this.generateToken(savedUser);
-
-      return { token, user: userResponse, shop };
     } catch (error) {
       if (error instanceof HttpException) throw error;
       console.log(error);
@@ -258,7 +218,7 @@ export class UserService {
       throw new NotFoundException('This user doesnt exist');
     }
 
-    if (user.role === UserRole.SHOP_OWNER) {
+    if (user.role === UserRole.merchant) {
       throw new UnauthorizedException(
         'You dont have the permission to delete this user',
       );
@@ -275,7 +235,7 @@ export class UserService {
     }
 
     // Remove The User Shop.
-    await this.shopService.remove(targetUser.shopId.toString());
+    await this.shopService.remove(userId, targetUser.shopId.toString()); // Include both user ID and shop ID
 
     const deletedUser = await this.userModel.findByIdAndDelete(paramId);
 
@@ -308,42 +268,5 @@ export class UserService {
       console.log(error);
       throw new InternalServerErrorException(error);
     }
-  }
-  async addToCart(itemId: mongoose.Types.ObjectId, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      user.cart.push(itemId);
-
-      await user.save();
-
-      return 'Item added successfully';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async removeItemCart(itemId: mongoose.Types.ObjectId, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      for (let i = 0; i < user.cart.length; i++) {
-        if (user.cart[i] == itemId) {
-          user.cart.splice(i, 1);
-          break;
-        }
-      }
-
-      await user.save();
-
-      return 'Item removed successfully';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
 }

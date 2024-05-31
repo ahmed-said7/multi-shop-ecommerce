@@ -114,7 +114,7 @@ export class OrderService {
   }
 
   async findAllShopOrder(shopId: string, userRole: string) {
-    if (userRole !== 'shop_owner') {
+    if (userRole !== 'merchant') {
       throw new ForbiddenException("you don't have permission ");
     }
 
