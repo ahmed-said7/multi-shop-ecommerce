@@ -14,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 describe('AdminController', () => {
   let adminsController: AdminController;
 
+  // Set up the whole module
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
