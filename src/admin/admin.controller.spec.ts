@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 
-import { Model, Document, Types } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AdminController } from './admin.controller';
@@ -8,11 +7,9 @@ import { AdminService } from './admin.service';
 
 import { UserModule } from '../user/user.module';
 import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
-import { User, UserDocument, UserSchema } from '../user/schemas/user_schema';
-
-type UserDoc = Document<unknown, any, UserDocument> &
-  User &
-  Document<any, any, any> & { _id: Types.ObjectId };
+import { User, UserSchema } from '../user/schemas/user_schema';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('AdminController', () => {
   let adminsService: AdminService;
@@ -21,6 +18,16 @@ describe('AdminController', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
+        ConfigModule.forRoot({
+          envFilePath: '.env',
+          isGlobal: true,
+        }),
+        JwtModule.register({
+          secret: process.env.SECRET,
+          signOptions: { expiresIn: '1d' },
+          global: true,
+        }),
+        MongooseModule.forRoot(process.env.DB_URI),
         MongooseModule.forFeature([
           { name: User.name, schema: UserSchema },
           { name: Shop.name, schema: ShopSchema },
@@ -37,7 +44,9 @@ describe('AdminController', () => {
 
   describe('FindOne', () => {
     it('Should Return All', async () => {
-      const result: UserDoc = new Model<UserDocument>();
+      const result: any = {
+        name: 'Ahmed Karmy',
+      };
 
       jest
         .spyOn(adminsService, 'findOne')
