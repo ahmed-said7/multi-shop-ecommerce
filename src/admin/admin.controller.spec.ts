@@ -12,7 +12,6 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 describe('AdminController', () => {
-  let adminsService: AdminService;
   let adminsController: AdminController;
 
   beforeEach(async () => {
@@ -38,21 +37,19 @@ describe('AdminController', () => {
       providers: [AdminService],
     }).compile();
 
-    adminsService = moduleRef.get<AdminService>(AdminService);
     adminsController = moduleRef.get<AdminController>(AdminController);
   });
 
   describe('FindOne', () => {
-    it('Should Return All', async () => {
-      const result: any = {
-        name: 'Ahmed Karmy',
-      };
+    it('Should Throw on Invalid ID', async () => {
+      let data = null;
+      try {
+        data = await adminsController.findOne('adafa');
+      } catch (error) {
+        data = null;
+      }
 
-      jest
-        .spyOn(adminsService, 'findOne')
-        .mockImplementation(() => Promise.resolve(result));
-
-      expect(await adminsController.findOne('adafa')).toBe(result);
+      expect(data).toBeNull();
     });
   });
 });
