@@ -13,18 +13,29 @@ import { UpdateMerchantDto as UpdateDto } from './dto/updateMerchant.dto';
 
 import { Merchant, MerchantDocument } from './schema/merchant.schema';
 
+import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
+
 @Injectable()
 export class MerchantService {
   constructor(
     @InjectModel(Merchant.name)
     private readonly merchantModel: Model<MerchantDocument>,
+    @InjectModel(Shop.name)
+    private readonly shopModel: Model<ShopDocument>,
   ) {}
 
   private readonly logger = new Logger(MerchantService.name);
 
   async create(data: CreateDto) {
     try {
-      await new this.merchantModel(data).save();
+      const shop = await new this.shopModel().save();
+
+      const merchant = await new this.merchantModel({
+        ...data,
+        shop: shop._id,
+      }).save();
+
+      this.logger.log(merchant);
 
       return 'Merchant Created Successfully';
     } catch (error) {
