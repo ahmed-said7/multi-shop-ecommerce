@@ -9,19 +9,19 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import type { Request } from 'express';
 import mongoose from 'mongoose';
-import { Coupon } from 'src/coupon/schemas/coupon.schema';
-import { Item, ItemDocument } from 'src/item/schemas/item-schema';
-import { Order } from 'src/order/schemas/order_schema';
-import { PhotoSlider } from 'src/photo-slider/schemas/photo-slider_schema';
-import { ProductSlider } from 'src/product-slider/schemas/productSlider_schema';
-import { Cart } from 'src/cart/schemas/cart.schema';
-import { Category } from 'src/category/schemas/category_schema';
-import { VideoContainer } from 'src/video-container/schemas/videoContainer-schema';
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { Coupon } from '../../coupon/schemas/coupon.schema';
+import { Item, ItemDocument } from '../../item/schemas/item-schema';
+import { Order } from '../../order/schemas/order_schema';
+import { PhotoSlider } from '../../photo-slider/schemas/photo-slider_schema';
+import { ProductSlider } from '../../product-slider/schemas/productSlider_schema';
+import { Cart } from '../../cart/schemas/cart.schema';
+import { Category } from '../../category/schemas/category_schema';
+import { VideoContainer } from '../../video-container/schemas/videoContainer-schema';
+import { Shop, ShopDocument } from '../../shop/schemas/shop_schema';
 import {
   ReviewContainer,
   ReviewContainerDocument,
-} from 'src/review-container/schemas/reviewContainer_schema';
+} from '../../review-container/schemas/reviewContainer_schema';
 
 @Injectable()
 export class MerchantGuard implements CanActivate {

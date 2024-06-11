@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+
 import * as mongoose from 'mongoose';
 
 import { Shop, ShopDocument } from './schemas/shop_schema';
@@ -16,26 +16,26 @@ import { CreateShopDto } from './dto/create-shop.dto';
 import {
   ProductSlider,
   ProductSliderDocument,
-} from 'src/product-slider/schemas/productSlider_schema';
+} from '../product-slider/schemas/productSlider_schema';
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photo-slider_schema';
+} from '../photo-slider/schemas/photo-slider_schema';
 import {
   Category,
   CategoryDocument,
-} from 'src/category/schemas/category_schema';
-import { Item, ItemDocument } from 'src/item/schemas/item-schema';
-import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
+} from '../category/schemas/category_schema';
+import { Item, ItemDocument } from '../item/schemas/item-schema';
+import { User, UserDocument, UserRole } from '../user/schemas/user_schema';
 import {
   ReviewContainer,
   ReviewContainerDocument,
-} from 'src/review-container/schemas/reviewContainer_schema';
+} from '../review-container/schemas/reviewContainer_schema';
 import {
   VideoContainer,
   VideoContainerDocument,
-} from 'src/video-container/schemas/videoContainer-schema';
-import { Banner, BannerDocument } from 'src/banner/schemas/banner_schema';
+} from '../video-container/schemas/videoContainer-schema';
+import { Banner, BannerDocument } from '../banner/schemas/banner_schema';
 
 @Injectable()
 export class ShopService {

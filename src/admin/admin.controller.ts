@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 
 import { AdminService } from './admin.service';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Controller('admin')
 export class AdminController {

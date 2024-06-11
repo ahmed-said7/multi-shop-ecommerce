@@ -8,30 +8,30 @@ import {
 
 import * as mongoose from 'mongoose';
 
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { UpdateShopDto } from 'src/shop/dto/update-shop.dto';
-import { CreateShopDto } from 'src/shop/dto/create-shop.dto';
-import { Review, ReviewDocument } from 'src/review/schemas/review_schema';
+import { UpdateShopDto } from '../shop/dto/update-shop.dto';
+import { CreateShopDto } from '../shop/dto/create-shop.dto';
+import { Review, ReviewDocument } from '../review/schemas/review_schema';
 import {
   ProductSlider,
   ProductSliderDocument,
-} from 'src/product-slider/schemas/productSlider_schema';
+} from '../product-slider/schemas/productSlider_schema';
 import {
   PhotoSlider,
   PhotoSliderDocument,
-} from 'src/photo-slider/schemas/photo-slider_schema';
+} from '../photo-slider/schemas/photo-slider_schema';
 import {
   Category,
   CategoryDocument,
-} from 'src/category/schemas/category_schema';
-import { Item, ItemDocument } from 'src/item/schemas/item-schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
-import { Banner, BannerDocument } from 'src/banner/schemas/banner_schema';
+} from '../category/schemas/category_schema';
+import { Item, ItemDocument } from '../item/schemas/item-schema';
+import { User, UserDocument } from '../user/schemas/user_schema';
+import { Banner, BannerDocument } from '../banner/schemas/banner_schema';
 import {
   VideoContainer,
   VideoContainerDocument,
-} from 'src/video-container/schemas/videoContainer-schema';
+} from '../video-container/schemas/videoContainer-schema';
 
 @Injectable()
 export class ShopService {

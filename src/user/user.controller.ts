@@ -12,16 +12,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import mongoose from 'mongoose';
-
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthService } from 'src/auth/auth.service';
 import { EmailService } from './email/email.service';
 import { User } from './schemas/user_schema';
-import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+
+import { AuthService } from '../auth/auth.service';
+import { JwtGuard } from '../auth/guards/jwt-auth.guard';
+import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 
 @Controller('user')
 export class UserController {

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Types, HydratedDocument } from 'mongoose';
 
 import validator from 'validator';
 
@@ -25,7 +25,7 @@ export enum ReadyOption {
 }
 
 // Define the document type for the user schema
-export type UserDocument = User & Document;
+export type UserDocument = HydratedDocument<User>;
 
 // Define the user schema
 @Schema({

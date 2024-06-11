@@ -6,12 +6,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
+
+import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
+import { User, UserDocument } from '../user/schemas/user_schema';
 
 @Injectable()
 export class AdminService {
@@ -19,12 +20,8 @@ export class AdminService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    private readonly jwtService: JwtService,
   ) {}
 
-  private decodeToken(token: string) {
-    return this.jwtService.decode<{ username: string; email: string }>(token);
-  }
   async findOne(id: string) {
     try {
       const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');

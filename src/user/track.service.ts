@@ -4,7 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from './schemas/user_schema';
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 
 @Injectable()
 export class TrackService {

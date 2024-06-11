@@ -1,8 +1,8 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtGuard } from '../auth/guards/jwt-auth.guard';
 import { TrackService } from './track.service';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { MerchantGuard } from '../auth/guards/merchant.guard';
 
 @Controller('user/track')
 export class UserTrackController {

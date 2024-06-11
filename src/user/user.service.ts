@@ -10,19 +10,14 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import mongoose, { Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
 
-import {
-  Order,
-  OrderDocument,
-  OrderStatusTypes,
-} from 'src/order/schemas/order_schema';
-import { CreateOrderDto } from 'src/order/dto/create-order.dto';
-import { Item, ItemDocument } from 'src/item/schemas/item-schema';
-import { ShopService } from 'src/shop/shop.service';
+import { ShopService } from '../shop/shop.service';
+import { Order, OrderDocument } from '../order/schemas/order_schema';
+import { Item, ItemDocument } from '../item/schemas/item-schema';
 
 @Injectable()
 export class UserService {
@@ -69,7 +64,7 @@ export class UserService {
             description: 'Add Description',
             title: `${userResponse.email.split('@')[0]} shop`,
           },
-          savedUser._id,
+          savedUser._id.toString(),
         ); // Include user ID here
         const updatedUser = await this.userModel.findByIdAndUpdate(
           savedUser._id,
