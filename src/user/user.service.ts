@@ -15,19 +15,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
 
-import { ShopService } from '../shop/shop.service';
 import { Order, OrderDocument } from '../order/schemas/order_schema';
-import { Item, ItemDocument } from '../item/schemas/item-schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly shopService: ShopService,
 
     private readonly jwtService: JwtService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -51,30 +47,7 @@ export class UserService {
 
       const savedUser = await createdUser.save();
 
-      const userResponse = { ...savedUser.toObject(), password: undefined };
-
       const token = this.generateToken(savedUser);
-
-      if (savedUser.role === 'merchant') {
-        const shop = await this.shopService.create(
-          {
-            categories: [],
-            containers: [],
-            customers: [],
-            description: 'Add Description',
-            title: `${userResponse.email.split('@')[0]} shop`,
-          },
-          savedUser._id.toString(),
-        ); // Include user ID here
-        const updatedUser = await this.userModel.findByIdAndUpdate(
-          savedUser._id,
-          {
-            shopId: shop._id,
-          },
-          { new: true },
-        );
-        return { token, user: updatedUser };
-      }
 
       return { token, user: savedUser };
     } catch (error) {
@@ -228,9 +201,6 @@ export class UserService {
     for (const orderId of user.orders) {
       await this.orderModel.findByIdAndDelete(orderId);
     }
-
-    // Remove The User Shop.
-    await this.shopService.remove(userId, targetUser.shopId.toString()); // Include both user ID and shop ID
 
     const deletedUser = await this.userModel.findByIdAndDelete(paramId);
 

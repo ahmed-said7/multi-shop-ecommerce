@@ -37,8 +37,6 @@ export class CreateUserDto {
   })
   phone: string;
 
-  shop: Types.ObjectId;
-
   wallet: number;
 
   orders: Types.ObjectId[];

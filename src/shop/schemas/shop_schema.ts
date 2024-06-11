@@ -18,13 +18,13 @@ export class Shop {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userID: Types.ObjectId;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Item' })
+  @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })
   itemsIDs: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'User' })
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
   customers: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Category' })
+  @Prop({ type: [Types.ObjectId], ref: 'Category', default: [] })
   categories: Types.ObjectId[];
 
   @Prop({
@@ -50,7 +50,7 @@ export class Shop {
     default: [],
   })
   containers: { containerID: Types.ObjectId; containerType: string }[];
-  @Prop()
+  @Prop({ default: [] })
   introPages: string[];
 
   @Prop()
