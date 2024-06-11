@@ -213,7 +213,7 @@ export class UserService {
       throw new NotFoundException('This user doesnt exist');
     }
 
-    if (user.role === UserRole.merchant) {
+    if (user.role === UserRole.MERCHANT) {
       throw new UnauthorizedException(
         'You dont have the permission to delete this user',
       );

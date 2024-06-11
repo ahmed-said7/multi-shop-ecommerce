@@ -80,6 +80,6 @@ import { UploadModule } from 'src/upload/upload.module';
   ],
   controllers: [ShopController],
   providers: [ShopService],
-  exports: [MongooseModule], // Export MongooseModule to make ShopModel available in other modules
+  exports: [MongooseModule, ShopService], // Export MongooseModule to make ShopModel available in other modules
 })
 export class ShopModule {}

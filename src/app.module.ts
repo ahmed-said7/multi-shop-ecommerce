@@ -26,6 +26,7 @@ import { FileManagerModule } from './file-manager/file-manager.module';
 import { CartModule } from './cart/cart.module';
 import { BannerModule } from './banner/banner.module';
 import { UploadModule } from './upload/upload.module';
+import { MerchantModule } from './merchant/merchant.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { UploadModule } from './upload/upload.module';
     FileManagerModule,
     CartModule,
     UploadModule,
+    MerchantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

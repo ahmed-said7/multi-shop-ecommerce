@@ -1,9 +1,9 @@
 import {
-  BadGatewayException,
   BadRequestException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+
 import { CreateAdminRequestDto } from './dto/create-admin-request.dto';
 import { UpdateAdminRequestDto } from './dto/update-admin-request.dto';
 import { InjectModel } from '@nestjs/mongoose';

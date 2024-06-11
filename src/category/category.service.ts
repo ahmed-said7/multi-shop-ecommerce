@@ -1,8 +1,5 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category_schema';
@@ -63,12 +60,7 @@ export class CategoryService {
     }
   }
 
-  async update(
-    id: string,
-    updateCategoryDto: UpdateCategoryDto,
-    shopId: string,
-    userRole: string,
-  ) {
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     try {
       const category = await this.categoryModel
         .findByIdAndUpdate(id, updateCategoryDto, { new: true })

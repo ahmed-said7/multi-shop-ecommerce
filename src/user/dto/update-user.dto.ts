@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEnum, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsString, IsEnum } from 'class-validator';
 
 import { UserRole } from '../schemas/user_schema';
 import { Types } from 'mongoose';

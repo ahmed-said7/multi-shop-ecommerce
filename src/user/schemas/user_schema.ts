@@ -3,11 +3,13 @@ import { Types, HydratedDocument } from 'mongoose';
 
 import validator from 'validator';
 
+export type Gender = 'male' | 'female' | 'other';
+
 // Enum for user roles
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
-  merchant = 'merchant',
+  MERCHANT = 'merchant',
 }
 
 export enum UserExperienceType {

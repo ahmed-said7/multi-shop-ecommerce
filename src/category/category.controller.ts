@@ -45,10 +45,8 @@ export class CategoryController {
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-    @Body('shopId') shopId: string,
-    @Body('userRole') userRole: string,
   ) {
-    return this.categoryService.update(id, updateCategoryDto, shopId, userRole);
+    return this.categoryService.update(id, updateCategoryDto);
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
