@@ -25,7 +25,7 @@ export class Merchant {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, default: DateTime.now().toISO() })
+  @Prop({ required: true, default: DateTime.now().setZone('GMT').toISO() })
   birthday: string;
 
   @Prop({ required: true, default: 'other', enum: ['male', 'female', 'other'] })

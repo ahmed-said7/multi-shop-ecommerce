@@ -28,12 +28,18 @@ export class MerchantService {
 
   async create(data: CreateDto) {
     try {
-      const shop = await new this.shopModel().save();
+      const shop = await new this.shopModel({
+        title: `${data.name}-Shop`,
+      }).save();
 
       const merchant = await new this.merchantModel({
         ...data,
         shop: shop._id,
       }).save();
+
+      await this.shopModel.findByIdAndUpdate(shop._id, {
+        userID: merchant._id,
+      });
 
       this.logger.log(merchant);
 
