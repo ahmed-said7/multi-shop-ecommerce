@@ -70,7 +70,11 @@ export class MerchantService {
 
   async findOne(id: string) {
     try {
-      return await this.merchantModel.findById(id);
+      const merchant = await this.merchantModel.findById(id);
+
+      delete merchant.password;
+
+      return merchant;
     } catch (error) {
       this.logger.error(error);
 

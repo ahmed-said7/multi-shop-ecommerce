@@ -15,7 +15,6 @@ import { CreateMerchantDto } from './dto/createMerchant.dto';
 import { UpdateMerchantDto } from './dto/updateMerchant.dto';
 
 import { AdminGuard } from '../auth/guards/admin.guard';
-import { MerchantGuard } from '../auth/guards/merchant.guard';
 
 @Controller('merchant')
 export class MerchantController {
@@ -38,19 +37,16 @@ export class MerchantController {
   }
 
   @Get(':id')
-  @UseGuards(MerchantGuard)
   findOne(@Param('id') id: string) {
     return this.merchantService.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(MerchantGuard)
   update(@Param('id') id: string, @Body() data: UpdateMerchantDto) {
     return this.merchantService.update(id, data);
   }
 
   @Delete(':id')
-  @UseGuards(MerchantGuard)
   delete(@Param('id') id: string) {
     return this.merchantService.delete(id);
   }
