@@ -8,6 +8,7 @@ import { MerchantController } from './merchant.controller';
 import { ShopModule } from 'src/shop/shop.module';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { MerchantSchema } from 'src/user/schemas/merchant_schema';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MerchantSchema } from 'src/user/schemas/merchant_schema';
     ]),
 
     ShopModule,
+    AuthModule,
   ],
   controllers: [MerchantController],
   providers: [MerchantService],

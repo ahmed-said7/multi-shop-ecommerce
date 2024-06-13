@@ -37,14 +37,6 @@ import {
 } from '../intro-page/schemas/intro_page_schema';
 
 @Module({
-  providers: [
-    AuthService,
-    ShopService,
-    LocalStrategy,
-    RefreshJwtStrategy,
-    UserService,
-  ],
-  controllers: [AuthController],
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
@@ -62,6 +54,16 @@ import {
 
     PassportModule,
   ],
+
+  providers: [
+    AuthService,
+    ShopService,
+    LocalStrategy,
+    RefreshJwtStrategy,
+    UserService,
+  ],
+  controllers: [AuthController],
+
   exports: [AuthService],
 })
 export class AuthModule {}

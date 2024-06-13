@@ -26,6 +26,11 @@ export class MerchantController {
     return this.merchantService.create(data);
   }
 
+  @Post('login')
+  login(@Body('email') email: string, @Body('password') password: string) {
+    return this.merchantService.merchantSignIn(email, password);
+  }
+
   @Get()
   @UseGuards(AdminGuard)
   findAll(@Query('page') page?: number) {

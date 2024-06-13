@@ -39,7 +39,7 @@ export class Merchant {
   role: string;
 
   @Prop({ unique: true, type: Types.ObjectId, ref: 'Shop' })
-  shop: string;
+  shopId: string;
 }
 
 export const merchantSchema = SchemaFactory.createForClass(Merchant);

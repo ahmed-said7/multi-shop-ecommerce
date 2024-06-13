@@ -36,6 +36,15 @@ export class AuthService {
       refreshToken: this.jwtService.sign(payload, { expiresIn: '1d' }),
     };
   }
+
+  async getToken(data: any) {
+    delete data.password;
+
+    return {
+      accessToken: await this.jwtService.signAsync(data),
+    };
+  }
+
   async refreshToken(user: User) {
     const payload = {
       userId: user?.['_id'],

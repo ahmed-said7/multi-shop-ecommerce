@@ -20,8 +20,8 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() creatUserDto: CreateUserDto) {
-    return await this.userService.register(creatUserDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.register(createUserDto);
   }
 
   @UseGuards(RefreshJwtGuard)
