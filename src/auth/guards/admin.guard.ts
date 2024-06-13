@@ -3,13 +3,10 @@ import type { Request } from 'express';
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+
 import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
 
 @Injectable()
@@ -17,22 +14,31 @@ export class AdminGuard implements CanActivate {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    const id = request.params.id as string;
+    const token = request.header('authorization').split(' ')[1];
 
-    if (!id) {
-      throw new ForbiddenException('id not provided');
+    if (!token) {
+      return false;
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('Invalid id format');
+    let tokenData: { userId: string };
+
+    try {
+      tokenData = await this.jwtService.verifyAsync(token);
+    } catch {
+      return false;
     }
 
-    const user = await this.userModel.findById(id);
+    if (!tokenData.userId) {
+      return false;
+    }
+
+    const user = await this.userModel.findById(tokenData.userId);
 
     if (!user) {
       return false;
