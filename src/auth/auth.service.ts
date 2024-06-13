@@ -45,6 +45,10 @@ export class AuthService {
     };
   }
 
+  async verifyToken<T>(token: string) {
+    return await this.jwtService.decode<T>(token);
+  }
+
   async refreshToken(user: User) {
     const payload = {
       userId: user?.['_id'],

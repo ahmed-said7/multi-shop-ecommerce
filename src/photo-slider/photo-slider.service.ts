@@ -26,7 +26,7 @@ export class PhotoSliderService {
     shopId: Types.ObjectId,
     createPhotoSliderDto: CreatePhotoSliderDto,
   ): Promise<PhotoSlider> {
-    let createdPhotoSlider = await new this.photoSliderModel(
+    const createdPhotoSlider = await new this.photoSliderModel(
       createPhotoSliderDto,
     ).save();
 

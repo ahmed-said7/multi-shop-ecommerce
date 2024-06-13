@@ -32,7 +32,7 @@ export class PhotoSliderController {
   @UseGuards(JwtGuard)
   @Post()
   create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile('image') file: Express.Multer.File,
     @Body('shopId') shopId: Types.ObjectId,
     @Body() createPhotoSliderDto: CreatePhotoSliderDto,
   ): Promise<PhotoSlider> {
