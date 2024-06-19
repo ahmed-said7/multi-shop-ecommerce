@@ -1,18 +1,27 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
+  Logger,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
 
-import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import {
   PhotoSlider,
   PhotoSliderDocument,
 } from './schemas/photo-slider_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+
+import { v2 as cloudinary } from 'cloudinary';
+
+import { join } from 'path';
+
+import { rm } from 'fs/promises';
+
+import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 
 @Injectable()
 export class PhotoSliderService {
@@ -22,40 +31,68 @@ export class PhotoSliderService {
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
   ) {}
 
-  async create(
-    shopId: Types.ObjectId,
-    createPhotoSliderDto: CreatePhotoSliderDto,
-  ): Promise<PhotoSlider> {
-    const createdPhotoSlider = await new this.photoSliderModel(
-      createPhotoSliderDto,
-    ).save();
+  private readonly logger = new Logger(PhotoSliderService.name);
 
-    const payload = {
-      createPhotoSliderDto,
-      shopId,
-    };
-    const Shop = await this.shopModel.findById(payload);
-
-    if (!Shop) {
-      throw new NotFoundException("Couldn't find the shop");
+  async create(shopId: string, images: Express.Multer.File[]) {
+    if (!shopId) {
+      throw new BadRequestException('Shop ID must be provided');
     }
 
-    if (Shop?.containers) {
-      Shop.containers.push({
-        containerID: createdPhotoSlider.id,
-        containerType: 'PhotoSlider',
-      });
-    } else {
-      Shop.$set('containers', [
-        {
-          containerID: createdPhotoSlider.id,
-          containerType: 'PhotoSlider',
-        },
-      ]);
-    }
+    cloudinary.config({
+      cloud_name: 'dykmqerdt',
+      api_key: '914667443463293',
+      api_secret: 'SVBMr1Pd6PCXas9DxnAr_86b11E',
+      secure: true,
+    });
 
-    await Shop.save();
-    return createdPhotoSlider;
+    const imagesPath = join(__dirname, '..', '..');
+
+    const imageList = images.map((img) => {
+      return {
+        ...img,
+        path: join(imagesPath, img.path),
+      };
+    });
+
+    try {
+      const links: string[] = [];
+
+      for (const img of imageList) {
+        const { url } = await cloudinary.uploader.upload(img.path);
+        links.push(url);
+
+        await rm(img.path);
+      }
+
+      const photoSlider: CreatePhotoSliderDto = {
+        shopId,
+        isContainer: true,
+        isRounded: true,
+        photoSlides: links.map((link) => {
+          return {
+            buttonColor: '',
+            buttonLink: '',
+            buttonPosition: '',
+            buttonText: '',
+            buttonTextColor: '',
+            photo: link,
+            subTitle: '',
+            title: '',
+            titleAndSubTitleColor: '',
+            titleAndSubTitlePostion: '',
+          };
+        }),
+      };
+
+      const slider = await new this.photoSliderModel({
+        ...photoSlider,
+        shopId,
+      }).save();
+
+      return slider;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async findAll(): Promise<PhotoSlider[]> {

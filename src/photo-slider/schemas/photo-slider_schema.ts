@@ -14,7 +14,7 @@ export class PhotoSlider {
     {
       title: string;
       subTitle: string;
-      titleAndSubTitlePostion: string;
+      titleAndSubTitlePosition: string;
       titleAndSubTitleColor: string;
       buttonText: string;
       buttonLink: string;

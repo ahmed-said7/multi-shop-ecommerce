@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsArray, IsString } from 'class-validator';
+import { IsNotEmpty, IsArray } from 'class-validator';
 
 export class CreatePhotoSliderDto {
   @IsArray()
@@ -17,4 +17,5 @@ export class CreatePhotoSliderDto {
   }[];
   isContainer: boolean;
   isRounded: boolean;
+  shopId: string;
 }

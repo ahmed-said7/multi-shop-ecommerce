@@ -29,6 +29,11 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { DateTime } from 'luxon';
+import { v4 as uuid } from 'uuid';
+import { extension } from 'mime-types';
 
 @Module({
   imports: [
@@ -53,6 +58,18 @@ import { UploadModule } from 'src/upload/upload.module';
       signOptions: { expiresIn: '1h' },
     }),
     UploadModule,
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './images/photo-slider',
+        filename(_req, file, callback) {
+          const nowDate = DateTime.now().toISODate();
+
+          const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
+
+          callback(null, name);
+        },
+      }),
+    }),
   ],
   controllers: [PhotoSliderController],
   providers: [PhotoSliderService],

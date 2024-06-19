@@ -8,17 +8,16 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
+  Logger,
+  UploadedFiles,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
-import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import { PhotoSlider } from './schemas/photo-slider_schema';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
 
 @Controller('photo-slider')
@@ -28,15 +27,16 @@ export class PhotoSliderController {
     private readonly uploadService: UploadService,
   ) {}
 
-  @UseInterceptors(FileInterceptor('image'))
+  private readonly logger = new Logger(PhotoSliderController.name);
+
   @UseGuards(JwtGuard)
   @Post()
+  @UseInterceptors(FilesInterceptor('images'))
   create(
-    @UploadedFile('image') file: Express.Multer.File,
-    @Body('shopId') shopId: Types.ObjectId,
-    @Body() createPhotoSliderDto: CreatePhotoSliderDto,
-  ): Promise<PhotoSlider> {
-    return this.photoSliderService.create(shopId, createPhotoSliderDto);
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('shopId') shopId: string,
+  ) {
+    return this.photoSliderService.create(shopId, files);
   }
 
   @Get()

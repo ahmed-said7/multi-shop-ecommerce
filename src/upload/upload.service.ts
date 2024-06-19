@@ -1,8 +1,6 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UploadService {
@@ -32,15 +30,6 @@ export class UploadService {
 
   async uploadFile(file: Express.Multer.File, destination: string) {
     try {
-      const obj = await this.s3Client.send(
-        new PutObjectCommand({
-          Body: file.buffer,
-          Bucket: this.bucket,
-          Key: destination,
-          ContentType: file.mimetype,
-        }),
-      );
-
       return `${this.r2Subdomain}/${destination}`;
     } catch (error) {
       throw new InternalServerErrorException(`Error while uploading file!`);
