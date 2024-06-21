@@ -36,6 +36,7 @@ import {
   VideoContainerDocument,
 } from '../video-container/schemas/videoContainer-schema';
 import { Banner, BannerDocument } from '../banner/schemas/banner_schema';
+import { UploadService } from 'src/upload/upload.service';
 
 @Injectable()
 export class ShopService {
@@ -58,6 +59,7 @@ export class ShopService {
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     @InjectModel(Banner.name)
     private readonly bannerModel: mongoose.Model<BannerDocument>,
+    private readonly uploadService: UploadService,
   ) {}
 
   async create(createShopDto: CreateShopDto, userId: string) {
@@ -143,8 +145,19 @@ export class ShopService {
     }
   }
 
-  async update(id: string, updateShopDto: UpdateShopDto) {
+  async update(
+    id: string,
+    file: Express.Multer.File,
+    updateShopDto: UpdateShopDto,
+  ) {
+    if (!id) {
+      throw new BadRequestException("Can't find shop");
+    }
+
     try {
+      const url = await this.uploadService.uploadFile(file);
+      updateShopDto.logo = url;
+
       const shop = await this.shopModel.findByIdAndUpdate(id, updateShopDto, {
         new: true,
       });

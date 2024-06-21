@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { UploadService } from 'src/upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('shop')
 export class ShopController {
@@ -74,18 +75,23 @@ export class ShopController {
     return this.shopService.findUserShops(id);
   }
 
-  @Patch()
   @UseGuards(MerchantGuard)
   @UseInterceptors(FileInterceptor('shop-logo'))
+  @Patch()
   async update(
-    @Body('shopId') shopId: string,
+    @Req() request: Request,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const url = await this.uploadService.uploadFile(file);
-    updateShopDto.logo = url;
+    const user = request.user as MerchantPayload;
 
-    return await this.shopService.update(shopId, updateShopDto);
+    const shop = await this.shopService.update(
+      user.shopId,
+      file,
+      updateShopDto,
+    );
+
+    return shop;
   }
 
   @UseGuards(MerchantGuard)

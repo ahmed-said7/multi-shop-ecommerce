@@ -1,6 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
 
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 
 import type { Request } from 'express';
 
@@ -10,6 +15,8 @@ import { UserRole } from 'src/user/schemas/user_schema';
 @Injectable()
 export class MerchantGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
+
+  private readonly logger = new Logger(MerchantGuard.name);
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -30,8 +37,7 @@ export class MerchantGuard implements CanActivate {
       return false;
     }
 
-    request.body['userId'] = payload.id;
-    request.body['shopId'] = payload.shopId;
+    request.user = payload;
 
     return true;
   }

@@ -42,6 +42,7 @@ import {
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
 import { ShopService } from '../shop/shop.service';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { ShopService } from '../shop/shop.service';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     AuthModule,
+    UploadModule,
   ],
   controllers: [UserController, OtpController, UserTrackController],
   providers: [UserService, OtpService, EmailService, ShopService, TrackService],
