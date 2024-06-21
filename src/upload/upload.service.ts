@@ -1,49 +1,69 @@
-import { S3Client } from '@aws-sdk/client-s3';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+
 import { ConfigService } from '@nestjs/config';
+
+import { join } from 'path';
+
+import { v2 as cloudinary } from 'cloudinary';
+
+import { rm } from 'fs/promises';
 
 @Injectable()
 export class UploadService {
-  private s3Client: S3Client;
-  private bucket: string = this.config.get<string>('CLOUDFLARE_R2_BUCKET');
-  private accountId: string = this.config.get<string>('CLOUDFLARE_R2_ENDPOINT');
-  private accessKeyId: string = this.config.get<string>(
-    'CLOUDFLARE_R2_ACCESS_KEY_ID',
-  );
-  private secretAccessKey: string = this.config.get<string>(
-    'CLOUDFLARE_R2_SECRET_ACCESS_KEY',
-  );
-  private r2Subdomain: string = this.config.get<string>(
-    'CLOUDFLARE_R2_SUBDOMAIN',
-  );
-
   constructor(private config: ConfigService) {
-    this.s3Client = new S3Client({
-      endpoint: `https://${this.accountId}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: this.accessKeyId,
-        secretAccessKey: this.secretAccessKey,
-      },
-      region: 'us-east-1',
+    cloudinary.config({
+      cloud_name: 'dykmqerdt',
+      api_key: '914667443463293',
+      api_secret: 'SVBMr1Pd6PCXas9DxnAr_86b11E',
+      secure: true,
     });
   }
 
-  async uploadFile(file: Express.Multer.File, destination: string) {
+  private readonly filesPath = join(__dirname, '..', '..');
+
+  async uploadFile(file: Express.Multer.File) {
+    file.path = join(this.filesPath, file.path);
+
+    const { url } = await cloudinary.uploader.upload(file.path);
+
+    await rm(file.path);
+
+    return url;
+  }
+
+  async uploadFiles(files: Express.Multer.File[]) {
+    const fileList = files.map((img) => {
+      return {
+        ...img,
+        path: join(this.filesPath, img.path),
+      };
+    });
+
     try {
-      return `${this.r2Subdomain}/${destination}`;
+      const links: string[] = [];
+
+      for (const file of fileList) {
+        const { url } = await cloudinary.uploader.upload(file.path);
+        links.push(url);
+
+        await rm(file.path);
+      }
+
+      return links;
     } catch (error) {
-      throw new InternalServerErrorException(`Error while uploading file!`);
+      throw new InternalServerErrorException(error);
     }
   }
-  async uploadFiles(files: Express.Multer.File[]): Promise<string[]> {
-    try {
-      const uploadPromises = files.map((file) => {
-        const destination = `${Date.now()}-${file.originalname}`;
-        return this.uploadFile(file, destination);
-      });
-      return await Promise.all(uploadPromises);
-    } catch (error) {
-      throw new InternalServerErrorException(`Error while uploading files!`);
-    }
+
+  async removeFile(path: string) {
+    await cloudinary.uploader.destroy(path);
+
+    return 'File Deleted';
+  }
+
+  async removeFiles(paths: string[]) {
+    await cloudinary.api.delete_resources(paths);
+
+    return 'Files Deleted';
   }
 }

@@ -1,27 +1,24 @@
 import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
   Logger,
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { InjectModel } from '@nestjs/mongoose';
+
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
+
 import {
   PhotoSlider,
   PhotoSliderDocument,
 } from './schemas/photo-slider_schema';
+
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 
-import { v2 as cloudinary } from 'cloudinary';
-
-import { join } from 'path';
-
-import { rm } from 'fs/promises';
-
-import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class PhotoSliderService {
@@ -29,70 +26,21 @@ export class PhotoSliderService {
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: Model<PhotoSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    private readonly uploadFileService: UploadService,
   ) {}
 
   private readonly logger = new Logger(PhotoSliderService.name);
 
-  async create(shopId: string, images: Express.Multer.File[]) {
+  async create(shopId: string) {
     if (!shopId) {
       throw new BadRequestException('Shop ID must be provided');
     }
+  }
 
-    cloudinary.config({
-      cloud_name: 'dykmqerdt',
-      api_key: '914667443463293',
-      api_secret: 'SVBMr1Pd6PCXas9DxnAr_86b11E',
-      secure: true,
-    });
+  async uploadFilesToView(images: Express.Multer.File[]) {
+    const links = await this.uploadFileService.uploadFiles(images);
 
-    const imagesPath = join(__dirname, '..', '..');
-
-    const imageList = images.map((img) => {
-      return {
-        ...img,
-        path: join(imagesPath, img.path),
-      };
-    });
-
-    try {
-      const links: string[] = [];
-
-      for (const img of imageList) {
-        const { url } = await cloudinary.uploader.upload(img.path);
-        links.push(url);
-
-        await rm(img.path);
-      }
-
-      const photoSlider: CreatePhotoSliderDto = {
-        shopId,
-        isContainer: true,
-        isRounded: true,
-        photoSlides: links.map((link) => {
-          return {
-            buttonColor: '',
-            buttonLink: '',
-            buttonPosition: '',
-            buttonText: '',
-            buttonTextColor: '',
-            photo: link,
-            subTitle: '',
-            title: '',
-            titleAndSubTitleColor: '',
-            titleAndSubTitlePostion: '',
-          };
-        }),
-      };
-
-      const slider = await new this.photoSliderModel({
-        ...photoSlider,
-        shopId,
-      }).save();
-
-      return slider;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    return links;
   }
 
   async findAll(): Promise<PhotoSlider[]> {

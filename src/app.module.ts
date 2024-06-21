@@ -39,6 +39,7 @@ import { MerchantModule } from './merchant/merchant.module';
       signOptions: { expiresIn: '1d' },
       global: true,
     }),
+
     MongooseModule.forRoot(process.env.DB_URI),
 
     ShopModule,
