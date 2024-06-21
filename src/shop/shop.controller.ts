@@ -72,17 +72,16 @@ export class ShopController {
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
-  @Patch(':id')
+  @Patch()
   @UseInterceptors(FileInterceptor('image'))
   async update(
-    @Param('id') id: string,
     @Body('shopId') shopId: string,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const url = await this.uploadService.uploadFile(file);
     updateShopDto.logo = url;
-    return this.shopService.update(id, updateShopDto);
+    return this.shopService.update(shopId, updateShopDto);
   }
 
   @UseGuards(JwtGuard, MerchantGuard)
