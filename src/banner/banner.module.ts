@@ -31,8 +31,10 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
-import { UploadService } from 'src/upload/upload.service';
+
 import { UploadModule } from 'src/upload/upload.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Module({
   imports: [
@@ -56,6 +58,13 @@ import { UploadModule } from 'src/upload/upload.module';
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
     }),
+
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './images/banner',
+      }),
+    }),
+
     UploadModule,
   ],
   controllers: [BannerController],
