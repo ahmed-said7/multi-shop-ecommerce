@@ -40,7 +40,11 @@ export class User {
   @Prop({ required: true }) // Ensure password is required
   password: string;
 
-  @Prop({ required: true, enum: UserRole, default: UserRole.USER }) // Add the role property
+  @Prop({
+    required: true,
+    enum: [UserRole.ADMIN, UserRole.USER],
+    default: UserRole.USER,
+  }) // Add the role property
   role: UserRole;
 
   @Prop({
