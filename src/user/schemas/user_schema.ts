@@ -34,17 +34,17 @@ export type UserDocument = HydratedDocument<User>;
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class User {
-  @Prop({ required: true }) // Ensure name is required
+  @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true }) // Ensure password is required
+  @Prop({ required: true })
   password: string;
 
   @Prop({
     required: true,
     enum: [UserRole.ADMIN, UserRole.USER],
     default: UserRole.USER,
-  }) // Add the role property
+  })
   role: UserRole;
 
   @Prop({
