@@ -37,7 +37,7 @@ export class IntroPageController {
     return this.introPageService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -46,7 +46,7 @@ export class IntroPageController {
     return this.introPageService.update(id, updateIntroPageDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.introPageService.remove(id);

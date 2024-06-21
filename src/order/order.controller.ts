@@ -53,19 +53,19 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch('confirm/:id')
   confirmDeliver(@Param('id') id: string) {
     return this.orderService.confimeDelivery(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('userId') userId: string) {
     return this.orderService.remove(id, userId);

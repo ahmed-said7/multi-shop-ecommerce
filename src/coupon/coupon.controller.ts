@@ -18,7 +18,6 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { applyCoupon } from './dto/apply-coupon.dto';
 
 @Controller('coupon')
 export class CouponController {
@@ -35,11 +34,8 @@ export class CouponController {
 
   @UseGuards(JwtGuard)
   @Post('/apply')
-  applyCoupon(
-    @Body() applyCoupon: applyCoupon,
-    @Body('userId') userId: string,
-  ) {
-    return this.couponService.applyCoupon(userId, applyCoupon);
+  applyCoupon(@Body('userId') userId: string) {
+    // return this.couponService.applyCoupon(userId, applyCoupon);
   }
 
   @UseGuards(JwtGuard)
@@ -53,7 +49,7 @@ export class CouponController {
     return this.couponService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: Types.ObjectId,
@@ -62,7 +58,7 @@ export class CouponController {
     return this.couponService.update(id, updateCouponDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: Types.ObjectId) {
     return this.couponService.remove(id);

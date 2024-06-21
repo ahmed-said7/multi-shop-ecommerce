@@ -53,7 +53,7 @@ export class BannerController {
     return this.bannerService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -62,7 +62,7 @@ export class BannerController {
     return this.bannerService.update(id, updateBannerDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<string> {
     return this.bannerService.remove(id);

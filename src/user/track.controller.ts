@@ -1,6 +1,5 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 
-import { JwtGuard } from '../auth/guards/jwt-auth.guard';
 import { TrackService } from './track.service';
 import { MerchantGuard } from '../auth/guards/merchant.guard';
 
@@ -8,7 +7,7 @@ import { MerchantGuard } from '../auth/guards/merchant.guard';
 export class UserTrackController {
   constructor(private readonly trackService: TrackService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Post('shop')
   addNewShop(@Body('userId') userId: string, @Body('shopId') shopId: string) {
     return this.trackService.trackShop(userId, shopId);

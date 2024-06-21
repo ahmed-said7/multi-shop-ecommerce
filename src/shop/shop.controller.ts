@@ -10,6 +10,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Logger,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
@@ -27,6 +28,8 @@ export class ShopController {
     private readonly shopService: ShopService,
     private readonly uploadService: UploadService,
   ) {}
+
+  private readonly logger = new Logger(ShopController.name);
 
   @UseGuards(JwtGuard)
   @Post()
@@ -71,9 +74,9 @@ export class ShopController {
     return this.shopService.findUserShops(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
   @Patch()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(MerchantGuard)
+  @UseInterceptors(FileInterceptor('shop-logo'))
   async update(
     @Body('shopId') shopId: string,
     @Body() updateShopDto: UpdateShopDto,
@@ -81,10 +84,11 @@ export class ShopController {
   ) {
     const url = await this.uploadService.uploadFile(file);
     updateShopDto.logo = url;
-    return this.shopService.update(shopId, updateShopDto);
+
+    return await this.shopService.update(shopId, updateShopDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete('/:id')
   remove(@Body('shopId') shopId: string, @Param('id') id: string) {
     return this.shopService.remove(shopId, id);

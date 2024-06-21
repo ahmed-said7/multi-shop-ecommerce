@@ -33,13 +33,13 @@ export class VideoContainerController {
     return this.videoContainerService.findAll(new Types.ObjectId(id));
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Get('/one/:id')
   findOne(@Param('id') id: string) {
     return this.videoContainerService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -48,7 +48,7 @@ export class VideoContainerController {
     return this.videoContainerService.update(id, updateVideoContainerDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.videoContainerService.remove(id);

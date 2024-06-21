@@ -48,7 +48,7 @@ export class PhotoSliderController {
     return this.photoSliderService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -57,7 +57,7 @@ export class PhotoSliderController {
     return this.photoSliderService.update(id, updatePhotoSliderDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<string> {
     return this.photoSliderService.remove(id);

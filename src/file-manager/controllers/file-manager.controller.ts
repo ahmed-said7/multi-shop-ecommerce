@@ -11,14 +11,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileManagerService } from '../services/file-manager.service';
 import { UploadFileResponseDto } from '../dtos/responses/upload-file-response.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 
 @Controller('file-manager')
 export class FileManagerController {
   constructor(private fileManagerService: FileManagerService) {}
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Post('upload-photo/:id/:isSlider')
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhoto(

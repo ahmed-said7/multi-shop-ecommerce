@@ -36,7 +36,7 @@ export class ReviewContainerController {
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(id);
   }
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -45,7 +45,7 @@ export class ReviewContainerController {
     return this.reviewService.update(id, updateReviewDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('shopId') shopId: string) {
     return this.reviewService.remove(id, shopId);

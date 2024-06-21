@@ -38,7 +38,7 @@ export class ProductSliderController {
     return this.productSliderService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -47,7 +47,7 @@ export class ProductSliderController {
     return this.productSliderService.update(id, updateProductSliderDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Body('shopId') shopId: string) {
     return this.productSliderService.remove(id, shopId);

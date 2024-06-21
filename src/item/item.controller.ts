@@ -71,7 +71,7 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
   async update(
@@ -87,13 +87,13 @@ export class ItemController {
     return this.itemService.update(id, updateItemDto);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.itemService.remove(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Delete('/image/:id')
   removeImage(@Param('id') id: string, @Body('image') image: string) {
     return this.itemService.removeImage(id, image);
