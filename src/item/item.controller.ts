@@ -15,7 +15,6 @@ import {
 
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose, { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';

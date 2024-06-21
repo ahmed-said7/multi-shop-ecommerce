@@ -18,25 +18,24 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { UploadService } from '../upload/upload.service';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
-  constructor(
-    private readonly photoSliderService: PhotoSliderService,
-    private readonly uploadService: UploadService,
-  ) {}
+  constructor(private readonly photoSliderService: PhotoSliderService) {}
 
   private readonly logger = new Logger(PhotoSliderController.name);
 
   @UseGuards(JwtGuard)
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
-  create(
-    @UploadedFiles() files: Express.Multer.File[],
-    @Body('shopId') shopId: string,
-  ) {
+  create(@Body('shopId') shopId: string) {
     return this.photoSliderService.create(shopId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('preview')
+  @UseInterceptors(FilesInterceptor('images'))
+  uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
+    return this.photoSliderService.uploadFilesToView(files);
   }
 
   @Get()
