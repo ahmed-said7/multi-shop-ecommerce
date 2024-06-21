@@ -56,7 +56,7 @@ export class ShopController {
     return this.shopService.findOne(id);
   }
 
-  @UseGuards(JwtGuard, MerchantGuard)
+  @UseGuards(MerchantGuard)
   @Patch('join/:id')
   userJoin(
     @Param('id') id: mongoose.Types.ObjectId,

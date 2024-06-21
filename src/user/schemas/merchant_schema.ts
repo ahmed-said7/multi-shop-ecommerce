@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import validator from 'validator';
+import { UserRole } from './user_schema';
 
 export type MerchantDocument = Merchant & Document;
 
@@ -15,7 +16,7 @@ export class Merchant {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, default: 'merchant' })
+  @Prop({ required: true, default: UserRole.MERCHANT })
   role: string;
 
   @Prop({

@@ -17,6 +17,15 @@ import { Merchant, MerchantDocument } from './schema/merchant.schema';
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { AuthService } from 'src/auth/auth.service';
 
+export type MerchantPayload = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  gender: string;
+  shopId: string;
+};
+
 type DocType = Document<
   unknown,
   any,
@@ -101,12 +110,13 @@ export class MerchantService {
       throw new NotFoundException();
     }
 
-    const payload = {
-      id: merchant._id,
+    const payload: MerchantPayload = {
+      id: merchant._id.toString(),
       email: merchant.email,
       name: merchant.name,
       role: merchant.role,
       gender: merchant.gender,
+      shopId: merchant.shopId,
     };
 
     const token = await this.authService.getToken(payload);

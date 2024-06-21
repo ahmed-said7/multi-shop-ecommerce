@@ -11,7 +11,7 @@ import { Request } from 'express';
 import mongoose from 'mongoose';
 
 import { Shop, ShopDocument } from '../../shop/schemas/shop_schema';
-import { User, UserDocument } from '../../user/schemas/user_schema';
+import { User, UserDocument, UserRole } from '../../user/schemas/user_schema';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
@@ -48,7 +48,7 @@ export class JwtGuard implements CanActivate {
 
     request.body.userId = decodedToken.userId;
 
-    if (user.role === 'merchant') {
+    if (user.role === UserRole.MERCHANT) {
       const shop = await this.shopModel.findById(user.shopId);
       if (shop) {
         request.body.shopId = user.shopId;
