@@ -36,7 +36,7 @@ export class PhotoSliderController {
     @UploadedFiles() files: Express.Multer.File[],
     @Body('shopId') shopId: string,
   ) {
-    return this.photoSliderService.create(shopId, files);
+    return this.photoSliderService.create(shopId);
   }
 
   @Get()

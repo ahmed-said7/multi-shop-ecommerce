@@ -28,6 +28,12 @@ import { BannerModule } from './banner/banner.module';
 import { UploadModule } from './upload/upload.module';
 import { MerchantModule } from './merchant/merchant.module';
 
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { DateTime } from 'luxon';
+import { v4 as uuid } from 'uuid';
+import { extension } from 'mime-types';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,7 +45,18 @@ import { MerchantModule } from './merchant/merchant.module';
       signOptions: { expiresIn: '1d' },
       global: true,
     }),
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './images/',
+        filename(_req, file, callback) {
+          const nowDate = DateTime.now().toISODate();
 
+          const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
+
+          callback(null, name);
+        },
+      }),
+    }),
     MongooseModule.forRoot(process.env.DB_URI),
 
     ShopModule,

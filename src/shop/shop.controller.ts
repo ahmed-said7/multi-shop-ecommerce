@@ -61,7 +61,6 @@ export class ShopController {
   userJoin(
     @Param('id') id: mongoose.Types.ObjectId,
     @Body('userId') userId: string,
-    @Body('shopId') shopId: string,
   ) {
     return this.shopService.userJoin(id, userId);
   }
@@ -81,8 +80,7 @@ export class ShopController {
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const destination = `${Date.now()}-${file.originalname}`;
-    const url = await this.uploadService.uploadFile(file, destination);
+    const url = await this.uploadService.uploadFile(file);
     updateShopDto.logo = url;
     return this.shopService.update(id, updateShopDto);
   }

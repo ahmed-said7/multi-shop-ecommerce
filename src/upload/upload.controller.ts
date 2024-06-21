@@ -14,8 +14,7 @@ export class UploadController {
   @Post('image')
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    const destination = `${Date.now()}-${file.originalname}`;
-    const imageUrl = await this.uploadService.uploadFile(file, destination);
+    const imageUrl = await this.uploadService.uploadFile(file);
     return { imageUrl };
   }
 }

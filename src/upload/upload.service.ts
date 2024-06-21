@@ -10,11 +10,11 @@ import { rm } from 'fs/promises';
 
 @Injectable()
 export class UploadService {
-  constructor(private config: ConfigService) {
+  constructor(private readonly config: ConfigService) {
     cloudinary.config({
-      cloud_name: 'dykmqerdt',
-      api_key: '914667443463293',
-      api_secret: 'SVBMr1Pd6PCXas9DxnAr_86b11E',
+      cloud_name: this.config.get<string>('CLOUDINARY_NAME'),
+      api_key: this.config.get<string>('CLOUDINARY_KEY'),
+      api_secret: this.config.get<string>('CLOUDINARY_API_SECRET'),
       secure: true,
     });
   }

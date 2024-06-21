@@ -36,8 +36,7 @@ export class BannerController {
     @Body('shopId') shopId: Types.ObjectId,
     @Body() createBannerDto: CreateBannerDto,
   ) {
-    const destination = `${Date.now()}-${file.originalname}`;
-    const url = await this.uploadService.uploadFile(file, destination);
+    const url = await this.uploadService.uploadFile(file);
     createBannerDto.image = url as string;
     console.log(createBannerDto.image);
 
