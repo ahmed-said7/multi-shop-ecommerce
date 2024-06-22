@@ -22,6 +22,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { UploadService } from 'src/upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
 
 @Controller('shop')
 export class ShopController {
@@ -64,9 +65,9 @@ export class ShopController {
   @Patch('join/:id')
   userJoin(
     @Param('id') id: mongoose.Types.ObjectId,
-    @Body('userId') userId: string,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.shopService.userJoin(id, userId);
+    return this.shopService.userJoin(id, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -79,12 +80,10 @@ export class ShopController {
   @UseInterceptors(FileInterceptor('shop-logo'))
   @Patch()
   async update(
-    @Req() request: Request,
+    @MerchantUser() user: MerchantPayload,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const user = request.user as MerchantPayload;
-
     const shop = await this.shopService.update(
       user.shopId,
       file,
@@ -96,8 +95,8 @@ export class ShopController {
 
   @UseGuards(MerchantGuard)
   @Delete('/:id')
-  remove(@Body('shopId') shopId: string, @Param('id') id: string) {
-    return this.shopService.remove(shopId, id);
+  remove(@MerchantUser() user: MerchantPayload, @Param('id') id: string) {
+    return this.shopService.remove(user.shopId, id);
   }
 
   @UseGuards(JwtGuard)

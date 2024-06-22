@@ -14,6 +14,8 @@ import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('review-container')
 export class ReviewContainerController {
@@ -47,7 +49,7 @@ export class ReviewContainerController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('shopId') shopId: string) {
-    return this.reviewService.remove(id, shopId);
+  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+    return this.reviewService.remove(id, user.shopId);
   }
 }

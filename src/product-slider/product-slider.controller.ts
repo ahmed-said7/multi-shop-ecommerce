@@ -14,6 +14,8 @@ import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
+import { MerchantPayload } from 'src/merchant/merchant.service';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
 
 @Controller('product-slider')
 export class ProductSliderController {
@@ -49,7 +51,7 @@ export class ProductSliderController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('shopId') shopId: string) {
-    return this.productSliderService.remove(id, shopId);
+  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+    return this.productSliderService.remove(id, user?.shopId);
   }
 }

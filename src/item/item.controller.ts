@@ -10,7 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFiles,
-  Req,
 } from '@nestjs/common';
 
 import { ItemService } from './item.service';
@@ -78,10 +77,7 @@ export class ItemController {
     @Param('id') id: string,
     @Body() updateItemDto: any,
     @UploadedFiles() files: Express.Multer.File[],
-    @Req() req: Request,
   ) {
-    console.log(req);
-
     const imageUrls = await this.uploadService.uploadFiles(files);
     updateItemDto.images = imageUrls;
     return this.itemService.update(id, updateItemDto);

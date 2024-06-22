@@ -15,6 +15,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('order')
 export class OrderController {
@@ -67,7 +69,7 @@ export class OrderController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('userId') userId: string) {
-    return this.orderService.remove(id, userId);
+  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+    return this.orderService.remove(id, user.id);
   }
 }
