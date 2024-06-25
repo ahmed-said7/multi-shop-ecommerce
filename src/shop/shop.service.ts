@@ -3,6 +3,7 @@ import {
   HttpException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -61,6 +62,8 @@ export class ShopService {
     private readonly bannerModel: mongoose.Model<BannerDocument>,
     private readonly uploadService: UploadService,
   ) {}
+
+  private readonly logger = new Logger(ShopService.name);
 
   async create(createShopDto: CreateShopDto, userId: string) {
     try {
@@ -156,6 +159,7 @@ export class ShopService {
 
     try {
       const url = await this.uploadService.uploadFile(file);
+
       updateShopDto.logo = url;
 
       const shop = await this.shopModel.findByIdAndUpdate(id, updateShopDto, {

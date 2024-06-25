@@ -19,7 +19,7 @@ export class UploadService {
     });
   }
 
-  private readonly filesPath = join(__dirname, '..', '..');
+  private readonly filesPath = join(__dirname, '..', '..', '..');
 
   async uploadFile(file: Express.Multer.File) {
     file.path = join(this.filesPath, file.path);
