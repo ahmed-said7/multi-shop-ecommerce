@@ -11,6 +11,7 @@ import {
 import { AdminRequestsService } from './admin-requests.service';
 import { CreateAdminRequestDto } from './dto/create-admin-request.dto';
 import { UpdateAdminRequestDto } from './dto/update-admin-request.dto';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('admin-requests')
 export class AdminRequestsController {
@@ -22,26 +23,29 @@ export class AdminRequestsController {
   }
 
   @Get()
-  findAll(@Query('userId') userId?: string) {
+  findAll(@Query('userId', ValidateObjectIdPipe) userId?: string) {
     return this.adminRequestsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.adminRequestsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateAdminRequestDto: UpdateAdminRequestDto,
-    @Query('userId') userId,
+    @Query('userId', ValidateObjectIdPipe) userId: string,
   ) {
     return this.adminRequestsService.update(id, updateAdminRequestDto, userId);
   }
 
   @Delete(':id')
-  remove(@Query('userId') userId: string, @Param('id') id: string) {
+  remove(
+    @Query('userId', ValidateObjectIdPipe) userId: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ) {
     return this.adminRequestsService.remove(id, userId);
   }
 }

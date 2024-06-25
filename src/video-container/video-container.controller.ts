@@ -14,6 +14,7 @@ import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('video-container')
 export class VideoContainerController {
@@ -29,20 +30,20 @@ export class VideoContainerController {
   }
 
   @Get(':id')
-  findAll(@Param('id') id: Types.ObjectId) {
+  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.videoContainerService.findAll(new Types.ObjectId(id));
   }
 
   @UseGuards(MerchantGuard)
   @Get('/one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateVideoContainerDto: UpdateVideoContainerDto,
   ) {
     return this.videoContainerService.update(id, updateVideoContainerDto);
@@ -50,7 +51,7 @@ export class VideoContainerController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.remove(id);
   }
 }

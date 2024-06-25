@@ -16,6 +16,7 @@ import { UpdateMerchantDto } from './dto/updateMerchant.dto';
 
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { ValidateMerchantGuard } from './guards/validate-merchant.guard';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('merchant')
 export class MerchantController {
@@ -39,19 +40,22 @@ export class MerchantController {
 
   @Get(':id')
   @UseGuards(ValidateMerchantGuard)
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.merchantService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(ValidateMerchantGuard)
-  update(@Param('id') id: string, @Body() data: UpdateMerchantDto) {
+  update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() data: UpdateMerchantDto,
+  ) {
     return this.merchantService.update(id, data);
   }
 
   @Delete(':id')
   @UseGuards(ValidateMerchantGuard)
-  delete(@Param('id') id: string) {
+  delete(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.merchantService.delete(id);
   }
 }

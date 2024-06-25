@@ -11,6 +11,7 @@ import {
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('review')
 export class ReviewController {
@@ -31,17 +32,23 @@ export class ReviewController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.reviewService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
+  update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ) {
     return this.reviewService.update(id, updateReviewDto);
   }
 
   @Delete(':id/:user')
-  remove(@Param('id') id: string, @Param('user') user: string) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Param('user') user: string,
+  ) {
     return this.reviewService.remove(id, user);
   }
 }

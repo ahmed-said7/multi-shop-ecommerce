@@ -1,6 +1,7 @@
 import { Controller, Get, Body, Param, Delete } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('reports')
 export class ReportsController {
@@ -21,7 +22,7 @@ export class ReportsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.reportsService.remove(+id);
   }
 }

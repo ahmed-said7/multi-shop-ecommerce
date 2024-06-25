@@ -10,6 +10,7 @@ import {
 
 import { AdminService } from './admin.service';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('admin')
 export class AdminController {
@@ -20,17 +21,23 @@ export class AdminController {
   findAll() {}
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.adminService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.adminService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') userId: string, @Body('id') deleteId: string) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) userId: string,
+    @Body('id') deleteId: string,
+  ) {
     return this.adminService.remove(userId, deleteId);
   }
 }

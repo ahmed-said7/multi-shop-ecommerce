@@ -17,6 +17,7 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('order')
 export class OrderController {
@@ -51,25 +52,31 @@ export class OrderController {
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.orderService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+  update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
     return this.orderService.update(id, updateOrderDto);
   }
 
   @UseGuards(MerchantGuard)
   @Patch('confirm/:id')
-  confirmDeliver(@Param('id') id: string) {
+  confirmDeliver(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.orderService.confimeDelivery(id);
   }
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @MerchantUser() user: MerchantPayload,
+  ) {
     return this.orderService.remove(id, user.id);
   }
 }

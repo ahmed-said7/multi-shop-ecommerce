@@ -18,6 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('coupon')
 export class CouponController {
@@ -34,25 +35,28 @@ export class CouponController {
 
   @UseGuards(JwtGuard)
   @Post('/apply')
-  applyCoupon(@Body('userId') userId: string) {
+  applyCoupon(@Body('userId', ValidateObjectIdPipe) userId: string) {
     // return this.couponService.applyCoupon(userId, applyCoupon);
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findAll(@Param('id') id: Types.ObjectId, @Query('page') page?: number) {
+  findAll(
+    @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
+    @Query('page') page?: number,
+  ) {
     return this.couponService.findAll(new Types.ObjectId(id), page);
   }
 
   @Get('/one/:id')
-  findOne(@Param('id') id: Types.ObjectId) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.couponService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: Types.ObjectId,
+    @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
     @Body() updateCouponDto: UpdateCouponDto,
   ) {
     return this.couponService.update(id, updateCouponDto);
@@ -60,7 +64,7 @@ export class CouponController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: Types.ObjectId) {
+  remove(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.couponService.remove(id);
   }
 }

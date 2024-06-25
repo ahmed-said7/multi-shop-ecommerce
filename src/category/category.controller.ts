@@ -18,6 +18,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('category')
 export class CategoryController {
@@ -39,14 +40,14 @@ export class CategoryController {
 
   @UseGuards(MerchantGuard)
   @Get('/one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.categoryService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     return this.categoryService.update(id, updateCategoryDto);
@@ -54,7 +55,7 @@ export class CategoryController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.categoryService.remove(id);
   }
 }

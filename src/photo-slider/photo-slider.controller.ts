@@ -20,6 +20,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
@@ -46,14 +47,16 @@ export class PhotoSliderController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<PhotoSlider | null> {
+  findOne(
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ): Promise<PhotoSlider | null> {
     return this.photoSliderService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
   ): Promise<PhotoSlider | null> {
     return this.photoSliderService.update(id, updatePhotoSliderDto);
@@ -61,7 +64,7 @@ export class PhotoSliderController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<string> {
+  remove(@Param('id', ValidateObjectIdPipe) id: string): Promise<string> {
     return this.photoSliderService.remove(id);
   }
 }

@@ -21,6 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('banner')
 export class BannerController {
@@ -52,14 +53,16 @@ export class BannerController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Banner | null> {
+  findOne(
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ): Promise<Banner | null> {
     return this.bannerService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateBannerDto: UpdateBannerDto,
   ): Promise<Banner | null> {
     return this.bannerService.update(id, updateBannerDto);
@@ -67,7 +70,7 @@ export class BannerController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<string> {
+  remove(@Param('id', ValidateObjectIdPipe) id: string): Promise<string> {
     return this.bannerService.remove(id);
   }
 }

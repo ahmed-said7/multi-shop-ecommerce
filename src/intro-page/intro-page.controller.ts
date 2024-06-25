@@ -14,6 +14,7 @@ import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('intro-page')
 export class IntroPageController {
@@ -28,19 +29,19 @@ export class IntroPageController {
   }
 
   @Get(':id')
-  findAll(@Param('id') id?: Types.ObjectId) {
+  findAll(@Param('id', ValidateObjectIdPipe) id?: Types.ObjectId) {
     return this.introPageService.findAll(new Types.ObjectId(id));
   }
 
   @Get('/one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.introPageService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateIntroPageDto: UpdateIntroPageDto,
   ) {
     return this.introPageService.update(id, updateIntroPageDto);
@@ -48,7 +49,7 @@ export class IntroPageController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.introPageService.remove(id);
   }
 }

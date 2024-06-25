@@ -11,6 +11,7 @@ import {
 import { CartService } from './cart.service';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateCartItemDto } from './dto/create-cart.dto';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('cart')
 export class CartController {
@@ -33,14 +34,14 @@ export class CartController {
 
   @UseGuards(JwtGuard)
   @Delete('/remove/:id')
-  removeFromCart(@Param('id') cartItemId: string) {
+  removeFromCart(@Param('id', ValidateObjectIdPipe) cartItemId: string) {
     return this.cartService.removeFromCart(cartItemId);
   }
 
   @UseGuards(JwtGuard)
   @Put('/update/:id')
   updateItemQuantity(
-    @Param('id') itemId: string,
+    @Param('id', ValidateObjectIdPipe) itemId: string,
     @Body('quantity') quantity: number,
   ) {
     return this.cartService.updateItemQuantity(itemId, quantity);

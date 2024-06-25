@@ -16,6 +16,7 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('product-slider')
 export class ProductSliderController {
@@ -31,19 +32,19 @@ export class ProductSliderController {
   }
 
   @Get('shop/:id')
-  findAll(@Param('id') id: Types.ObjectId) {
+  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.productSliderService.findAll(new Types.ObjectId(id));
   }
 
   @Get('one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.productSliderService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateProductSliderDto: UpdateProductSliderDto,
   ) {
     return this.productSliderService.update(id, updateProductSliderDto);
@@ -51,7 +52,10 @@ export class ProductSliderController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @MerchantUser() user: MerchantPayload,
+  ) {
     return this.productSliderService.remove(id, user?.shopId);
   }
 }

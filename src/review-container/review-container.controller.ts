@@ -16,6 +16,7 @@ import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('review-container')
 export class ReviewContainerController {
@@ -30,18 +31,18 @@ export class ReviewContainerController {
   }
 
   @Get('/shop/:id')
-  findAll(@Param('id') id: Types.ObjectId) {
+  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.reviewService.findAll(new Types.ObjectId(id));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.reviewService.findOne(id);
   }
   @UseGuards(MerchantGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewContainerDto,
   ) {
     return this.reviewService.update(id, updateReviewDto);
@@ -49,7 +50,10 @@ export class ReviewContainerController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @MerchantUser() user: MerchantPayload) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @MerchantUser() user: MerchantPayload,
+  ) {
     return this.reviewService.remove(id, user.shopId);
   }
 }

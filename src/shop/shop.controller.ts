@@ -23,6 +23,7 @@ import { UploadService } from 'src/upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('shop')
 export class ShopController {
@@ -46,25 +47,28 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Body('userId') userId: string) {
+  findAll(@Body('userId', ValidateObjectIdPipe) userId: string) {
     return this.shopService.findAll(userId);
   }
 
   @UseGuards(JwtGuard)
   @Get('items')
-  findShopItems(@Body('userId') userId: string, @Param('id') id?: string) {
+  findShopItems(
+    @Body('userId', ValidateObjectIdPipe) userId: string,
+    @Param('id', ValidateObjectIdPipe) id?: string,
+  ) {
     return this.shopService.findShopItems(userId, id);
   }
 
   @Get('one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findOne(id);
   }
 
   @UseGuards(MerchantGuard)
   @Patch('join/:id')
   userJoin(
-    @Param('id') id: mongoose.Types.ObjectId,
+    @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
     @MerchantUser() user: MerchantPayload,
   ) {
     return this.shopService.userJoin(id, user.id);
@@ -72,7 +76,7 @@ export class ShopController {
 
   @UseGuards(JwtGuard)
   @Get('user/:id')
-  findUserShops(@Param('id') id: string) {
+  findUserShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
   }
 
@@ -95,13 +99,16 @@ export class ShopController {
 
   @UseGuards(MerchantGuard)
   @Delete('/:id')
-  remove(@MerchantUser() user: MerchantPayload, @Param('id') id: string) {
+  remove(
+    @MerchantUser() user: MerchantPayload,
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ) {
     return this.shopService.remove(user.shopId, id);
   }
 
   @UseGuards(JwtGuard)
   @Get('containers/:id')
-  findShopContainers(@Param('id') id: string) {
+  findShopContainers(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findShopContainers(id);
   }
 }

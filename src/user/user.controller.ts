@@ -21,6 +21,7 @@ import { User } from './schemas/user_schema';
 import { AuthService } from '../auth/auth.service';
 import { JwtGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('user')
 export class UserController {
@@ -63,7 +64,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User | null> {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string): Promise<User | null> {
     return this.userService.findOne(id);
   }
 
@@ -75,13 +76,19 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Body('userId') userId: string) {
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body('userId') userId: string,
+  ) {
     return this.userService.remove(id, userId);
   }
 
   @UseGuards(JwtGuard)
   @Patch('/fav/:id')
-  addFavorite(@Param('id') itemId: string, @Body('userId') userId: string) {
+  addFavorite(
+    @Param('id', ValidateObjectIdPipe) itemId: string,
+    @Body('userId') userId: string,
+  ) {
     return this.userService.addFav(itemId, userId);
   }
 }

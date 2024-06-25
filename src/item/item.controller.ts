@@ -22,6 +22,7 @@ import { UploadService } from 'src/upload/upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('item')
 export class ItemController {
@@ -74,7 +75,7 @@ export class ItemController {
   }
 
   @Get('one-item/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.itemService.findOne(id);
   }
 
@@ -82,7 +83,7 @@ export class ItemController {
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
   async update(
-    @Param('id') id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateItemDto: any,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
@@ -95,13 +96,16 @@ export class ItemController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.itemService.remove(id);
   }
 
   @UseGuards(MerchantGuard)
   @Delete('/image/:id')
-  removeImage(@Param('id') id: string, @Body('image') image: string) {
+  removeImage(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body('image') image: string,
+  ) {
     return this.itemService.removeImage(id, image);
   }
 }
