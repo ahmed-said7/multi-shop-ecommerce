@@ -161,8 +161,6 @@ export class ItemService {
       let item = await this.itemModel.findById(id);
       if (!item) throw new NotFoundException('Item not found!');
 
-      updateItemDto.images = item.images.concat(updateItemDto.images);
-
       item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
       });

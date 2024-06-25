@@ -14,10 +14,12 @@ import {
 import { PhotoSliderService } from './photo-slider.service';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import { PhotoSlider } from './schemas/photo-slider_schema';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
+
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
@@ -25,13 +27,13 @@ export class PhotoSliderController {
 
   private readonly logger = new Logger(PhotoSliderController.name);
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
-  create(@Body('shopId') shopId: string) {
-    return this.photoSliderService.create(shopId);
+  create(@MerchantUser() user: MerchantPayload) {
+    return this.photoSliderService.create(user.shopId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post('preview')
   @UseInterceptors(FilesInterceptor('images'))
   uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {

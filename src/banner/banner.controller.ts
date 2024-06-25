@@ -14,12 +14,13 @@ import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { Banner } from './schemas/banner_schema';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
+import { MerchantPayload } from 'src/merchant/merchant.service';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
 
 @Controller('banner')
 export class BannerController {
@@ -28,19 +29,21 @@ export class BannerController {
     private readonly uploadService: UploadService,
   ) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @UploadedFile() file: Express.Multer.File,
-    @Body('shopId') shopId: Types.ObjectId,
+    @MerchantUser() user: MerchantPayload,
     @Body() createBannerDto: CreateBannerDto,
   ) {
     const url = await this.uploadService.uploadFile(file);
     createBannerDto.image = url as string;
-    console.log(createBannerDto.image);
 
-    return this.bannerService.create(shopId, createBannerDto);
+    return this.bannerService.create(
+      Types.ObjectId.createFromHexString(user.shopId),
+      createBannerDto,
+    );
   }
 
   @Get()
