@@ -34,7 +34,7 @@ export class CategoryController {
   }
 
   @Get('/shop/:shopId')
-  findAll(@Param('shopId') shopId: Types.ObjectId) {
+  findAll(@Param('shopId', ValidateObjectIdPipe) shopId: Types.ObjectId) {
     return this.categoryService.findAll(shopId);
   }
 
