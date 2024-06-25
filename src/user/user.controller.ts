@@ -81,7 +81,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Patch('/fav/:id')
-  addFavoriute(@Param('id') itemId: string, @Body('userId') userId: string) {
+  addFavorite(@Param('id') itemId: string, @Body('userId') userId: string) {
     return this.userService.addFav(itemId, userId);
   }
 }

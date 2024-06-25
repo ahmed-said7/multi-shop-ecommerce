@@ -9,11 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+import { Types } from 'mongoose';
+
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
+
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
@@ -31,10 +32,9 @@ export class CategoryController {
     return this.categoryService.create(user.shopId, createCategoryDto);
   }
 
-  @UseGuards(JwtGuard)
   @Get('/shop/:shopId')
   findAll(@Param('shopId') shopId: Types.ObjectId) {
-    return this.categoryService.findAll(new Types.ObjectId(shopId));
+    return this.categoryService.findAll(shopId);
   }
 
   @UseGuards(MerchantGuard)
