@@ -33,6 +33,8 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Module({
   imports: [
@@ -55,6 +57,11 @@ import { UploadModule } from 'src/upload/upload.module';
     JwtModule.register({
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
+    }),
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './images/items',
+      }),
     }),
     AuthModule,
     UploadModule,

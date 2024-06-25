@@ -10,15 +10,18 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFiles,
+  Logger,
 } from '@nestjs/common';
+
+import mongoose, { Types } from 'mongoose';
 
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import mongoose, { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { UploadService } from 'src/upload/upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('item')
 export class ItemController {
@@ -27,17 +30,22 @@ export class ItemController {
     private readonly uploadService: UploadService,
   ) {}
 
-  @UseGuards(JwtGuard)
+  private readonly logger = new Logger(ItemController.name);
+
+  @UseGuards(MerchantGuard)
   @Post()
   @UseInterceptors(FilesInterceptor('images'))
   async create(
     @Body() createItemDto: CreateItemDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Body('shopId') shopId: string,
+    @MerchantUser() user: MerchantPayload,
   ) {
     const imageUrls = await this.uploadService.uploadFiles(files);
     createItemDto.images = imageUrls;
-    return this.itemService.create(createItemDto, shopId);
+
+    this.logger.log(createItemDto);
+
+    return this.itemService.create(createItemDto, user.shopId);
   }
 
   @Get('all-items/:shop/')
@@ -79,7 +87,9 @@ export class ItemController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     const imageUrls = await this.uploadService.uploadFiles(files);
+
     updateItemDto.images = imageUrls;
+
     return this.itemService.update(id, updateItemDto);
   }
 

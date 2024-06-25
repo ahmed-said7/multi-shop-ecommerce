@@ -7,7 +7,7 @@ import {
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item, ItemDocument } from './schemas/item-schema';
-import mongoose, { Model, MongooseError, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { JwtService } from '@nestjs/jwt';
@@ -160,7 +160,9 @@ export class ItemService {
     try {
       let item = await this.itemModel.findById(id);
       if (!item) throw new NotFoundException('Item not found!');
+
       updateItemDto.images = item.images.concat(updateItemDto.images);
+
       item = await this.itemModel.findByIdAndUpdate(id, updateItemDto, {
         new: true,
       });
