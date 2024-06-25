@@ -15,18 +15,20 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(JwtGuard)
-  @Post('')
+  @UseGuards(MerchantGuard)
+  @Post()
   create(
-    @Body('shopId') shopId: string,
+    @MerchantUser() user: MerchantPayload,
     @Body() createCategoryDto: CreateCategoryDto,
   ) {
-    return this.categoryService.create(shopId, createCategoryDto);
+    return this.categoryService.create(user.shopId, createCategoryDto);
   }
 
   @UseGuards(JwtGuard)
