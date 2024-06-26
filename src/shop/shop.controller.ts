@@ -51,7 +51,6 @@ export class ShopController {
     return this.shopService.findAll(userId);
   }
 
-  @UseGuards(JwtGuard)
   @Get('items')
   findShopItems(
     @Body('userId', ValidateObjectIdPipe) userId: string,
@@ -74,7 +73,7 @@ export class ShopController {
     return this.shopService.userJoin(id, user.id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Get('user/:id')
   findUserShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
@@ -106,7 +105,6 @@ export class ShopController {
     return this.shopService.remove(user.shopId, id);
   }
 
-  @UseGuards(JwtGuard)
   @Get('containers/:id')
   findShopContainers(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findShopContainers(id);

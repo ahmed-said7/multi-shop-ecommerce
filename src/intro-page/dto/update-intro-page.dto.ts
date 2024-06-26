@@ -10,7 +10,4 @@ export class UpdateIntroPageDto extends PartialType(CreateIntroPageDto) {
   @IsNotEmpty({ message: 'Intro page must have a paragraph' })
   @IsString({ message: 'title must be a string' })
   paragraph: string;
-
-  @IsString({ message: 'shopId must be a string' })
-  shop: string;
 }

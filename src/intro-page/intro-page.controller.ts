@@ -30,7 +30,7 @@ export class IntroPageController {
   ) {
     return this.introPageService.create(
       createIntroPageDto,
-      Types.ObjectId.createFromHexString(user.shopId),
+      new Types.ObjectId(user.shopId),
     );
   }
 
