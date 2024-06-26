@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
@@ -47,8 +51,13 @@ export class ProductSliderService {
     }
   }
 
-  async findAll(id: Types.ObjectId) {
+  async findAll(id) {
     try {
+      const shop = await this.shopModel.findById(id);
+      if (!shop) {
+        throw new NotFoundException('this shop not found');
+      }
+
       const productSlider = await this.productSliderModel
         .find({ shopId: id })
         .populate({
@@ -60,12 +69,19 @@ export class ProductSliderService {
 
       return productSlider;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
   async findOne(id: string) {
     try {
+      const productSliderExist = await this.productSliderModel.findById(id);
+      if (!productSliderExist) {
+        throw new NotFoundException('this product slider not found');
+      }
       const productSlider = await this.productSliderModel
         .findById(id)
         .populate({
@@ -81,13 +97,20 @@ export class ProductSliderService {
 
       return productSlider;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async update(id: string, updateProductSliderDto: UpdateProductSliderDto) {
     try {
+      const productSliderExist = await this.productSliderModel.findById(id);
+      if (!productSliderExist) {
+        throw new NotFoundException('this product slider not found');
+      }
       const productSlider = await this.productSliderModel.findByIdAndUpdate(
         id,
         updateProductSliderDto,
@@ -98,14 +121,21 @@ export class ProductSliderService {
 
       return productSlider;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async remove(id: string, shopId: string) {
     try {
+      const productSliderExist = await this.productSliderModel.findById(id);
+      if (!productSliderExist) {
+        throw new NotFoundException('this product slider not found');
+      }
       const shop = await this.shopModel.findById(shopId);
-
       for (let i = 0; i < shop.containers.length; i++) {
         if (shop.containers[i].containerID.toString() === id) {
           shop.containers.splice(i, 1);
@@ -116,7 +146,11 @@ export class ProductSliderService {
       await this.productSliderModel.findByIdAndDelete(id);
       return 'Prouct Slider has been deleted successfully!';
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 }

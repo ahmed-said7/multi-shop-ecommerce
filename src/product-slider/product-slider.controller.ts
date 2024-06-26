@@ -35,8 +35,8 @@ export class ProductSliderController {
   }
 
   @Get('shop/:id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
-    return this.productSliderService.findAll(new Types.ObjectId(id));
+  findAll(@Param('id', ValidateObjectIdPipe) id: string) {
+    return this.productSliderService.findAll(id);
   }
 
   @Get('one/:id')
