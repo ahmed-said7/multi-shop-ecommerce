@@ -14,6 +14,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Coupon } from './schemas/coupon.schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
+import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 
 @Injectable()
 export class CouponService {
@@ -22,6 +23,8 @@ export class CouponService {
     @InjectModel(User.name)
     private readonly userModel: mongoose.Model<UserDocument>,
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
+    @InjectModel(Shop.name)
+    private readonly shopModel: mongoose.Model<ShopDocument>,
   ) {}
 
   async create(createCouponDto: CreateCouponDto, shopId: string) {
@@ -51,6 +54,10 @@ export class CouponService {
 
   async findAll(shopId: Types.ObjectId, page: number = 0) {
     try {
+      const shop = await this.shopModel.findById(shopId);
+      if (!shop) {
+        throw new NotFoundException('this shop not found');
+      }
       const coupons = await this.couponModel
         .find({
           shopId,
@@ -60,21 +67,29 @@ export class CouponService {
 
       return coupons;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
   async findOne(id: Types.ObjectId) {
     try {
+      const couponExist = await this.couponModel.findById(id);
+      if (!couponExist) {
+        throw new NotFoundException('this coupon not found');
+      }
       const coupon = await this.couponModel.findById(id);
       return coupon;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
   async update(id: Types.ObjectId, updateCouponDto: UpdateCouponDto) {
     try {
+      const couponExist = await this.couponModel.findById(id);
+      if (!couponExist) {
+        throw new NotFoundException('this coupon not found');
+      }
       const coupon = await this.couponModel.findByIdAndUpdate(
         id,
         updateCouponDto,
@@ -83,17 +98,21 @@ export class CouponService {
 
       return coupon;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
   async remove(id: Types.ObjectId) {
     try {
+      const couponExist = await this.couponModel.findById(id);
+      if (!couponExist) {
+        throw new NotFoundException('this coupon not found');
+      }
       await this.couponModel.findByIdAndDelete(id);
 
       return 'The coupon was deleted successfully';
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 

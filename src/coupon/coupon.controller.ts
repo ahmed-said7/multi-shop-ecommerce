@@ -19,27 +19,33 @@ import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { applyCoupon } from './dto/apply-coupon.dto';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { MerchantPayload } from 'src/merchant/merchant.service';
 
 @Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
   create(
     @Body() createCouponDto: CreateCouponDto,
-    @Body('shopId') shopId: string,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.couponService.create(createCouponDto, shopId);
+    return this.couponService.create(createCouponDto, user.shopId);
   }
 
   @UseGuards(JwtGuard)
   @Post('/apply')
-  applyCoupon(@Body('userId', ValidateObjectIdPipe) userId: string) {
-    // return this.couponService.applyCoupon(userId, applyCoupon);
+  applyCoupon(
+    @Body('userId', ValidateObjectIdPipe) userId: string,
+    @Body() applyCoupon: applyCoupon,
+  ) {
+    return this.couponService.applyCoupon(userId, applyCoupon);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Get(':id')
   findAll(
     @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,

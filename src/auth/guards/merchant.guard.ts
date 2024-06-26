@@ -28,8 +28,10 @@ export class MerchantGuard implements CanActivate {
 
     const token = request.header('authorization').split(' ')[1];
 
-    if (!token) {
-      throw new UnauthorizedException('expire token or invalid');
+    const isValidToken = await this.validate(token);
+
+    if (!isValidToken) {
+      throw new UnauthorizedException('Invalid or expired token');
     }
 
     const payload = await this.jwtService.verifyAsync<MerchantPayload>(token);
@@ -45,5 +47,14 @@ export class MerchantGuard implements CanActivate {
     request.user = payload;
 
     return true;
+  }
+
+  async validate(token: string): Promise<boolean> {
+    try {
+      await this.jwtService.verifyAsync(token, { secret: process.env.SECRET });
+      return true; // Token is valid
+    } catch (error) {
+      return false; // Token is invalid
+    }
   }
 }
