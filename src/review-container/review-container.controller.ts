@@ -21,18 +21,18 @@ import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 @Controller('review-container')
 export class ReviewContainerController {
   constructor(private readonly reviewService: ReviewContainerService) {}
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
   create(
     @Body() createReviewDto: CreateReviewContainerDto,
-    @Body('shopId') shopId: string,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.reviewService.create(createReviewDto, shopId);
+    return this.reviewService.create(createReviewDto, user.shopId);
   }
 
   @Get('/shop/:id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
-    return this.reviewService.findAll(new Types.ObjectId(id));
+  findAll(@Param('id', ValidateObjectIdPipe) id: string) {
+    return this.reviewService.findAll(id);
   }
 
   @Get(':id')

@@ -48,7 +48,7 @@ export class ReviewContainerService {
         shop.$set('containers', [
           {
             containerID: reviewContainer.id,
-            containerType: 'ProductSlider',
+            containerType: 'ReviewContainer',
           },
         ]);
       }
@@ -62,7 +62,7 @@ export class ReviewContainerService {
     }
   }
 
-  async findAll(id: Types.ObjectId) {
+  async findAll(id: string) {
     try {
       return await this.reviewContainerModel.find({ shopId: id });
     } catch (error) {
@@ -73,36 +73,47 @@ export class ReviewContainerService {
 
   async findOne(id: string) {
     try {
-      return await this.reviewContainerModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const reviewContainer = await this.reviewContainerModel.findById(id);
+      if (!reviewContainer) {
+        throw new NotFoundException('this review container not found');
+      }
+      return await this.reviewContainerModel.findById(id);
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async update(id: string, updatereviewContainerDto: UpdateReviewContainerDto) {
     try {
-      const reviewContainer = await this.reviewContainerModel
-        .findByIdAndUpdate(id, updatereviewContainerDto, {
+      const reviewContainer = await this.reviewContainerModel.findByIdAndUpdate(
+        id,
+        updatereviewContainerDto,
+        {
           new: true,
-        })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        },
+      );
       if (!reviewContainer)
         throw new NotFoundException("This container doesn't exist");
       return reviewContainer;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async remove(id: string, shopId) {
     try {
+      const reviewContainer = await this.reviewContainerModel.findById(id);
+      if (!reviewContainer) {
+        throw new NotFoundException('this review container not found');
+      }
       const shop = await this.shopModel.findById(shopId);
 
       if (shop) {
@@ -117,8 +128,11 @@ export class ReviewContainerService {
       await this.reviewContainerModel.findByIdAndDelete(id);
       return 'Review container deleted successfully';
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 }
