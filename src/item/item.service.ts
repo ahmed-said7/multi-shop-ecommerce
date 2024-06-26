@@ -51,7 +51,7 @@ export class ItemService {
 
   async findAll(
     page?: number,
-    shopId?: Types.ObjectId,
+    shopId?: string,
     category?: string,
     subCategory?: string,
     sortOrder?: string,
@@ -141,8 +141,7 @@ export class ItemService {
 
       return { count, pagination, items };
     } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException(error.message);
+      throw error;
     }
   }
 
@@ -152,7 +151,7 @@ export class ItemService {
       if (!item) throw new NotFoundException('Item not found!');
       return item;
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
@@ -167,34 +166,19 @@ export class ItemService {
 
       return item;
     } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  // remove image from item.images
-  async removeImage(id: string, image: string) {
-    try {
-      const item = await this.itemModel.findById(id);
-      if (!item) throw new NotFoundException('Item not found!');
-      const index = item.images.indexOf(image);
-      if (index > -1) {
-        item.images.splice(index, 1);
-      }
-      await item.save();
-      return item;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
   async remove(id: string) {
     try {
+      const item = await this.itemModel.findById(id);
+      if (!item) throw new NotFoundException('Item not found!');
       await this.itemModel.findByIdAndDelete(id);
 
       return 'deleted item successfully';
     } catch (error: any) {
-      // 500.
-      throw new InternalServerErrorException(error?.message);
+      throw error;
     }
   }
 }

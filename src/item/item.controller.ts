@@ -49,9 +49,9 @@ export class ItemController {
     return this.itemService.create(createItemDto, user.shopId);
   }
 
-  @Get('all-items/:shop/')
+  @Get('all-items/:shop')
   findAll(
-    @Param('shop') shopId: Types.ObjectId,
+    @Param('shop') shopId: string,
     @Query('page') page: number,
     @Query('limitParam') limitParam: number,
     @Query('category') category: string,
@@ -63,7 +63,7 @@ export class ItemController {
   ) {
     return this.itemService.findAll(
       page,
-      new mongoose.Types.ObjectId(shopId),
+      shopId,
       category,
       subCategory,
       sortOrder,
@@ -98,14 +98,5 @@ export class ItemController {
   @Delete(':id')
   remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.itemService.remove(id);
-  }
-
-  @UseGuards(MerchantGuard)
-  @Delete('/image/:id')
-  removeImage(
-    @Param('id', ValidateObjectIdPipe) id: string,
-    @Body('image') image: string,
-  ) {
-    return this.itemService.removeImage(id, image);
   }
 }
