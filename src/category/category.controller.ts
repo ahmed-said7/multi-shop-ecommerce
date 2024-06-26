@@ -40,8 +40,11 @@ export class CategoryController {
 
   @UseGuards(MerchantGuard)
   @Get('/one/:id')
-  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.categoryService.findOne(id);
+  findOne(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @MerchantUser() user: MerchantPayload,
+  ) {
+    return this.categoryService.findOne(id, user.shopId);
   }
 
   @UseGuards(MerchantGuard)
@@ -49,13 +52,17 @@ export class CategoryController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.categoryService.update(id, user.shopId, updateCategoryDto);
   }
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.categoryService.remove(id);
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @MerchantUser() user: MerchantPayload,
+  ) {
+    return this.categoryService.remove(id, user.shopId);
   }
 }

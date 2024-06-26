@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -50,42 +54,44 @@ export class CategoryService {
     }
   }
 
-  async findOne(id: string) {
-    try {
-      const category = await this.categoryModel.findById(id);
-      return category;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+  async findOne(id: string, shopId: string) {
+    const category = await this.categoryModel.findOne({ _id: id, shopId });
+
+    if (!category) {
+      throw new NotFoundException('No Category is Found');
     }
+
+    return category;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    try {
-      const category = await this.categoryModel
-        .findByIdAndUpdate(id, updateCategoryDto, { new: true })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+  async update(
+    id: string,
+    shopId: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ) {
+    const category = await this.categoryModel.findOneAndUpdate(
+      { _id: id, shopId },
+      updateCategoryDto,
+      { new: true },
+    );
 
-      return category;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+    if (!category) {
+      throw new NotFoundException('No Category is Found');
     }
+
+    return category;
   }
 
-  async remove(id: string) {
-    try {
-      await this.categoryModel.findByIdAndDelete(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      return 'Category has been deleted successfully';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+  async remove(id: string, shopId: string) {
+    const category = await this.categoryModel.findOneAndDelete({
+      _id: id,
+      shopId,
+    });
+
+    if (!category) {
+      throw new NotFoundException('No Category is Found');
     }
+
+    return category;
   }
 }
