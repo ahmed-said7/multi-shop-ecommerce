@@ -11,7 +11,7 @@ import {
 import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
 import { MerchantPayload } from 'src/merchant/merchant.service';
@@ -22,13 +22,16 @@ import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
-    @Body('shopId') shopId: string,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.productSliderService.create(createProductSliderDto, shopId);
+    return this.productSliderService.create(
+      createProductSliderDto,
+      user.shopId,
+    );
   }
 
   @Get('shop/:id')

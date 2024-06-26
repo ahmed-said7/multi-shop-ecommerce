@@ -11,22 +11,26 @@ import {
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { MerchantPayload } from 'src/merchant/merchant.service';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
 
 @Controller('video-container')
 export class VideoContainerController {
   constructor(private readonly videoContainerService: VideoContainerService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(MerchantGuard)
   @Post()
   create(
-    @Body('shopId') shopId: Types.ObjectId,
+    @MerchantUser() user: MerchantPayload,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
-    return this.videoContainerService.create(shopId, createVideoContainerDto);
+    return this.videoContainerService.create(
+      Types.ObjectId.createFromHexString(user.shopId),
+      createVideoContainerDto,
+    );
   }
 
   @Get(':id')

@@ -11,21 +11,27 @@ import {
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { MerchantPayload } from 'src/merchant/merchant.service';
+import { MerchantUser } from 'utils/extractors/merchant-user.param';
 
 @Controller('intro-page')
 export class IntroPageController {
   constructor(private readonly introPageService: IntroPageService) {}
-  @UseGuards(JwtGuard)
+
+  @UseGuards(MerchantGuard)
   @Post()
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
-    @Body('shopId') shopId: Types.ObjectId,
+    @MerchantUser() user: MerchantPayload,
   ) {
-    return this.introPageService.create(createIntroPageDto, shopId);
+    return this.introPageService.create(
+      createIntroPageDto,
+      Types.ObjectId.createFromHexString(user.shopId),
+    );
   }
 
   @Get(':id')
