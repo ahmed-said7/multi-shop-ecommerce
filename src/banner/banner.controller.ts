@@ -61,10 +61,14 @@ export class BannerController {
 
   @UseGuards(MerchantGuard)
   @Patch(':id')
-  update(
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @UploadedFile() file: Express.Multer.File,
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateBannerDto: UpdateBannerDto,
   ): Promise<Banner | null> {
+    const url = await this.uploadService.uploadFile(file);
+    updateBannerDto.image = url as string;
     return this.bannerService.update(id, updateBannerDto);
   }
 

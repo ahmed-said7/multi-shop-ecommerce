@@ -59,13 +59,21 @@ export class BannerService {
   }
 
   async findOne(id: string): Promise<Banner | null> {
-    return this.bannerModel.findById(id).exec();
+    const banner = await this.bannerModel.findById(id);
+    if (!banner) {
+      throw new NotFoundException('this banner not found');
+    }
+    return banner;
   }
 
   async update(
     id: string,
     updateBannerDto: UpdateBannerDto,
   ): Promise<Banner | null> {
+    const banner = await this.bannerModel.findById(id);
+    if (!banner) {
+      throw new NotFoundException('this banner not found');
+    }
     return this.bannerModel
       .findByIdAndUpdate(id, updateBannerDto, { new: true })
       .exec();
@@ -86,10 +94,7 @@ export class BannerService {
       }
     }
     await shop.save();
-    await this.bannerModel.findByIdAndDelete(id).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    });
+    await this.bannerModel.findByIdAndDelete(id);
     return 'banner has been deleted successfully!';
   }
 }
