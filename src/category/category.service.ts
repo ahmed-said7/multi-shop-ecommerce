@@ -42,16 +42,15 @@ export class CategoryService {
   }
 
   async findAll(shopId: Types.ObjectId) {
-    try {
-      const categories = await this.categoryModel.find({
-        shopId,
-      });
-
-      return categories;
-    } catch (error) {
-      console.error('Error finding categories:', error);
-      throw new InternalServerErrorException(error);
+    const shop = await this.shopModel.findById(shopId);
+    if (!shop) {
+      throw new NotFoundException('this shop not found');
     }
+    const categories = await this.categoryModel.find({
+      shopId,
+    });
+
+    return categories;
   }
 
   async findOne(id: string, shopId: string) {

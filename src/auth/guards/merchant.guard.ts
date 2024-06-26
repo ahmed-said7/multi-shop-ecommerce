@@ -5,6 +5,7 @@ import {
   ExecutionContext,
   Injectable,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import type { Request } from 'express';
@@ -20,6 +21,10 @@ export class MerchantGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
+
+    if (!request.headers.authorization) {
+      throw new UnauthorizedException('Authorization header is missing');
+    }
 
     const token = request.header('authorization').split(' ')[1];
 
