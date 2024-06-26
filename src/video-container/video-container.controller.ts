@@ -28,7 +28,7 @@ export class VideoContainerController {
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
     return this.videoContainerService.create(
-      Types.ObjectId.createFromHexString(user.shopId),
+      new Types.ObjectId(user.shopId),
       createVideoContainerDto,
     );
   }

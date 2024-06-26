@@ -31,17 +31,17 @@ export class VideoContainerService {
     return this.jwtService.decode<{ userId: string; username: string }>(token);
   }
   async create(
-    shop: Types.ObjectId,
+    shopId: Types.ObjectId,
     createVideoContainerDto: CreateVideoContainerDto,
   ) {
     const payload = {
       ...createVideoContainerDto,
-      shop,
+      shopId,
     };
 
     const videoContainer = await new this.videoContainerModel(payload).save();
 
-    const Shop = await this.shopModel.findById(shop);
+    const Shop = await this.shopModel.findById(shopId);
 
     if (!Shop) {
       throw new NotFoundException("Couldn't find the shop");
@@ -67,27 +67,43 @@ export class VideoContainerService {
 
   async findAll(id: Types.ObjectId) {
     try {
+      const shop = await this.shopModel.findById(id);
+      if (!shop) {
+        throw new NotFoundException('this shop not found');
+      }
+
       return await this.videoContainerModel.find({ shopId: id });
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async findOne(id: string) {
     try {
-      return await this.videoContainerModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+      const video = await this.videoContainerModel.findById(id);
+      if (!video) {
+        throw new NotFoundException('this video container not found');
+      }
+      return await this.videoContainerModel.findById(id);
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
   async update(id: string, updateVideoContainerDto: UpdateVideoContainerDto) {
     try {
+      const video = await this.videoContainerModel.findById(id);
+      if (!video) {
+        throw new NotFoundException('this video container not found');
+      }
       return await this.videoContainerModel.findByIdAndUpdate(
         id,
         updateVideoContainerDto,
@@ -96,7 +112,11 @@ export class VideoContainerService {
         },
       );
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(error);
+      }
     }
   }
 
@@ -104,7 +124,7 @@ export class VideoContainerService {
     const videoContainer = await this.videoContainerModel.findById(id);
 
     if (!videoContainer) {
-      throw new InternalServerErrorException("this slider doesn't exist");
+      throw new NotFoundException("this video container doesn't exist");
     }
 
     const shop = await this.shopModel.findById(videoContainer.shopId);
