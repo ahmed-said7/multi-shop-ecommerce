@@ -42,6 +42,7 @@ import {
 } from '../intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -71,8 +72,8 @@ import { AuthModule } from 'src/auth/auth.module';
       signOptions: { expiresIn: '1h' },
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    AuthModule,
-    UploadModule
+    forwardRef(()=>AuthModule),
+    UploadModule,ApiModule
   ],
   controllers: [UserController, OtpController, UserTrackController],
   providers: [UserService, OtpService, EmailService, TrackService],

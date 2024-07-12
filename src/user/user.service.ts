@@ -2,9 +2,7 @@ import {
   BadRequestException,
   HttpException,
   Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
+  NotFoundException
 } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,14 +14,15 @@ import { User, UserDocument, UserRole } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
 
 import { Order, OrderDocument } from '../order/schemas/order_schema';
+import { ApiService, IQuery } from 'src/common/filter/api.service';
 
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-
     private readonly jwtService: JwtService,
+    private apiService:ApiService<User,IQuery>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
   ) {}
 
@@ -42,15 +41,17 @@ export class UserService {
       return { token , user: userResponse };
   }
 
-  async findAll( page?: number) {
-    page ||= 1;
-    const foundUsers = await this.userModel
-        .find()
-        .select("-password")
-        .limit(10)
-        .skip(page * 10);
-    const count = await this.userModel.find().countDocuments();
-    return { count, foundUsers };
+  async findAll(userId:string , page?: string ) {
+    const user=await this.userModel.findOne({
+      _id:userId,role:UserRole.ADMIN
+    });
+    if( ! user ){
+      throw new HttpException("you are not allowed to access this route",400);
+    }
+    const { paginationObj , query }=await this.apiService
+      .getAllDocs( this.userModel.find(),{ page } );
+    const users=await query;
+    return { paginationObj , users };
   }
 
   async findOne(id: string) {
@@ -75,43 +76,40 @@ export class UserService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
-      const { cart, orders, wishList } = updateUserDto;
+      // const user = await this.userModel.findById(userId);
+      // if (cart && cart.length > 0) {
+      //   const itemToAdd = cart[0];
+      //   const existingItemIndex = user.cart.findIndex(
+      //     (itemId) => itemId === itemToAdd,
+      //   );
+      //   if (existingItemIndex !== -1) {
+      //     user.cart.splice(existingItemIndex, 1);
+      //     updateUserDto.cart = undefined;
+      //   } else {
+      //     user.cart.push(itemToAdd);
+      //     updateUserDto.cart = undefined;
+      //   }
+      // }
 
-      const user = await this.userModel.findById(userId);
+      // if (wishList && wishList.length > 0) {
+      //   const itemToAddToWishList = wishList[0];
+      //   const existingItemIndexWish = user.wishList.findIndex(
+      //     (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
+      //   );
+      //   if (existingItemIndexWish !== -1) {
+      //     user.wishList.splice(existingItemIndexWish, 1);
+      //     updateUserDto.wishList = undefined;
+      //   } else {
+      //     user.wishList.push(itemToAddToWishList);
+      //     updateUserDto.wishList = undefined;
+      //   }
+      // }
+      // await user.save();
 
-      if (cart && cart.length > 0) {
-        const itemToAdd = cart[0];
-        const existingItemIndex = user.cart.findIndex(
-          (itemId) => itemId === itemToAdd,
-        );
-        if (existingItemIndex !== -1) {
-          user.cart.splice(existingItemIndex, 1);
-          updateUserDto.cart = undefined;
-        } else {
-          user.cart.push(itemToAdd);
-          updateUserDto.cart = undefined;
-        }
-      }
-
-      if (wishList && wishList.length > 0) {
-        const itemToAddToWishList = wishList[0];
-        const existingItemIndexWish = user.wishList.findIndex(
-          (itemId) => new Types.ObjectId(itemId) === itemToAddToWishList,
-        );
-        if (existingItemIndexWish !== -1) {
-          user.wishList.splice(existingItemIndexWish, 1);
-          updateUserDto.wishList = undefined;
-        } else {
-          user.wishList.push(itemToAddToWishList);
-          updateUserDto.wishList = undefined;
-        }
-      }
-      await user.save();
-
-      if (orders) {
-        const updatedOrders = [...user.orders, ...orders];
-        updateUserDto.orders = updatedOrders;
-      }
+      // if (orders) {
+      //   const updatedOrders = [...user.orders, ...orders];
+      //   updateUserDto.orders = updatedOrders;
+      // }
 
       const updatedUser = await this.userModel
         .findByIdAndUpdate(userId, updateUserDto, { new: true })
@@ -119,20 +117,20 @@ export class UserService {
 
       updatedUser.password = undefined;
 
-      return updatedUser;
+      return { updatedUser };
   }
 
-  async remove(paramId: string, userId: string) {
+  async remove( userId: string) {
     // only and UserRole.USER 
-    const targetUser = await this.userModel.findById(paramId);
+    const targetUser = await this.userModel.findById(userId);
 
-    if (!targetUser) {
-      throw new NotFoundException('This user doesnt exist');
-    }
+    // if (!targetUser) {
+    //   throw new NotFoundException('This user doesnt exist');
+    // }
 
     await this.orderModel.deleteMany({ userId });
 
-    await this.userModel.findByIdAndDelete(paramId);
+    await this.userModel.findByIdAndDelete(userId);
 
     return { status : 'User Deleted Successfully'};
   }
@@ -154,4 +152,16 @@ export class UserService {
       );
       return { favorites : user?.favorites || [] };
   }
+  async removeFav(itemId: string, userId: string ) {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: {
+          favorites: itemId,
+        },
+      },
+      { new: true },
+    );
+    return { favorites : user?.favorites || [] };
+}
 }

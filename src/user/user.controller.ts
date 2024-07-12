@@ -45,14 +45,13 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async login(@Request() req) {
     const user = req.user;
-
     return await this.authService.login(user);
   }
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Param('page') page: number, @Body('userId') userId: string) {
-    return this.userService.findAll(page);
+  findAll(@Param('page') page: string, @Body('userId') userId: string) {
+    return this.userService.findAll(userId,page);
   }
 
   @UseGuards(JwtGuard)
@@ -75,11 +74,11 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(
-    @Param('id', ValidateObjectIdPipe) id: string,
+  removeMe(
+    // @Param('id', ValidateObjectIdPipe) id: string,
     @Body('userId') userId: string,
   ) {
-    return this.userService.remove(id, userId);
+    return this.userService.remove(userId);
   }
 
   @UseGuards(JwtGuard)
@@ -89,5 +88,13 @@ export class UserController {
     @Body('userId') userId: string,
   ) {
     return this.userService.addFav(itemId, userId);
+  }
+  @UseGuards(JwtGuard)
+  @Delete('/fav/:id')
+  removeFavorite(
+    @Param('id', ValidateObjectIdPipe) itemId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.userService.removeFav(itemId, userId);
   }
 }
