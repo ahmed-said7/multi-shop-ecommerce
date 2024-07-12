@@ -1,18 +1,13 @@
 import mongoose from 'mongoose';
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
-import { User, UserDocument } from './schemas/user_schema';
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 
 @Injectable()
 export class TrackService {
   constructor(
     @InjectModel(Shop.name)
-    private readonly shopModel: mongoose.Model<ShopDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<UserDocument>,
+    private readonly shopModel: mongoose.Model<ShopDocument>
   ) {}
 
   async trackShop(userId: string, shopId: string) {

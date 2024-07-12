@@ -5,11 +5,14 @@ import {
   MaxLength,
   IsEnum,
   IsEmail,
-  Matches,
+  IsMobilePhone,
+  IsDate,
+  IsOptional,
 } from 'class-validator';
 
 import { UserRole } from '../schemas/user_schema';
-import { Types } from 'mongoose';
+import { Transform } from 'class-transformer';
+import { GENDER_STATUS } from 'src/common/enums';
 
 export class CreateUserDto {
   // Shop title, must not be empty, and should be a string
@@ -28,26 +31,26 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'A user must have a role' })
   @IsEnum(UserRole, { message: 'Invalid user role' })
   role: UserRole;
-
+  
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @Matches(/^(\+\d{1,3}[- ]?)?\d{10}$/, {
-    message: 'Invalid phone number format',
-  })
+  @IsNotEmpty()
+  @IsMobilePhone()
   phone: string;
 
-  wallet: number;
+  @IsNotEmpty()
+  @IsEnum(GENDER_STATUS)
+  gender: GENDER_STATUS;
+  
 
-  orders: Types.ObjectId[];
-
-  cart: Types.ObjectId[];
-
-  wishList: Types.ObjectId[];
-
-  favorites?: Types.ObjectId[];
-
-  gender: 'male' | 'female';
-
+  @IsOptional()
+  @Transform( ({ value }) => {
+    if( value ){
+      return new Date(value);
+    };
+  })
+  @IsDate()
   birthday: string;
 }

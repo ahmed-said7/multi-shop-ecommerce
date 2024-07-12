@@ -1,36 +1,48 @@
-import { IsOptional, IsString, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsEnum,
+  IsEmail,
+  IsMobilePhone,
+  IsDate
+} from 'class-validator';
 
 import { UserRole } from '../schemas/user_schema';
-import { Types } from 'mongoose';
+import { Transform } from 'class-transformer';
+import { GENDER_STATUS } from 'src/common/enums';
 
-import { CreateUserDto } from './create-user.dto';
-
-export class UpdateUserDto implements Partial<CreateUserDto> {
+export class UpdateUserDto {
+  // Shop title, must not be empty, and should be a string
   @IsOptional()
-  @IsString({ message: 'A user must have a string title' })
-  name?: string;
+  @IsString({ message: 'A user must have a string name' })
+  name: string;
 
-  // @IsOptional()
-  // @IsString({ message: 'A user must have a string password' })
-  // password?: string;
-
-  shop?: Types.ObjectId;
-
+  // User Role, must not be empty and should be of the current options
   @IsOptional()
   @IsEnum(UserRole, { message: 'Invalid user role' })
-  role?: UserRole;
+  role: UserRole;
+  
+  @IsOptional()
+  @IsEmail()
+  email: string;
 
   @IsOptional()
-  @IsString({ message: 'Invalid phone number format' })
-  phone?: string;
+  @IsMobilePhone()
+  phone: string;
 
-  orders?: Types.ObjectId[];
+  @IsOptional()
+  @IsEnum(GENDER_STATUS)
+  gender: GENDER_STATUS;
+  
 
-  cart?: Types.ObjectId[];
-
-  wishList?: Types.ObjectId[];
-
-  gender: 'male' | 'female';
-
+  @IsOptional()
+  @Transform( ({ value }) => {
+    if( value ){
+      return new Date(value);
+    };
+  })
+  @IsDate()
   birthday: string;
 }

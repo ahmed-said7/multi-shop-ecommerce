@@ -1,6 +1,6 @@
 /.eslintrc.js
 /.prettierrc
-/.env
+# /.env
 # compiled output
 /dist
 /node_modules

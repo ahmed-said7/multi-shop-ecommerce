@@ -23,13 +23,13 @@ export class EmailService {
       apiKey: key,
       apiSecret: secretKey,
     });
-
+    const self=this;
     const data: SendEmailV3_1.Body = {
       Messages: [
         {
           From: {
-            Email: 'ahmed.mohamed.eng05@gmail.com',
-            Name: 'Ahmed Karmy',
+            Email: self.configService.get("Email"),
+            Name: self.configService.get("Name") 
           },
           To: [
             {
@@ -55,7 +55,7 @@ export class EmailService {
   }
 
   async emailOTPCode(to: string, name: string) {
-    const otpCode = await this.otpService.createOtp();
+    const { otp : otpCode } = await this.otpService.createOtp();
 
     return await this.sendEmail(to, name, otpCode);
   }
