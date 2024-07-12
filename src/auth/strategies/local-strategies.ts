@@ -18,10 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   async validate(username: string, password: string) {
     const user = await this.authService
-      .validateUser(username, password)
-      .catch(() => {
-        throw new BadRequestException('Username or Password isnt right');
-      });
+      .validateUser(username, password);
 
     if (!user) {
       throw new BadRequestException('Username or Password isnt right');
