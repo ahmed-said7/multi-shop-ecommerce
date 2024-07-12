@@ -14,7 +14,7 @@ import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 

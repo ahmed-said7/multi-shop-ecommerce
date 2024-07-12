@@ -33,6 +33,8 @@ import { diskStorage } from 'multer';
 import { DateTime } from 'luxon';
 import { v4 as uuid } from 'uuid';
 import { extension } from 'mime-types';
+import { APP_FILTER } from '@nestjs/core';
+import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 
 @Module({
   imports: [
@@ -84,7 +86,7 @@ import { extension } from 'mime-types';
     MerchantModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [ AppService , { provide:APP_FILTER , useClass: catchExceptionsFilter } ],
   exports: [MongooseModule],
 })
 export class AppModule {}

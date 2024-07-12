@@ -21,7 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('banner')
 export class BannerController {

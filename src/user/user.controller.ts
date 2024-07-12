@@ -21,7 +21,7 @@ import { User } from './schemas/user_schema';
 import { AuthService } from '../auth/auth.service';
 import { JwtGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('user')
 export class UserController {
