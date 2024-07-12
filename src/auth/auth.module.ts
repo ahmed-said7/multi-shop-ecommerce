@@ -1,39 +1,37 @@
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-
-import { LocalStrategy } from './strategies/local-strategies';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../user/schemas/user_schema';
-
-import { PassportModule } from '@nestjs/passport';
-import { RefreshJwtStrategy } from './strategies/refreshToken.strategy';
-import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
-import { Item, ItemSchema } from '../item/schemas/item-schema';
-import { Category, CategorySchema } from '../category/schemas/category_schema';
+import { Module, forwardRef } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { AuthController } from "./auth.controller";
+import { LocalStrategy } from "./strategies/local-strategies";
+import { MongooseModule } from "@nestjs/mongoose";
+import { PassportModule } from "@nestjs/passport";
+import { RefreshJwtStrategy } from "./strategies/refreshToken.strategy";
+import { User, UserSchema } from "../user/schemas/user_schema";
+import { Shop, ShopSchema } from "../shop/schemas/shop_schema";
+import { Item, ItemSchema } from "../item/schemas/item-schema";
+import { Category, CategorySchema } from "../category/schemas/category_schema";
 import {
   ProductSlider,
   ProductSliderSchema,
-} from '../product-slider/schemas/productSlider_schema';
+} from "../product-slider/schemas/productSlider_schema";
 import {
   PhotoSlider,
   PhotoSliderSchema,
-} from '../photo-slider/schemas/photo-slider_schema';
-import { Review, ReviewSchema } from '../review/schemas/review_schema';
+} from "../photo-slider/schemas/photo-slider_schema";
+import { Review, ReviewSchema } from "../review/schemas/review_schema";
 import {
   ReviewContainer,
   ReviewContainerSchema,
-} from '../review-container/schemas/reviewContainer_schema';
-import { Banner, BannerSchema } from '../banner/schemas/banner_schema';
+} from "../review-container/schemas/reviewContainer_schema";
+import { Banner, BannerSchema } from "../banner/schemas/banner_schema";
 import {
   VideoContainer,
   VideoContainerSchema,
-} from '../video-container/schemas/videoContainer-schema';
+} from "../video-container/schemas/videoContainer-schema";
 import {
   IntroPage,
   IntroPageSchema,
-} from '../intro-page/schemas/intro_page_schema';
-import { UserModule } from 'src/user/user.module';
+} from "../intro-page/schemas/intro_page_schema";
+import { UserModule } from "src/user/user.module";
 
 @Module({
   imports: [
@@ -51,16 +49,10 @@ import { UserModule } from 'src/user/user.module';
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
     PassportModule,
-    UserModule
+    forwardRef(() => UserModule),
   ],
-
-  providers: [
-    AuthService,
-    LocalStrategy,
-    RefreshJwtStrategy
-  ],
+  providers: [AuthService, LocalStrategy, RefreshJwtStrategy],
   controllers: [AuthController],
-
   exports: [AuthService],
 })
 export class AuthModule {}
