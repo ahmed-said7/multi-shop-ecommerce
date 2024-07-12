@@ -1,14 +1,11 @@
 import {
-  BadRequestException,
-  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 
@@ -27,153 +24,62 @@ export class UserService {
   ) {}
 
   async register(createUserDto: CreateUserDto) {
-    try {
       const { email } = createUserDto;
       const foundUser = await this.userModel.findOne({ email });
       if (foundUser) {
         throw new UnauthorizedException('There is a user with the same email!');
-      }
-
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-      const createdUser = new this.userModel({
-        ...createUserDto,
-        password: hashedPassword,
-      });
-
-      const savedUser = await createdUser.save().catch((err) => {
-        console.log(err);
-        if (err && err.code == 11000) {
-          console.log(err);
-
-          throw new BadRequestException(
-            'There is a user with the same phone number!',
-          );
-        } else
-          throw new InternalServerErrorException(
-            'Unexpected error while creating the user',
-          );
-      });
-
+      };
+      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+      const savedUser=await this.userModel.create(createUserDto);
       const token = this.generateToken(savedUser);
-      const userResponse = { ...savedUser.toObject(), password: undefined };
-
-      return { token, user: userResponse };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+      const userResponse = { ... savedUser.toObject() , password: undefined };
+      return { token , user: userResponse };
     }
-  }
 
-  async findAll(page?: number) {
-    try {
-      const foundUsers = await this.userModel
+  async findAll( page?: number ) {
+    page ||= 1;
+    const foundUsers = await this.userModel
         .find()
+        .select("-password")
         .limit(10)
         .skip(page * 10);
-
       const count = await this.userModel.find().countDocuments();
-      foundUsers.forEach((user) => {
-        user.password = undefined;
-      });
       return { count, foundUsers };
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
+  };
 
   async findOne(id: string) {
-    try {
-      const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
-      const idValid = checkForHexRegExp.test(id);
-      if (!idValid) throw new BadRequestException('Please enter correct Id');
       const foundUser = await this.userModel
         .findById(id)
         .populate({
           path: 'cart.orderId',
-          model: 'Order',
-        })
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new NotFoundException(
-            'An unexpected error happened while finding the user!',
-          );
-        });
+          model: 'Order'
+        }).select("-password");
       if (!foundUser) throw new NotFoundException('This user doesnt exist');
-      foundUser.password = undefined;
-      return foundUser;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return { foundUser };
   }
 
   async findOneWithEmail(email: string) {
-    return await this.userModel
-      .findOne({ email })
-      .lean()
-      .exec()
-      .catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
+    const foundUser= await this.userModel.findOne({ email }).select("-password");
+    if (!foundUser) throw new NotFoundException('This user doesnt exist');
+    return { foundUser };
   }
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    try {
-      const { ...data } = updateUserDto;
-      const user = await this.userModel.findById(id);
-
-      if (user.role == UserRole.ADMIN) {
-        const updatedUser = await this.userModel.findByIdAndUpdate(
-          user._id,
-          data,
-          {
-            new: true,
-          },
-        );
-
-        updatedUser.password = undefined;
-        return updatedUser;
-      } else {
-        throw new UnauthorizedException('Unathorized error');
-      }
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+  async update( id: Types.ObjectId , updateUserDto: UpdateUserDto ) {
+    // id of logged user
+    const updatedUser = await this.userModel
+      .findById(id , updateUserDto , { new: true }).select("-password");
+    return { updatedUser };
   }
 
-  async remove(userId: string, deleteId: string) {
-    try {
-      const user = await this.userModel.findById(userId).catch((err) => {
-        console.log(err);
-        throw new NotFoundException('This user doesnt exist');
-      });
-      if (!user) throw new NotFoundException('This user doesnt exist');
-      if (user.role == 'admin' || userId == deleteId) {
-        await this.shopService.remove(user.shopId.toString());
-
-        const deletedUser = await this.userModel.findByIdAndDelete(deleteId);
-
-        if (!deletedUser) {
-          throw new NotFoundException('User to delete not found');
-        }
-
-        return 'User Deleted Successfully';
-      } else
-        throw new UnauthorizedException(
-          'You dont have the permission to delete this user',
-        );
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+  async remove(userId: Types.ObjectId ) {
+    // id of logged user
+    const user = await this.userModel.findByIdAndDelete(userId);
+    if (!user) throw new NotFoundException('This user doesnt exist')
+    return { status : 'User Deleted Successfully'};
   }
 
   private generateToken(user: UserDocument): string {
-    const payload = { sub: user._id, email: user.email };
+    const payload = { userId: user._id, email: user.email };
     return this.jwtService.sign(payload, { secret: process.env.SECRET });
   }
+
 }
