@@ -16,7 +16,7 @@ import { UpdateMerchantDto } from './dto/updateMerchant.dto';
 
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { ValidateMerchantGuard } from './guards/validate-merchant.guard';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('merchant')
 export class MerchantController {

@@ -11,7 +11,7 @@ import {
 import { AdminRequestsService } from './admin-requests.service';
 import { CreateAdminRequestDto } from './dto/create-admin-request.dto';
 import { UpdateAdminRequestDto } from './dto/update-admin-request.dto';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('admin-requests')
 export class AdminRequestsController {

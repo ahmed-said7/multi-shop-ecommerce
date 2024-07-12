@@ -10,7 +10,7 @@ import {
 
 import { AdminService } from './admin.service';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('admin')
 export class AdminController {

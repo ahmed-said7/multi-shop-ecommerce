@@ -13,7 +13,7 @@ import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 

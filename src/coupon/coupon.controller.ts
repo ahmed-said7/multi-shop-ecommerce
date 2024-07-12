@@ -18,7 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 import { applyCoupon } from './dto/apply-coupon.dto';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';

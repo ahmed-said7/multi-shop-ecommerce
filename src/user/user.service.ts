@@ -17,6 +17,7 @@ import * as bcrypt from 'bcrypt';
 
 import { Order, OrderDocument } from '../order/schemas/order_schema';
 
+
 @Injectable()
 export class UserService {
   constructor(
@@ -27,101 +28,54 @@ export class UserService {
   ) {}
 
   async register(createUserDto: CreateUserDto) {
-    try {
       const { email, phone } = createUserDto;
-      const foundUser = await this.userModel.findOne({ email });
-      const foundUserPhone = await this.userModel.findOne({ phone });
-      if (foundUser) {
-        throw new BadRequestException('There is a user with the same email!');
-      }
-      if (foundUserPhone) {
-        throw new BadRequestException('There is a user with the same phone!');
-      }
-
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-      const createdUser = new this.userModel({
-        ...createUserDto,
-        password: hashedPassword,
+      const foundUser = await this.userModel.findOne({ 
+        $or:[{ email } , { phone } ]
       });
-
-      const savedUser = await createdUser.save();
-
+      if (foundUser) {
+        throw new BadRequestException('There is a user with the same email or phone!');
+      }
+      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+      const savedUser=await this.userModel.create(createUserDto);
       const token = this.generateToken(savedUser);
-
-      return { token, user: savedUser };
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      const userResponse = { ... savedUser.toObject() , password: undefined };
+      return { token , user: userResponse };
   }
 
-  async findAll(userId: string, page?: number) {
-    const user = await this.userModel.findById(userId);
-
-    if (user.role.toLowerCase() !== 'admin') {
-      throw new UnauthorizedException('User Must Be an Admin');
-    }
-
-    try {
-      const foundUsers = await this.userModel
+  async findAll( page?: number) {
+    page ||= 1;
+    const foundUsers = await this.userModel
         .find()
+        .select("-password")
         .limit(10)
         .skip(page * 10);
-
-      const count = await this.userModel.find().countDocuments();
-
-      foundUsers.forEach((user) => {
-        user.password = undefined;
-      });
-      return { count, foundUsers };
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    const count = await this.userModel.find().countDocuments();
+    return { count, foundUsers };
   }
 
   async findOne(id: string) {
-    try {
-      const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
-      const idValid = checkForHexRegExp.test(id);
-      if (!idValid) throw new BadRequestException('Please enter correct Id');
-      const foundUser = await this.userModel
-        .findById(id)
-        .populate({
-          path: 'cart',
-          model: 'Item',
-        })
-        .populate({
-          path: 'wishList',
-          model: 'Item',
-        })
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new NotFoundException(
-            'An unexpected error happened while finding the user!',
-          );
-        });
-      if (!foundUser) throw new NotFoundException('This user doesnt exist');
-      foundUser.password = undefined;
-      return foundUser;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+    const foundUser = await this.userModel
+      .findById(id)
+      .populate({
+        path: 'cart',
+        model: 'Item',
+      })
+      .populate({
+        path: 'wishList',
+        model: 'Item',
+      }).select("-password");
+    if (!foundUser) throw new NotFoundException('This user doesnt exist');
+    return { foundUser };
   }
 
   async findOneWithEmail(email: string) {
-    return await this.userModel.findOne({ email }).lean().exec();
+    const foundUser= await this.userModel.findOne({ email });
+    if (!foundUser) throw new NotFoundException('This user doesnt exist');
+    return { foundUser };
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
-    try {
       const { cart, orders, wishList } = updateUserDto;
-
-      // Can't update role
-      delete updateUserDto.role;
 
       const user = await this.userModel.findById(userId);
 
@@ -166,58 +120,29 @@ export class UserService {
       updatedUser.password = undefined;
 
       return updatedUser;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
   }
 
   async remove(paramId: string, userId: string) {
-    const user = await this.userModel.findById(userId);
-
-    if (!user) {
-      throw new NotFoundException('This user doesnt exist');
-    }
-
+    // only and UserRole.USER 
     const targetUser = await this.userModel.findById(paramId);
 
     if (!targetUser) {
       throw new NotFoundException('This user doesnt exist');
     }
 
-    if (user.role === UserRole.MERCHANT) {
-      throw new UnauthorizedException(
-        'You dont have the permission to delete this user',
-      );
-    }
+    await this.orderModel.deleteMany({ userId });
 
-    if (user.role === UserRole.USER && paramId !== userId) {
-      throw new UnauthorizedException(
-        'You dont have the permission to delete this user',
-      );
-    }
+    await this.userModel.findByIdAndDelete(paramId);
 
-    for (const orderId of user.orders) {
-      await this.orderModel.findByIdAndDelete(orderId);
-    }
-
-    const deletedUser = await this.userModel.findByIdAndDelete(paramId);
-
-    if (!deletedUser) {
-      throw new NotFoundException('User to delete not found');
-    }
-
-    return 'User Deleted Successfully';
+    return { status : 'User Deleted Successfully'};
   }
 
-  private generateToken(user: UserDocument): string {
-    const payload = { sub: user._id, email: user.email };
+  private generateToken( user: UserDocument ): string {
+    const payload = { userId: user._id, email: user.email };
     return this.jwtService.sign(payload, { secret: process.env.SECRET });
   }
 
-  async addFav(itemId: string, userId: string) {
-    try {
+  async addFav(itemId: string, userId: string ) {
       const user = await this.userModel.findByIdAndUpdate(
         userId,
         {
@@ -227,11 +152,6 @@ export class UserService {
         },
         { new: true },
       );
-
-      return user?.favorites || [];
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return { favorites : user?.favorites || [] };
   }
 }

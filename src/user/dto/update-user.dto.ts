@@ -10,19 +10,15 @@ export class UpdateUserDto implements Partial<CreateUserDto> {
   @IsString({ message: 'A user must have a string title' })
   name?: string;
 
-  @IsOptional()
-  @IsString({ message: 'A user must have a string password' })
-  password?: string;
+  // @IsOptional()
+  // @IsString({ message: 'A user must have a string password' })
+  // password?: string;
 
   shop?: Types.ObjectId;
 
   @IsOptional()
   @IsEnum(UserRole, { message: 'Invalid user role' })
   role?: UserRole;
-
-  @IsOptional()
-  @IsString({ message: 'Invalid email' })
-  email?: string;
 
   @IsOptional()
   @IsString({ message: 'Invalid phone number format' })

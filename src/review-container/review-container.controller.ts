@@ -16,7 +16,7 @@ import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('review-container')
 export class ReviewContainerController {

@@ -8,8 +8,6 @@ import { User, UserSchema } from '../user/schemas/user_schema';
 
 import { PassportModule } from '@nestjs/passport';
 import { RefreshJwtStrategy } from './strategies/refreshToken.strategy';
-import { UserService } from './user.service';
-import { ShopService } from './shop.service';
 import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
 import { Item, ItemSchema } from '../item/schemas/item-schema';
 import { Category, CategorySchema } from '../category/schemas/category_schema';
@@ -35,6 +33,7 @@ import {
   IntroPage,
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -51,16 +50,14 @@ import {
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-
     PassportModule,
+    UserModule
   ],
 
   providers: [
     AuthService,
-    ShopService,
     LocalStrategy,
-    RefreshJwtStrategy,
-    UserService,
+    RefreshJwtStrategy
   ],
   controllers: [AuthController],
 

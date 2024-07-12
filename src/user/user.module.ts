@@ -1,9 +1,8 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { User, UserSchema } from './schemas/user_schema';
@@ -41,8 +40,8 @@ import {
   IntroPage,
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
-import { ShopService } from '../shop/shop.service';
 import { UploadModule } from 'src/upload/upload.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -73,10 +72,10 @@ import { UploadModule } from 'src/upload/upload.module';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     AuthModule,
-    UploadModule,
+    UploadModule
   ],
   controllers: [UserController, OtpController, UserTrackController],
-  providers: [UserService, OtpService, EmailService, ShopService, TrackService],
+  providers: [UserService, OtpService, EmailService, TrackService],
   exports: [UserService, MongooseModule], // Export UserService and MongooseModule
 })
 export class UserModule {}

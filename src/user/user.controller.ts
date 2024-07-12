@@ -11,8 +11,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-
-import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { EmailService } from './email/email.service';
@@ -21,7 +19,8 @@ import { User } from './schemas/user_schema';
 import { AuthService } from '../auth/auth.service';
 import { JwtGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -53,7 +52,7 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get()
   findAll(@Param('page') page: number, @Body('userId') userId: string) {
-    return this.userService.findAll(userId, page);
+    return this.userService.findAll(page);
   }
 
   @UseGuards(JwtGuard)
@@ -64,7 +63,7 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id', ValidateObjectIdPipe) id: string): Promise<User | null> {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.userService.findOne(id);
   }
 

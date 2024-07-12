@@ -83,7 +83,7 @@ import { diskStorage } from 'multer';
     PhotoSliderModule,
     BannerModule,
     VideoContainerModule,
-    UploadModule,
+    UploadModule
   ],
   controllers: [ShopController],
   providers: [ShopService],

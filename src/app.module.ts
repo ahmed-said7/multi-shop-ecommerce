@@ -1,11 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ShopModule } from './shop/shop.module';
 import { UserModule } from './user/user.module';
 import { ItemModule } from './item/item.module';
 import { OrderModule } from './order/order.module';
@@ -34,6 +33,7 @@ import { v4 as uuid } from 'uuid';
 import { extension } from 'mime-types';
 import { APP_FILTER } from '@nestjs/core';
 import { catchExceptionsFilter } from './common/errorHandler/base.filter';
+import { ShopModule } from './shop/shop.module';
 
 @Module({
   imports: [
@@ -59,10 +59,9 @@ import { catchExceptionsFilter } from './common/errorHandler/base.filter';
       }),
     }),
     MongooseModule.forRoot(process.env.DB_URI),
-
-    ShopModule,
     UserModule,
     AuthModule,
+    ShopModule,
     AdminModule,
     ReviewContainerModule,
     ItemModule,

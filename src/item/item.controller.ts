@@ -22,7 +22,7 @@ import { UploadService } from 'src/upload/upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('item')
 export class ItemController {

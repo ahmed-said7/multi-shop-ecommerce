@@ -23,13 +23,12 @@ import { UploadService } from 'src/upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
 
 @Controller('shop')
 export class ShopController {
   constructor(
-    private readonly shopService: ShopService,
-    private readonly uploadService: UploadService,
+    private readonly shopService: ShopService
   ) {}
 
   private readonly logger = new Logger(ShopController.name);
