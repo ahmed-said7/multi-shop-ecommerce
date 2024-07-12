@@ -9,11 +9,11 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 
-import { ShopService } from './shop.service';
 
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { User, UserDocument, UserRole } from '../user/schemas/user_schema';
+import { ShopService } from 'src/shop/shop.service';
 
 @Injectable()
 export class UserService {
@@ -59,7 +59,7 @@ export class UserService {
   }
 
   async findOneWithEmail(email: string) {
-    const foundUser= await this.userModel.findOne({ email }).select("-password");
+    const foundUser= await this.userModel.findOne({ email });
     if (!foundUser) throw new NotFoundException('This user doesnt exist');
     return { foundUser };
   }
