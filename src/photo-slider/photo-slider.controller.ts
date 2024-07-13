@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   Logger,
   UploadedFiles,
+  Req,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
@@ -27,6 +28,7 @@ import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
+import { Request } from 'express';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
@@ -71,7 +73,10 @@ export class PhotoSliderController {
 
   @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string): Promise<string> {
+  remove(
+    @Req() req:Request,
+    @Param('id', ValidateObjectIdPipe) id: string
+  ): Promise<string> {
     return this.photoSliderService.remove(id);
   }
 }
