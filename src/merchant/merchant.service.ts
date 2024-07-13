@@ -1,5 +1,5 @@
 import { Model, Types } from 'mongoose';
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import {
   HttpException,
   Injectable,
@@ -13,9 +13,9 @@ import { UpdateMerchantDto as UpdateDto } from './dto/updateMerchant.dto';
 import { Merchant, MerchantDocument } from './schema/merchant.schema';
 
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
-import { AuthService } from 'src/auth/auth.service';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
 import { UserRole } from 'src/user/schemas/user_schema';
+import { jwtTokenService } from 'src/jwt/jwt.service';
 
 export type MerchantPayload = {
   userId: string;
@@ -29,7 +29,7 @@ export class MerchantService {
     private readonly merchantModel: Model<MerchantDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: Model<ShopDocument>,
-    private readonly authService: AuthService,
+    private jwt:jwtTokenService,
     private apiService:ApiService<MerchantDocument,IQuery>
   ) {}
 
@@ -55,6 +55,9 @@ export class MerchantService {
   async findOne(id: string) {
       const merchant = await this.merchantModel
         .findById(id).select("-password");
+      if( ! merchant ){
+        throw new HttpException("merchant not found",400)
+      };
       return {merchant};
   }
 
@@ -70,14 +73,13 @@ export class MerchantService {
       throw new HttpException("email or password is incorrect",400);
     };
 
-    const payload: MerchantPayload = {
+
+    const { accessToken , refreshToken } = await this.jwt.createTokens({
       userId: merchant._id.toString(),
-      role: UserRole.MERCHANT
-    };
+      role: UserRole.MERCHANT 
+    });
 
-    const token = await this.authService.getToken(payload);
-
-    return { token };
+    return { accessToken ,  refreshToken };
   }
 
   async findAll(page:string) {

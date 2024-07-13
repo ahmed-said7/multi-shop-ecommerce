@@ -34,11 +34,14 @@ import {
   IntroPageSchema,
 } from "../intro-page/schemas/intro_page_schema";
 import { UserModule } from "src/user/user.module";
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { jwtTokenModule } from 'src/jwt/jwt.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Category.name, schema: CategorySchema },
@@ -51,6 +54,7 @@ import { UserModule } from "src/user/user.module";
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
     PassportModule,
+    jwtTokenModule,
     forwardRef(() => UserModule) 
   ],
   providers: [

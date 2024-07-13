@@ -16,17 +16,24 @@ import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
 
 @Controller('product-slider')
 export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.productSliderService.create(
       createProductSliderDto,
@@ -53,11 +60,12 @@ export class ProductSliderController {
     return this.productSliderService.update(id, updateProductSliderDto);
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.productSliderService.remove(id, user?.shopId);
   }

@@ -1,9 +1,15 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
 import { UserService } from 'src/user/user.service';
+import { LoginUserDto } from './dto/login.dto';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
+import { jwtTokenService } from 'src/jwt/jwt.service';
 
 
 @Controller('auth')
@@ -11,23 +17,26 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private jwt:jwtTokenService
   ) {}
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    const { user } = req;
-    return await this.authService.login(user);
+  async login(@Body() body:LoginUserDto) {
+    return this.authService.loginUser(body);
   }
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.register(createUserDto);
+    return this.userService.register(createUserDto);
   }
 
-  @UseGuards(RefreshJwtGuard)
   @Post('refresh')
-  async refreshToken(@Request() req) {
-    return this.authService.refreshToken(req.user);
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  async refreshToken(@AuthUser() user:IAuthUser ) {
+    return this.jwt.createTokens({
+      userId: user._id,
+      role:user.role
+    })
   }
 }

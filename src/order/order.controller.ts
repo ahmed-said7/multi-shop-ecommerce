@@ -17,7 +17,13 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
+import { Roles } from 'src/common/decorator/roles';
 
 @Controller('order')
 export class OrderController {
@@ -71,12 +77,13 @@ export class OrderController {
     return this.orderService.confimeDelivery(id);
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.orderService.remove(id, user.id);
+    return this.orderService.remove(id, user._id);
   }
 }

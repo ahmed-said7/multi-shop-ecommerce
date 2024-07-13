@@ -33,6 +33,7 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import {
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Order.name, schema: OrderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },

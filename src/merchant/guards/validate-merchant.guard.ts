@@ -22,7 +22,7 @@ export class ValidateMerchantGuard implements CanActivate {
       return false;
     }
 
-    const payload = await this.authService.verifyToken<TokenPayload>(token);
+    const payload = await this.authService.verifyToken(token);
 
     if (payload?.role !== UserRole.MERCHANT) {
       return false;

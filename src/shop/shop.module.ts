@@ -45,6 +45,7 @@ import {
 import { UploadModule } from 'src/upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { diskStorage } from 'multer';
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Category.name, schema: CategorySchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },

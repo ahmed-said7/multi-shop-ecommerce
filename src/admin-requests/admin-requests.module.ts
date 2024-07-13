@@ -8,11 +8,13 @@ import {
   AdminRequest,
   AdminRequestSchema,
 } from './schemas/admin_request_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: AdminRequest.name, schema: AdminRequestSchema },
     ]),
   ],

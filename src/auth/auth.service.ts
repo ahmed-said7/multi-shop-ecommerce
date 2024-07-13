@@ -1,61 +1,42 @@
-import { Injectable } from '@nestjs/common';
-
+import { HttpException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-
-
-import { User } from '../user/schemas/user_schema';
 import { UserService } from 'src/user/user.service';
+import { LoginUserDto } from './dto/login.dto';
+import { jwtTokenService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private jwt:jwtTokenService
   ) {}
 
   async validateUser(email: string, password: string) {
     const { foundUser : user } = await this.userService.findOneWithEmail(email);
-    if ( await bcrypt.compare(password, user.password) ) {
-      user.password = undefined;
-      return user;
+    const valid=await bcrypt.compare(password, user.password);
+    if ( ! valid ) {
+      return false;
     };
-    return null;
+    return true;
+  };
+
+  async loginUser(body:LoginUserDto) {
+    const { foundUser : user } = await this.userService.findOneWithEmail(body.email);
+    const valid=await bcrypt.compare(body.password, user.password);
+    if ( ! valid ) {
+      throw new HttpException("email or password is not correct",400)
+    };
+    const {accessToken,refreshToken}=await this.jwt.createTokens({
+      userId: user._id.toString(),
+      role:user.role
+    });
+    return { accessToken , refreshToken };
   }
 
-  async login(user: User) {
-    const payload = {
-      userId: user?.['_id'],
-    };
+  async verifyToken(token: string) {
+    return await this.jwtService.decode(token);
+  };
 
-    user.password = undefined;
-
-    return {
-      ...user,
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.jwtService.sign(payload, { expiresIn: '1d' }),
-    };
-  }
-
-  async getToken(data: any) {
-    delete data.password;
-
-    return {
-      accessToken: await this.jwtService.signAsync(data),
-    };
-  }
-
-  async verifyToken<T>(token: string) {
-    return await this.jwtService.decode<T>(token);
-  }
-
-  async refreshToken(user: User) {
-    const payload = {
-      userId: user?.['_id'],
-    };
-
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
-  }
-}
+};

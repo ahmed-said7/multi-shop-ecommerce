@@ -6,11 +6,13 @@ import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { UserModule } from 'src/user/user.module';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { AdminStatisticsController } from './admin-statistics.controller';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
     ]),
     UserModule,

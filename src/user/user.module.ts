@@ -43,6 +43,8 @@ import {
 import { UploadModule } from 'src/upload/upload.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ApiModule } from 'src/common/filter/api.module';
+import { Merchant, merchantSchema } from "src/merchant/schema/merchant.schema";
+import { jwtTokenModule } from "src/jwt/jwt.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,6 +52,7 @@ import { ApiModule } from 'src/common/filter/api.module';
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Otp.name, schema: OtpSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
@@ -69,6 +72,7 @@ import { ApiModule } from 'src/common/filter/api.module';
       secret: process.env.SECRET,
       signOptions: { expiresIn: "1h" },
     }),
+    jwtTokenModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     forwardRef(()=>AuthModule),
     UploadModule,ApiModule

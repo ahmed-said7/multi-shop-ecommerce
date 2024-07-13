@@ -1,28 +1,27 @@
 import {
   BadRequestException,
-  HttpException,
   Injectable,
   NotFoundException
 } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtService } from '@nestjs/jwt';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserRole } from './schemas/user_schema';
+import { User, UserDocument } from './schemas/user_schema';
 import * as bcrypt from 'bcrypt';
 
 import { Order, OrderDocument } from '../order/schemas/order_schema';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { jwtTokenService } from 'src/jwt/jwt.service';
 
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly jwtService: JwtService,
     private apiService:ApiService<User,IQuery>,
+    private jwt:jwtTokenService,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
   ) {}
 
@@ -36,18 +35,14 @@ export class UserService {
       }
       createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
       const savedUser=await this.userModel.create(createUserDto);
-      const token = this.generateToken(savedUser);
-      const userResponse = { ... savedUser.toObject() , password: undefined };
-      return { token , user: userResponse };
+      const { accessToken , refreshToken } = this.jwt.createTokens({
+        userId: savedUser._id.toString(),
+        role:savedUser.role
+      });
+      return { accessToken ,  refreshToken , user:savedUser.toObject() };
   }
 
-  async findAll(userId:string , page?: string ) {
-    const user=await this.userModel.findOne({
-      _id:userId,role:UserRole.ADMIN
-    });
-    if( ! user ){
-      throw new HttpException("you are not allowed to access this route",400);
-    }
+  async findAll( page?: string ) {
     const { paginationObj , query }=await this.apiService
       .getAllDocs( this.userModel.find(),{ page } );
     const users=await query;
@@ -66,10 +61,10 @@ export class UserService {
         model: 'Item',
       }).select("-password");
     if (!foundUser) throw new NotFoundException('This user doesnt exist');
-    return { foundUser };
+    return { user:foundUser };
   }
 
-  async findOneWithEmail(email: string) {
+  async findOneWithEmail( email: string ) {
     const foundUser= await this.userModel.findOne({ email });
     if (!foundUser) throw new NotFoundException('This user doesnt exist');
     return { foundUser };
@@ -78,31 +73,17 @@ export class UserService {
   async update(userId: string, updateUserDto: UpdateUserDto) {
       const updatedUser = await this.userModel
         .findByIdAndUpdate(userId, updateUserDto, { new: true })
+        .select("-password")
         .populate({ path: 'cart', model: 'Item' });
-
-      updatedUser.password = undefined;
-
       return { updatedUser };
   }
 
   async remove( userId: string) {
-    // only and UserRole.USER 
-    const targetUser = await this.userModel.findById(userId);
-
-    // if (!targetUser) {
-    //   throw new NotFoundException('This user doesnt exist');
-    // }
-
     await this.orderModel.deleteMany({ userId });
 
     await this.userModel.findByIdAndDelete(userId);
 
     return { status : 'User Deleted Successfully'};
-  }
-
-  private generateToken( user: UserDocument ): string {
-    const payload = { userId: user._id, email: user.email };
-    return this.jwtService.sign(payload, { secret: process.env.SECRET });
   }
 
   async addFav(itemId: string, userId: string ) {
@@ -128,5 +109,5 @@ export class UserService {
       { new: true },
     );
     return { favorites : user?.favorites || [] };
-}
+  }
 }

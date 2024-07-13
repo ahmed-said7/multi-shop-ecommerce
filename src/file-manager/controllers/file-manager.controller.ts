@@ -12,7 +12,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileManagerService } from '../services/file-manager.service';
 import { UploadFileResponseDto } from '../dtos/responses/upload-file-response.dto';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 
 @Controller('file-manager')
 export class FileManagerController {

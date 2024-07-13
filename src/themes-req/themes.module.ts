@@ -26,12 +26,14 @@ import {
   ReviewContainer,
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Theme.name, schema: ThemeSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema},
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },

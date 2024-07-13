@@ -7,53 +7,53 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
   UseInterceptors,
-  UploadedFile,
-  Logger,
+  UploadedFile
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import mongoose from 'mongoose';
-import { Request } from 'express';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { UploadService } from 'src/upload/upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
 
 @Controller('shop')
 export class ShopController {
   constructor(
     private readonly shopService: ShopService
   ) {}
-
-  private readonly logger = new Logger(ShopController.name);
-
-  @UseGuards(JwtGuard)
+  
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
   create(
-    @Req() req: Request,
-    @Body('userId') userId: string,
+    @AuthUser('_id') userId: string,
     @Body() createShopDto: CreateShopDto,
   ) {
-    console.log(req.body.userId);
     return this.shopService.create(createShopDto, userId);
   }
 
-  @UseGuards(JwtGuard)
   @Get()
-  findAll(@Body('userId', ValidateObjectIdPipe) userId: string) {
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  findAll(@AuthUser('_id') userId: string) {
     return this.shopService.findAll(userId);
   }
-
+  
   @Get('items')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
   findShopItems(
-    @Body('userId', ValidateObjectIdPipe) userId: string,
+    @AuthUser('_id') userId: string,
     @Param('id', ValidateObjectIdPipe) id?: string,
   ) {
     return this.shopService.findShopItems(userId, id);
@@ -64,24 +64,27 @@ export class ShopController {
     return this.shopService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
   @Patch('join/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   userJoin(
     @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
-    @MerchantUser() user: MerchantDocument,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.shopService.userJoin(id, user._id.toString());
+    return this.shopService.userJoin(id, user._id);
   }
 
-  @UseGuards(MerchantGuard)
   @Get('user/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   findUserShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
   }
 
-  @UseGuards(MerchantGuard)
-  @UseInterceptors(FileInterceptor('shop-logo'))
   @Patch()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseInterceptors(FileInterceptor('shop-logo'))
+  @Roles(UserRole.MERCHANT)
   async update(
     @MerchantUser() user: Merchant,
     @Body() updateShopDto: UpdateShopDto,
@@ -96,8 +99,9 @@ export class ShopController {
     return shop;
   }
 
-  @UseGuards(MerchantGuard)
   @Delete('/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(
     @MerchantUser() user: Merchant,
     @Param('id', ValidateObjectIdPipe) id: string,

@@ -16,16 +16,23 @@ import { Types } from 'mongoose';
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
 
 @Controller('review-container')
 export class ReviewContainerController {
   constructor(private readonly reviewService: ReviewContainerService) {}
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   create(
     @Body() createReviewDto: CreateReviewContainerDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.reviewService.create(createReviewDto, user.shopId);
   }
@@ -48,11 +55,12 @@ export class ReviewContainerController {
     return this.reviewService.update(id, updateReviewDto);
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.reviewService.remove(id, user.shopId);
   }

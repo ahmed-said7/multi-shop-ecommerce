@@ -22,7 +22,13 @@ import { UploadService } from 'src/upload/upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
+import { Roles } from 'src/common/decorator/roles';
 
 @Controller('item')
 export class ItemController {
@@ -33,13 +39,14 @@ export class ItemController {
 
   private readonly logger = new Logger(ItemController.name);
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @UseInterceptors(FilesInterceptor('images'))
   async create(
     @Body() createItemDto: CreateItemDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     const imageUrls = await this.uploadService.uploadFiles(files);
     createItemDto.images = imageUrls;

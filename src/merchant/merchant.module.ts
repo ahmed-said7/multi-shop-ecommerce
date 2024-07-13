@@ -7,14 +7,17 @@ import { ShopModule } from 'src/shop/shop.module';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { ApiModule } from 'src/common/filter/api.module';
+import { User, UserSchema } from 'src/user/schemas/user_schema';
+import { jwtTokenModule } from 'src/jwt/jwt.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Shop.name, schema: ShopSchema },
+      { name: User.name, schema: UserSchema },
       { name: Merchant.name, schema: merchantSchema },
     ]),
-
+    jwtTokenModule,
     ShopModule,
     AuthModule,
     ApiModule

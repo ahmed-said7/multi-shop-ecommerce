@@ -30,12 +30,14 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Order.name, schema: OrderSchema },

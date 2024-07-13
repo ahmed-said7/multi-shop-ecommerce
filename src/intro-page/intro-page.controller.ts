@@ -14,19 +14,26 @@ import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
 
 @Controller('intro-page')
 export class IntroPageController {
   constructor(private readonly introPageService: IntroPageService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.introPageService.create(
       createIntroPageDto,

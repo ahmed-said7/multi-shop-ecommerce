@@ -14,7 +14,7 @@ import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema'
 import { Model } from 'mongoose';
 
 @Injectable()
-export class MerchantGuard implements CanActivate {
+export class AuthenticationGuard implements CanActivate {
     constructor(
         private readonly jwtService: JwtService,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
@@ -22,11 +22,9 @@ export class MerchantGuard implements CanActivate {
     ) {};
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest<Request>();
-
         if (!request.headers.authorization) {
             throw new UnauthorizedException('Authorization header is missing');
         }
-
         const token = request.header('authorization').split(' ')[1];
         let payload: {userId:string; role:string }
         try{

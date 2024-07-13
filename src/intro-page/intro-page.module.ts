@@ -27,6 +27,7 @@ import {
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: IntroPage.name, schema: IntroPageSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
 
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
 

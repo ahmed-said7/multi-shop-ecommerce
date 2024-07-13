@@ -20,7 +20,13 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { Roles } from 'src/common/decorator/roles';
+import { IAuthUser } from 'src/common/enums';
+import { AuthUser } from 'src/common/decorator/param.decorator';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
@@ -28,9 +34,10 @@ export class PhotoSliderController {
 
   private readonly logger = new Logger(PhotoSliderController.name);
 
-  @UseGuards(MerchantGuard)
   @Post()
-  create(@MerchantUser() user: MerchantPayload) {
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
+  create(@AuthUser() user: IAuthUser) {
     return this.photoSliderService.create(user.shopId);
   }
 

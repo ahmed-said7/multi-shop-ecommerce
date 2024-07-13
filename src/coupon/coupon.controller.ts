@@ -18,20 +18,27 @@ import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 
 import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { applyCoupon } from './dto/apply-coupon.dto';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { MerchantPayload } from 'src/merchant/merchant.service';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { Roles } from 'src/common/decorator/roles';
+import { IAuthUser } from 'src/common/enums';
+import { AuthUser } from 'src/common/decorator/param.decorator';
 
 @Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   create(
     @Body() createCouponDto: CreateCouponDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.couponService.create(createCouponDto, user.shopId);
   }

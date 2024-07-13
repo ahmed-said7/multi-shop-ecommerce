@@ -21,7 +21,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from '../upload/upload.service';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
 
 @Controller('banner')
 export class BannerController {
@@ -35,7 +37,7 @@ export class BannerController {
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @UploadedFile() file: Express.Multer.File,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
     @Body() createBannerDto: CreateBannerDto,
   ) {
     const url = await this.uploadService.uploadFile(file);

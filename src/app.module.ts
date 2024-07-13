@@ -34,6 +34,7 @@ import { extension } from 'mime-types';
 import { APP_FILTER } from '@nestjs/core';
 import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 import { ShopModule } from './shop/shop.module';
+import { jwtTokenModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -46,6 +47,8 @@ import { ShopModule } from './shop/shop.module';
       signOptions: { expiresIn: '1d' },
       global: true,
     }),
+    jwtTokenModule
+    ,
     MulterModule.register({
       storage: diskStorage({
         destination: './images/',
