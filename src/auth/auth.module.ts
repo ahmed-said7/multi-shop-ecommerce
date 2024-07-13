@@ -1,11 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-
 import { LocalStrategy } from './strategies/local-strategies';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user_schema';
-
 import { PassportModule } from '@nestjs/passport';
 import { RefreshJwtStrategy } from './strategies/refreshToken.strategy';
 import { Shop, ShopSchema } from '../shop/schemas/shop_schema';

@@ -3,6 +3,11 @@ export enum GENDER_STATUS {
     FEMALE="female"
 };
 
+export enum RequestType {
+    SHOP = 'Shop',
+    DESIGN = 'Design',
+};
+
 export interface IAuthUser {
     _id: string;
     role:string;

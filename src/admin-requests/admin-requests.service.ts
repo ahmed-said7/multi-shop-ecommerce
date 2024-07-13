@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -13,106 +14,57 @@ import {
   AdminRequestDocument,
 } from './schemas/admin_request_schema';
 import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
+import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { QueryRequestDto } from './dto/query-request.dto';
 
 @Injectable()
 export class AdminRequestsService {
   constructor(
     @InjectModel(AdminRequest.name)
     private adminRequestModel: Model<AdminRequestDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private apiService:ApiService<AdminRequest,QueryRequestDto>
   ) {}
   async create(createAdminRequestDto: CreateAdminRequestDto) {
-    try {
       const request = await this.adminRequestModel
-        .create(createAdminRequestDto)
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
+        .create(createAdminRequestDto);
+      return {request};
+  };
 
-      return request;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async findAll(userId?: string) {
-    try {
-      const query = {};
-      query['userId'] = userId;
-      if (userId == undefined) delete query['userId'];
-      const requests = await this.adminRequestModel.find(query).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-
-      return requests;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+  async findAll(queryObj:QueryRequestDto) {
+      const { paginationObj , query }=await this.apiService.getAllDocs(
+        this.adminRequestModel.find(),
+        queryObj
+      );
+      const data=await query;
+      if( data.length == 0 ){
+        throw new HttpException("No documents found",400);
+      };
+      return { requests:data , paginationObj };
   }
 
   async findOne(id: string) {
-    try {
-      const request = await this.adminRequestModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      return request;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      const request = await this.adminRequestModel.findById(id);
+      if( !request ){
+        throw new HttpException("request not found",400);
+      }
+      return {request};
   }
 
   async update(
     id: string,
-    updateAdminRequestDto: UpdateAdminRequestDto,
-    userId: string,
+    updateAdminRequestDto: UpdateAdminRequestDto
   ) {
-    try {
-      const user = await this.userModel.findById(userId).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      if (user.role != UserRole.ADMIN)
-        throw new InternalServerErrorException('You are not an admin');
-      const request = await this.adminRequestModel
-        .findByIdAndUpdate(id, updateAdminRequestDto, { new: true })
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-      return request;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+    const request = await this.adminRequestModel
+        .findByIdAndUpdate(id, updateAdminRequestDto, { new: true });
+    return {request};
   }
 
-  async remove(id: string, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      const request = await this.adminRequestModel.findById(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
+  async remove(id: string, user: { _id: string; role:string } ) {
+      const request = await this.adminRequestModel.findById(id);
       if (!request) throw new BadRequestException("This request doesn't exist");
-      if (!user || user.role != UserRole.ADMIN || user.id != request.userId)
+      if( user.role != UserRole.ADMIN || user._id.toString() != request.userId.toString())
         throw new BadRequestException("You can't delete this request");
-      await this.adminRequestModel.findByIdAndDelete(id).catch((err) => {
-        console.log(err);
-        throw new InternalServerErrorException(err);
-      });
-      return 'Request deleted successfully';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
+      await this.adminRequestModel.findByIdAndDelete(id);
+      return {status:'Request deleted successfully'};
+  };
 }

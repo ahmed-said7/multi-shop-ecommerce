@@ -9,6 +9,7 @@ import {
   AdminRequestSchema,
 } from './schemas/admin_request_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
       { name: Merchant.name, schema: merchantSchema },
       { name: AdminRequest.name, schema: AdminRequestSchema },
     ]),
+    ApiModule
   ],
   controllers: [AdminRequestsController],
   providers: [AdminRequestsService],

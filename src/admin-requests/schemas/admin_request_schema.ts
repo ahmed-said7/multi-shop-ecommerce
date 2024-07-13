@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Document, Types } from 'mongoose';
+import { RequestType } from 'src/common/enums';
 
 export type AdminRequestDocument = AdminRequest & Document;
-export enum RequestType {
-  SHOP = 'Shop',
-  DESIGN = 'Design',
-}
+// export enum RequestType {
+//   SHOP = 'Shop',
+//   DESIGN = 'Design',
+// }
 @Schema({
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
