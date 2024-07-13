@@ -24,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MerchantPayload } from 'src/merchant/merchant.service';
 import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
 
 @Controller('shop')
 export class ShopController {
@@ -67,9 +68,9 @@ export class ShopController {
   @Patch('join/:id')
   userJoin(
     @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
-    @MerchantUser() user: MerchantPayload,
+    @MerchantUser() user: MerchantDocument,
   ) {
-    return this.shopService.userJoin(id, user.id);
+    return this.shopService.userJoin(id, user._id.toString());
   }
 
   @UseGuards(MerchantGuard)
@@ -82,7 +83,7 @@ export class ShopController {
   @UseInterceptors(FileInterceptor('shop-logo'))
   @Patch()
   async update(
-    @MerchantUser() user: MerchantPayload,
+    @MerchantUser() user: Merchant,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -98,7 +99,7 @@ export class ShopController {
   @UseGuards(MerchantGuard)
   @Delete('/:id')
   remove(
-    @MerchantUser() user: MerchantPayload,
+    @MerchantUser() user: Merchant,
     @Param('id', ValidateObjectIdPipe) id: string,
   ) {
     return this.shopService.remove(user.shopId, id);

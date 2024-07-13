@@ -2,14 +2,11 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 import type { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
-import { UserRole } from 'src/user/schemas/user_schema';
+import {  UserRole } from 'src/user/schemas/user_schema';
 
 export type TokenPayload = {
-  id: string;
-  email: string;
-  name: string;
+  userId: string;
   role: string;
-  gender: string;
 };
 
 @Injectable()
@@ -30,7 +27,10 @@ export class ValidateMerchantGuard implements CanActivate {
     if (payload?.role !== UserRole.MERCHANT) {
       return false;
     }
-
+    request.user = {
+      role:UserRole.MERCHANT,
+      _id:payload.userId
+    }
     request.body = {
       ...request.body,
       ...payload,

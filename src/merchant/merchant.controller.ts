@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 
@@ -17,6 +18,7 @@ import { UpdateMerchantDto } from './dto/updateMerchant.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { ValidateMerchantGuard } from './guards/validate-merchant.guard';
 import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { Request } from 'express';
 
 @Controller('merchant')
 export class MerchantController {
@@ -34,7 +36,7 @@ export class MerchantController {
 
   @Get()
   @UseGuards(AdminGuard)
-  findAll(@Query('page') page?: number) {
+  findAll( @Query('page') page?: string ) {
     return this.merchantService.findAll(page);
   }
 
@@ -44,12 +46,20 @@ export class MerchantController {
     return this.merchantService.findOne(id);
   }
 
+  @Get("logged-user")
+  @UseGuards(ValidateMerchantGuard)
+  findMe(@Req() req:Request) {
+    return this.merchantService.findOne(req.user._id);
+  }
+
   @Patch(':id')
   @UseGuards(ValidateMerchantGuard)
   update(
+    @Req() req:Request,
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() data: UpdateMerchantDto,
   ) {
+    req.user
     return this.merchantService.update(id, data);
   }
 

@@ -32,7 +32,6 @@ export class Merchant {
   gender: string;
 
   @Prop({
-    required: true,
     default: UserRole.MERCHANT,
     enum: [UserRole.MERCHANT],
   })

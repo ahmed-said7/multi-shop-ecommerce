@@ -1,10 +1,8 @@
-import { Document, Model, MongooseError, Types } from 'mongoose';
-
+import { Model, Types } from 'mongoose';
+import bcrypt from "bcrypt";
 import {
-  BadRequestException,
+  HttpException,
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,23 +14,13 @@ import { Merchant, MerchantDocument } from './schema/merchant.schema';
 
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { AuthService } from 'src/auth/auth.service';
+import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { UserRole } from 'src/user/schemas/user_schema';
 
 export type MerchantPayload = {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  gender: string;
-  shopId: string;
+  userId: string;
+  role: UserRole.MERCHANT;
 };
-
-type DocType = Document<
-  unknown,
-  any,
-  Document<unknown, any, Merchant> & Merchant & { _id: Types.ObjectId }
-> &
-  Document<unknown, any, Merchant> &
-  Merchant & { _id: Types.ObjectId } & Required<{ _id: Types.ObjectId }>;
 
 @Injectable()
 export class MerchantService {
@@ -42,136 +30,70 @@ export class MerchantService {
     @InjectModel(Shop.name)
     private readonly shopModel: Model<ShopDocument>,
     private readonly authService: AuthService,
+    private apiService:ApiService<MerchantDocument,IQuery>
   ) {}
 
-  private readonly logger = new Logger(MerchantService.name);
-
   async create(data: CreateDto) {
-    try {
-      const shop = await new this.shopModel({
+      const shop = await this.shopModel.create({
         title: `${data.name}-Shop`,
-      }).save();
-
-      this.logger.verbose({ shop, shopId: shop._id });
-
-      const merchant = await new this.merchantModel({
-        ...data,
-        shopId: shop?._id || shop.id,
-      }).save();
-
-      await this.shopModel.findByIdAndUpdate(shop._id, {
-        userID: merchant._id,
       });
 
-      this.logger.log(merchant);
+      data.password=await bcrypt.hash(data.password,10);
+      
+      const merchant = await this.merchantModel.create({
+        ...data,
+        shopId: shop?._id
+      });
 
-      return 'Merchant Created Successfully';
-    } catch (error) {
-      this.logger.error(error);
+      await this.shopModel.findByIdAndUpdate(shop._id, {
+        userID: merchant._id
+      });
 
-      if (error instanceof MongooseError) {
-        throw new BadRequestException(`${error.name}: ${error.message}`);
-      }
-
-      throw new InternalServerErrorException("Can't Create Merchant");
-    }
+      return { status:'Merchant Created Successfully'};
   }
 
   async findOne(id: string) {
-    try {
-      const merchant = await this.merchantModel.findById(id);
-
-      delete merchant.password;
-
-      return merchant;
-    } catch (error) {
-      this.logger.error(error);
-
-      if (error instanceof MongooseError) {
-        throw new BadRequestException(`${error.name}: ${error.message}`);
-      }
-
-      throw new InternalServerErrorException("Can't Create Merchant");
-    }
+      const merchant = await this.merchantModel
+        .findById(id).select("-password");
+      return {merchant};
   }
 
   async merchantSignIn(email: string, password: string) {
-    let merchant: DocType;
-
-    try {
-      merchant = await this.merchantModel.findOne({ email, password });
-    } catch (error) {
-      this.logger.error(error);
-
-      throw new InternalServerErrorException("Can't generate code");
-    }
+    const merchant=await this.merchantModel.findOne({ email });
 
     if (!merchant) {
       throw new NotFoundException();
-    }
+    };
+
+    const valid=await bcrypt.compare(password, merchant.password);
+    if(!valid) {
+      throw new HttpException("email or password is incorrect",400);
+    };
 
     const payload: MerchantPayload = {
-      id: merchant._id.toString(),
-      email: merchant.email,
-      name: merchant.name,
-      role: merchant.role,
-      gender: merchant.gender,
-      shopId: merchant.shopId,
+      userId: merchant._id.toString(),
+      role: UserRole.MERCHANT
     };
 
     const token = await this.authService.getToken(payload);
 
-    return token;
+    return { token };
   }
 
-  async findAll(page: number = 0) {
-    try {
-      return await this.merchantModel
-        .find()
-        .skip(page * 10)
-        .limit(10);
-    } catch (error) {
-      this.logger.error(error);
-
-      if (error instanceof MongooseError) {
-        throw new BadRequestException(`${error.name}: ${error.message}`);
-      }
-
-      throw new InternalServerErrorException("Can't Create Merchant");
-    }
+  async findAll(page:string) {
+    const {paginationObj,query}=await this.apiService.
+      getAllDocs( this.merchantModel.find(), { page });
+    const merchant=await query;
+    return { merchant, paginationObj };
   }
 
   async update(id: string, data: UpdateDto) {
-    delete data.shop;
-
-    try {
       await this.merchantModel.findByIdAndUpdate(id, data, { new: true });
-
-      return 'Merchant Updated Successfully';
-    } catch (error) {
-      this.logger.error(error);
-
-      if (error instanceof MongooseError) {
-        throw new BadRequestException(`${error.name}: ${error.message}`);
-      }
-
-      throw new InternalServerErrorException("Can't Update Merchant");
-    }
+      return {status:'Merchant Updated Successfully'};
   }
 
   async delete(id: string) {
-    try {
       await this.merchantModel.findByIdAndDelete(id);
-
-      return 'Merchant Deleted Successfully';
-    } catch (error) {
-      this.logger.error(error);
-
-      if (error instanceof MongooseError) {
-        throw new BadRequestException(`${error.name}: ${error.message}`);
-      }
-
-      throw new InternalServerErrorException("Can't Delete Merchant");
-    }
+      return {status:'Merchant Deleted Successfully'};
   }
 }

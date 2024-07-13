@@ -36,7 +36,7 @@ export class MerchantGuard implements CanActivate {
 
     const payload = await this.jwtService.verifyAsync<MerchantPayload>(token);
 
-    if ( !payload || !payload.id ) {
+    if ( !payload || !payload.userId ) {
       return false;
     }
 
@@ -44,7 +44,7 @@ export class MerchantGuard implements CanActivate {
       return false;
     }
 
-    request.user = payload;
+    request.user = { role:UserRole.MERCHANT , _id:payload.userId };
 
     return true;
   }
