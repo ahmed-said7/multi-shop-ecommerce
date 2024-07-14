@@ -6,7 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
@@ -20,12 +20,12 @@ import { AuthUser } from 'src/common/decorator/param.decorator';
 import { IAuthUser } from 'src/common/enums';
 import { Roles } from 'src/common/decorator/roles';
 
-@Controller('video-container')
+@Controller("video-container")
 export class VideoContainerController {
   constructor(private readonly videoContainerService: VideoContainerService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   create(
     @AuthUser() user: IAuthUser,
@@ -37,8 +37,8 @@ export class VideoContainerController {
     );
   }
 
-  @Get(':id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
+  @Get(":id")
+  findAll(@Param("id", ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.videoContainerService.findAll(new Types.ObjectId(id));
   }
 
@@ -55,13 +55,13 @@ export class VideoContainerController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   update(
-    @Param('id', ValidateObjectIdPipe) id: string,
+    @Param("id", ValidateObjectIdPipe) id: string,
     @Body() updateVideoContainerDto: UpdateVideoContainerDto,
   ) {
     return this.videoContainerService.update(id, updateVideoContainerDto);
   }
 
-  
+
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)

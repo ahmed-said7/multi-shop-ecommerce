@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -21,13 +21,12 @@ import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-
-@Controller('coupon')
+@Controller("coupon")
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   create(
     @Body() createCouponDto: CreateCouponDto,
@@ -39,37 +38,37 @@ export class CouponController {
   @Post('/apply')
   @UseGuards(AuthenticationGuard)
   applyCoupon(
-    @Body('userId', ValidateObjectIdPipe) userId: string,
+    @Body("userId", ValidateObjectIdPipe) userId: string,
     @Body() applyCoupon: applyCoupon,
   ) {
     return this.couponService.applyCoupon(userId, applyCoupon);
   }
 
+
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   findAll(
-    @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
-    @Query('page') page?: number,
+    @Param("id", ValidateObjectIdPipe) id: Types.ObjectId,
+    @Query("page") page?: number,
   ) {
     return this.couponService.findAll(new Types.ObjectId(id), page);
   }
 
-  @Get('/one/:id')
-  findOne(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
+  @Get("/one/:id")
+  findOne(@Param("id", ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.couponService.findOne(id);
   }
 
-  
+
   @Patch(':id')
   @UseGuards(AuthenticationGuard)
   update(
-    @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
+    @Param("id", ValidateObjectIdPipe) id: Types.ObjectId,
     @Body() updateCouponDto: UpdateCouponDto,
   ) {
     return this.couponService.update(id, updateCouponDto);
   }
-
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard)
