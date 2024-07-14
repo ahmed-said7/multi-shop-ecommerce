@@ -38,7 +38,7 @@ export class CreateBannerDto {
   @IsString()
   buttonPosition: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   image: string;
 }

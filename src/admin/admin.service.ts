@@ -27,6 +27,7 @@ export class AdminService {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateUserDto , { new: true })
       .select("-password");
+      if (!updatedUser) throw new NotFoundException('This user doesnt exist');
     return { updatedUser };
   };
 

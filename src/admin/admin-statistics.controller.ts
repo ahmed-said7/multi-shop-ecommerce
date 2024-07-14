@@ -1,10 +1,9 @@
-import { Controller, Get, UseGuards, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
 import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
-import { AuthUser } from 'src/common/decorator/param.decorator';
 
 @Controller('admin-statistics')
 export class AdminStatisticsController {

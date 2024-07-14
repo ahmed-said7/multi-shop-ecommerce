@@ -57,8 +57,10 @@ export class AdminRequestsController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user:IAuthUser,
     @Body() updateAdminRequestDto: UpdateAdminRequestDto,
   ) {
+    updateAdminRequestDto.adminId=user._id;
     return this.adminRequestsService.update(id, updateAdminRequestDto);
   }
 

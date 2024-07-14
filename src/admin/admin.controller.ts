@@ -5,7 +5,6 @@ import {
   Patch,
   Param,
   Delete,
-  Redirect,
   UseGuards,
 } from '@nestjs/common';
 
@@ -21,16 +20,16 @@ import { Roles } from 'src/common/decorator/roles';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Get()
-  @Redirect('/user')
-  findAll() {}
+  // @Get()
+  // @Redirect('/user')
+  // findAll() {}
 
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.ADMIN)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.adminService.findOne(id);
-  }
+  };
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
@@ -40,7 +39,7 @@ export class AdminController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.adminService.update(id, updateUserDto);
-  }
+  };
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)

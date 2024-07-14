@@ -1,11 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateAdminRequestDto } from './create-admin-request.dto';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 
 export class UpdateAdminRequestDto extends PartialType(CreateAdminRequestDto) {
-  @Prop()
+  @IsOptional()
+  @IsString()
   adminId?: string;
+  @IsOptional()
   @IsString()
   status?: string;
 }
