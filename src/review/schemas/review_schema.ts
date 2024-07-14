@@ -9,8 +9,6 @@ export type ReviewDocument = Review & Document;
 export class Review {
   @Prop({ required: true })
   rating: number;
-  @Prop({ required: true })
-  description: string;
   @Prop({ type: Types.ObjectId, ref: 'Item' })
   item: string;
   @Prop({ required: true })

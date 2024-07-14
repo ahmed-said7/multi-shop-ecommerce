@@ -1,17 +1,22 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateReviewDto {
   @IsNotEmpty({ message: 'A review must have a rating!' })
+  @IsNumber()
+  @Min(1)
+  @Max(1)
   rating: number;
-  @IsNotEmpty({ message: 'A review must have a description!' })
-  description: string;
   @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  shopId: Types.ObjectId;
-  @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  user: Types.ObjectId;
+  @IsMongoId()
+  shopId: string;
+  @IsOptional({ message: 'A review must belong to a shop!' })
+  @IsMongoId()
+  user: string;
   @IsNotEmpty({ message: 'A review must have an item!' })
+  @IsMongoId()
   item: string;
   @IsNotEmpty({ message: 'A review must have a title!' })
+  @IsString()
   title: string;
-}
+};

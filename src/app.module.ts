@@ -34,6 +34,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 import { ShopModule } from './shop/shop.module';
 import { jwtTokenModule } from './jwt/jwt.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { jwtTokenModule } from './jwt/jwt.module';
         },
       }),
     }),
+    EventEmitterModule.forRoot({global:true}),
     MongooseModule.forRoot(process.env.DB_URI),
     UserModule,
     AuthModule,

@@ -1,16 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateReviewDto } from './create-review.dto';
-import { IsNotEmpty } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class UpdateReviewDto extends PartialType(CreateReviewDto) {
+export class UpdateReviewDto {
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(1)
   rating: number;
-
-  description: string;
-
-  shopId: Types.ObjectId;
-
-  user: Types.ObjectId;
-  item: string;
+  @IsOptional()
+  @IsString()
   title: string;
-}
+};
+
