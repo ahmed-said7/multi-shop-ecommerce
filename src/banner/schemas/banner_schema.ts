@@ -1,10 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
 
-// Define the document type for the shop schema
 export type BannerDocument = Banner & Document;
-
-// Define the shop schema
 @Schema({
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })

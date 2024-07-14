@@ -1,24 +1,19 @@
 import {
-  Logger,
   Injectable,
-  BadRequestException,
   InternalServerErrorException,
+  HttpException,
 } from '@nestjs/common';
-
 import { Model } from 'mongoose';
-
 import { InjectModel } from '@nestjs/mongoose';
-
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
-
 import {
   PhotoSlider,
   PhotoSliderDocument,
 } from './schemas/photo-slider_schema';
-
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
-
-import { UploadService } from '../upload/upload.service';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryPhotoSliderDto } from './dto/query-photo-slider.dto';
+import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 
 @Injectable()
 export class PhotoSliderService {
@@ -26,54 +21,68 @@ export class PhotoSliderService {
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: Model<PhotoSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private readonly uploadFileService: UploadService,
-  ) {}
+    private apiService:ApiService<PhotoSliderDocument,QueryPhotoSliderDto>
+  ) {};
 
-  private readonly logger = new Logger(PhotoSliderService.name);
-
-  async create(shopId: string) {
-    if (!shopId) {
-      throw new BadRequestException('Shop ID must be provided');
-    }
+  async create(shopId: string,body:CreatePhotoSliderDto) {
+    body.shopId = shopId;
+    const photoSlider=await this.photoSliderModel.create(body);
+    await this.shopModel.findByIdAndUpdate(
+      shopId,
+      {
+        $addToSet : { 
+          containers : { containerId:photoSlider._id ,type : "PhotoSlider" } 
+        }
+      }
+    );
+    return { photoSlider };
   }
 
-  async uploadFilesToView(images: Express.Multer.File[]) {
-    const links = await this.uploadFileService.uploadFiles(images);
+  // async uploadFilesToView(images: Express.Multer.File[]) {
+  //   const links = await this.uploadFileService.uploadFiles(images);
 
-    return links;
+  //   return links;
+  // }
+
+  async findAll(query:QueryPhotoSliderDto) {
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.photoSliderModel.find(),query);
+    const photoSliders=await result;
+    if( photoSliders.length == 0  ){
+      throw new HttpException("photo sliders not found",400);
+    };
+    return { photoSliders , pagination : paginationObj };
   }
 
-  async findAll(): Promise<PhotoSlider[]> {
-    return this.photoSliderModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<PhotoSlider | null> {
-    return this.photoSliderModel.findById(id).exec();
+  async findOne(id: string){
+    const photoSlider= this.photoSliderModel.findById(id);
+    if (!photoSlider)
+      throw new InternalServerErrorException("this slider doesn't exist");
+    return {photoSlider};
   }
 
   async update(
     id: string,
+    shopId: string,
     updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ): Promise<PhotoSlider | null> {
-    return this.photoSliderModel
-      .findByIdAndUpdate(id, updatePhotoSliderDto, { new: true })
-      .exec();
-  }
-
-  async remove(id: string): Promise<string> {
-    const photoSlider = await this.photoSliderModel.findById(id);
+  ) {
+    const photoSlider = await this.photoSliderModel.findOneAndUpdate(
+      {shopId,_id:id},updatePhotoSliderDto,{new:true}
+    );
     if (!photoSlider)
       throw new InternalServerErrorException("this slider doesn't exist");
+    return {photoSlider};
+  }
 
-    const shop = await this.shopModel.findById(photoSlider.shopId);
-    for (let i = 0; i < shop.containers.length; i++) {
-      if (shop.containers[i].containerID.toString() === id) {
-        shop.containers.splice(i, 1);
-        break;
-      }
-    }
-    await shop.save();
+  async remove(id: string,shopId:string){
+    const photoSlider = await this.photoSliderModel.findOneAndDelete({
+      shopId,_id:id
+    });
+    if (!photoSlider)
+      throw new InternalServerErrorException("this slider doesn't exist");
+    await this.shopModel
+      .findByIdAndUpdate(shopId,{$pull:{containers:{containerID:id }}});
     await this.photoSliderModel.findByIdAndDelete(id);
-    return 'Prouct Slider has been deleted successfully!';
+    return {status:'Prouct Slider has been deleted successfully!'};
   }
 }

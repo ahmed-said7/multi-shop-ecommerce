@@ -20,10 +20,6 @@ import { Roles } from 'src/common/decorator/roles';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // @Get()
-  // @Redirect('/user')
-  // findAll() {}
-
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.ADMIN)
@@ -36,7 +32,7 @@ export class AdminController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto
   ) {
     return this.adminService.update(id, updateUserDto);
   };
@@ -48,5 +44,5 @@ export class AdminController {
     @Param('id', ValidateObjectIdPipe) deleteId: string
   ) {
     return this.adminService.remove(deleteId);
-  }
+  };
 }

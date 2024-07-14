@@ -44,21 +44,6 @@ export class BannerService {
         containers : { containerID: createdBanner.id , containerType: 'Banner' } 
       }
     });
-
-    // if (Shop?.containers) {
-    //   Shop.containers.push({
-    //     containerID: createdBanner.id,
-    //     containerType: 'Banner',
-    //   });
-    // } else {
-    //   Shop.$set('containers', [
-    //     {
-    //       containerID: createdBanner.id,
-    //       containerType: 'Banner',
-    //     },
-    //   ]);
-    // }
-    // await Shop.save();
     return { banner : createdBanner };
   }
 
@@ -98,17 +83,10 @@ export class BannerService {
     });
     if (!banner) throw new NotFoundException("this banner doesn't exist");
 
-    // const shop = await this.shopModel.findById(banner.shopId);
     const shop=await this.shopModel
       .findByIdAndUpdate( banner.shopId , { $pull : { containerID : id } });
     if (!shop) throw new NotFoundException("this shop doesn't exist");
-    // for (let i = 0; i < shop.containers.length; i++) {
-    //   if (shop.containers[i].containerID.toString() === id) {
-    //     shop.containers.splice(i, 1);
-    //     break;
-    //   }
-    // }
-    // await shop.save();
+    
     await this.bannerModel.findByIdAndDelete(id);
     return {status:'banner has been deleted successfully!'};
   }

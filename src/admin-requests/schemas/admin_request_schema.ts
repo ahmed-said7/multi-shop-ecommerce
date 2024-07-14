@@ -4,10 +4,6 @@ import { Document, Types } from 'mongoose';
 import { RequestType } from 'src/common/enums';
 
 export type AdminRequestDocument = AdminRequest & Document;
-// export enum RequestType {
-//   SHOP = 'Shop',
-//   DESIGN = 'Design',
-// }
 @Schema({
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })

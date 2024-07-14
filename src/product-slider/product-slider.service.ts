@@ -1,6 +1,6 @@
 import {
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
@@ -12,6 +12,8 @@ import {
   ProductSlider,
   ProductSliderDocument,
 } from './schemas/productSlider_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryProductSliderDto } from './dto/query-product-slider.dto';
 
 @Injectable()
 export class ProductSliderService {
@@ -19,138 +21,83 @@ export class ProductSliderService {
     @InjectModel(ProductSlider.name)
     private productSliderModel: Model<ProductSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-  ) {}
+    private apiService: ApiService<ProductSliderDocument,QueryProductSliderDto>
+  ) {};
 
-  async create(createProductSliderDto: CreateProductSliderDto, shopId: string) {
-    try {
+  async create(body: CreateProductSliderDto, shopId: string) {
       const payload = {
-        ...createProductSliderDto,
-        shopId,
+        ... body ,
+        shopId
       };
-      const productSlider = await new this.productSliderModel(payload).save();
-      const Shop = await this.shopModel.findById(shopId);
-      if (Shop.containers) {
-        Shop.containers.push({
-          containerID: productSlider.id,
-          containerType: 'ProductSlider',
-        });
-      } else {
-        Shop.$set('containers', [
-          {
-            containerID: productSlider.id,
-            containerType: 'ProductSlider',
-          },
-        ]);
-      }
-
-      await Shop.save();
-      return productSlider;
-    } catch (err) {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    }
+      const productSlider = await this.productSliderModel.create(payload);
+      await this.shopModel.findByIdAndUpdate(
+        shopId,
+        {
+          $addToSet:{
+            containers : { 
+              containerID: productSlider.id ,
+              containerType: 'ProductSlider'
+            }
+          }
+        }
+      );
+      return {productSlider};
   }
 
-  async findAll(id) {
-    try {
-      const shop = await this.shopModel.findById(id);
-      if (!shop) {
-        throw new NotFoundException('this shop not found');
-      }
-
-      const productSlider = await this.productSliderModel
-        .find({ shopId: id })
-        .populate({
-          path: 'products',
-          model: 'Item',
-          select: 'name price description images',
-        })
-        .exec();
-
-      return productSlider;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+  async findAll(query:QueryProductSliderDto) {
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.productSliderModel.find(),query,["title"]);
+    const productSliders=await result.populate({
+      path: 'products',
+      model: 'Item',
+      select: 'name price description images',
+    });
+    if( productSliders.length == 0  ){
+      throw new HttpException("product sliders not found",400);
+    };
+    return { productSliders , pagination : paginationObj };
   }
   async findOne(id: string) {
-    try {
-      const productSliderExist = await this.productSliderModel.findById(id);
-      if (!productSliderExist) {
-        throw new NotFoundException('this product slider not found');
+    const productSlider = await this.productSliderModel
+      .findById(id)
+      .populate({
+        path: 'products',
+        model: 'Item',
+        select: 'name price description images',
+      });
+      if(!productSlider){
+        throw new HttpException("ProductSlider not found",400);
       }
-      const productSlider = await this.productSliderModel
-        .findById(id)
-        .populate({
-          path: 'products',
-          model: 'Item',
-          select: 'name price description images',
-        })
-        .exec()
-        .catch((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        });
-
-      return productSlider;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+      return {productSlider};
   }
 
-  async update(id: string, updateProductSliderDto: UpdateProductSliderDto) {
-    try {
-      const productSliderExist = await this.productSliderModel.findById(id);
-      if (!productSliderExist) {
-        throw new NotFoundException('this product slider not found');
-      }
-      const productSlider = await this.productSliderModel.findByIdAndUpdate(
-        id,
-        updateProductSliderDto,
+  async update( id: string , shopId:string , body: UpdateProductSliderDto ){
+      const productSlider = await this.productSliderModel.findOneAndUpdate(
+        { _id:id,shopId },
+        body,
         {
           new: true,
         },
       );
-
-      return productSlider;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
-  }
-
-  async remove(id: string, shopId: string) {
-    try {
-      const productSliderExist = await this.productSliderModel.findById(id);
-      if (!productSliderExist) {
+      if (!productSlider) {
         throw new NotFoundException('this product slider not found');
       }
-      const shop = await this.shopModel.findById(shopId);
-      for (let i = 0; i < shop.containers.length; i++) {
-        if (shop.containers[i].containerID.toString() === id) {
-          shop.containers.splice(i, 1);
-          break;
+      return {productSlider};
+  };
+
+  async remove(id: string, shopId: string) {
+    const productSlider = await this.productSliderModel.findOneAndDelete({ _id:id,shopId });
+    if (!productSlider) {
+      throw new NotFoundException('this product slider not found');
+    }
+    await this.shopModel.findByIdAndUpdate(shopId,
+    {
+      $pull:{
+        containers : { 
+          containerID: id
         }
       }
-      await shop.save();
-      await this.productSliderModel.findByIdAndDelete(id);
-      return 'Prouct Slider has been deleted successfully!';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+    });
+    return {status:'Prouct Slider has been deleted successfully!'};
   }
 }

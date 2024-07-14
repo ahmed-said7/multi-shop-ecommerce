@@ -1,11 +1,10 @@
 import { IsMongoId, IsOptional } from "class-validator";
 import { FindQuery } from "src/common/enums";
-export class QueryRequestDto extends FindQuery {
+
+export class QueryProductSliderDto extends FindQuery {
     @IsOptional()
     @IsMongoId()
-    userId:string;
+    shopId: string;
     @IsOptional()
-    type:string;
-    @IsOptional()
-    status:string;
+    isSlider:boolean;
 };

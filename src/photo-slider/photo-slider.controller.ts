@@ -8,9 +8,9 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
-  Logger,
   UploadedFiles,
   Req,
+  Query,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
@@ -24,37 +24,40 @@ import { Roles } from 'src/common/decorator/roles';
 import { IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { Request } from 'express';
+import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
+import { QueryPhotoSliderDto } from './dto/query-photo-slider.dto';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
   constructor(private readonly photoSliderService: PhotoSliderService) {}
 
-  private readonly logger = new Logger(PhotoSliderController.name);
-
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
-  create(@AuthUser() user: IAuthUser) {
-    return this.photoSliderService.create(user.shopId);
+  create(
+    @AuthUser("shopId") shopId: string,
+    @Body() body:CreatePhotoSliderDto 
+  ) {
+    return this.photoSliderService.create(shopId,body);
   }
 
-  @Post('preview')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
-  @UseInterceptors(FilesInterceptor('images'))
-  uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
-    return this.photoSliderService.uploadFilesToView(files);
-  }
+  // @Post('preview')
+  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  // @Roles(UserRole.MERCHANT)
+  // @UseInterceptors(FilesInterceptor('images'))
+  // uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
+  //   return this.photoSliderService.uploadFilesToView(files);
+  // }
 
   @Get()
-  findAll(): Promise<PhotoSlider[]> {
-    return this.photoSliderService.findAll();
+  findAll(@Query() query:QueryPhotoSliderDto ) {
+    return this.photoSliderService.findAll(query);
   }
 
   @Get(':id')
   findOne(
     @Param('id', ValidateObjectIdPipe) id: string,
-  ): Promise<PhotoSlider | null> {
+  ){
     return this.photoSliderService.findOne(id);
   }
 
@@ -65,8 +68,9 @@ export class PhotoSliderController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ): Promise<PhotoSlider | null> {
-    return this.photoSliderService.update(id, updatePhotoSliderDto);
+    @AuthUser("shopId") shopId: string
+  ){
+    return this.photoSliderService.update(id,shopId, updatePhotoSliderDto);
   }
 
   
@@ -74,9 +78,9 @@ export class PhotoSliderController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   remove(
-    @Req() req:Request,
+    @AuthUser("shopId") shopId: string,
     @Param('id', ValidateObjectIdPipe) id: string
-  ): Promise<string> {
-    return this.photoSliderService.remove(id);
+  ){
+    return this.photoSliderService.remove(id,shopId);
   }
 }

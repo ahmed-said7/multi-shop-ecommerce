@@ -1,11 +1,8 @@
 import {
   IsNotEmpty,
   IsString,
-  IsArray,
   MinLength,
-  MaxLength,
-  IsOptional,
-  IsMongoId,
+  MaxLength
 } from 'class-validator';
 
 export class CreateCategoryDto {
