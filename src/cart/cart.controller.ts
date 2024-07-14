@@ -12,34 +12,46 @@ import { CartService } from './cart.service';
 import { CreateCartItemDto } from './dto/create-cart.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { UserRole } from 'src/user/schemas/user_schema';
+import { AuthUser } from 'src/common/decorator/param.decorator';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @UseGuards(AuthenticationGuard)
+  
   @Post()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.USER)
   async getUserCart(
-    @Body('userId') userId: string,
+    @AuthUser('_id') userId: string,
     @Body('shopId') shopId: string,
   ) {
     return this.cartService.getCart(userId, shopId);
   }
 
-  @UseGuards(AuthenticationGuard)
+  
   @Post('/add')
-  addToCart(@Body('userId') userId: string, @Body() item: CreateCartItemDto) {
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.USER)
+  addToCart( @Body('userId') userId: string, @Body() item: CreateCartItemDto ) {
     return this.cartService.addToCart(userId, item);
   }
 
-  @UseGuards(AuthenticationGuard)
+  
   @Delete('/remove/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.USER)
   removeFromCart(@Param('id', ValidateObjectIdPipe) cartItemId: string) {
     return this.cartService.removeFromCart(cartItemId);
-  }
+  };
 
-  @UseGuards(AuthenticationGuard)
+  
   @Put('/update/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.USER)
   updateItemQuantity(
     @Param('id', ValidateObjectIdPipe) itemId: string,
     @Body('quantity') quantity: number,

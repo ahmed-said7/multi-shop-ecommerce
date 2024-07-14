@@ -4,6 +4,8 @@ import {
   IsArray,
   MinLength,
   MaxLength,
+  IsOptional,
+  IsMongoId,
 } from 'class-validator';
 
 export class CreateCategoryDto {
@@ -17,7 +19,9 @@ export class CreateCategoryDto {
     message: 'A Category title must be at most 20 characters long',
   })
   title: string;
-
+  
+  @IsOptional()
   @IsArray({ message: 'A Category must have a string array subCategory' })
+  @IsString({each: true})
   subCategory: string[];
 }

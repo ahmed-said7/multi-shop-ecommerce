@@ -15,13 +15,13 @@ export class Cart {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
 
-  @Prop({ required: true, min: 1 })
+  @Prop({ type:Number , default:1 })
   quantity: number;
 
-  @Prop({ required: true, minlength: 1 })
+  @Prop({ type:String })
   size: string;
 
-  @Prop({ required: true, minlength: 1 })
+  @Prop({ required: true })
   color: string;
 }
 

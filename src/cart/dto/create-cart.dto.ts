@@ -1,3 +1,5 @@
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+
 export class CreateCartDto {
   itemId: string;
   shopId: string;
@@ -7,9 +9,23 @@ export class CreateCartDto {
 
 export class CreateCartItemDto extends CreateCartDto {
   /**The Item Quantity */
+  @IsOptional()
+  @IsNumber()
   quantity: number;
 
-  sizes: string;
+  @IsNotEmpty()
+  @IsMongoId()
+  shopId: string;
 
+  @IsNotEmpty()
+  @IsMongoId()
+  itemId: string;
+  
+  @IsOptional()
+  @IsString()
+  sizes: string;
+  
+  @IsNotEmpty()
+  @IsString()
   colors: string;
 }

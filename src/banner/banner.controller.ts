@@ -29,8 +29,7 @@ import { QueryBannerDto } from './dto/query-banner.dto';
 @Controller('banner')
 export class BannerController {
   constructor(
-    private readonly bannerService: BannerService,
-    private readonly uploadService: UploadService
+    private readonly bannerService: BannerService
   ) {}
 
   @Post()

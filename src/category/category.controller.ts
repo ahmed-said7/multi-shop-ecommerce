@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { CategoryService } from './category.service';
@@ -19,6 +20,7 @@ import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
 import { UserRole } from 'src/user/schemas/user_schema';
+import { QueryCategoryDto } from './dto/query-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -34,9 +36,11 @@ export class CategoryController {
     return this.categoryService.create(user.shopId, createCategoryDto);
   }
 
-  @Get('/shop/:shopId')
-  findAll(@Param('shopId', ValidateObjectIdPipe) shopId: Types.ObjectId) {
-    return this.categoryService.findAll(shopId);
+  @Get()
+  findAll(
+    @Query() query:QueryCategoryDto
+  ) {
+    return this.categoryService.findAll(query);
   }
 
   @Get('/one/:id')

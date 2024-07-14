@@ -1,6 +1,6 @@
 import {
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -10,6 +10,9 @@ import { Category, CategoryDocument } from './schemas/category_schema';
 import mongoose, { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { UserDocument } from 'src/user/schemas/user_schema';
+import { QueryCategoryDto } from './dto/query-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -18,39 +21,37 @@ export class CategoryService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-  ) {}
+    private apiService:ApiService<UserDocument,QueryCategoryDto>
+  ) {};
 
   async create(shopId: string, createCategoryDto: CreateCategoryDto) {
     const payload = {
       ...createCategoryDto,
-      shopId,
+      shopId
     };
 
-    const category = await new this.categoryModel(payload).save();
+    const category = await this.categoryModel.create(payload);
 
     await this.shopModel.findByIdAndUpdate(
       payload.shopId,
       {
-        $push: { categories: category._id },
+        $addToSet: { categories: category._id },
       },
       {
         new: true,
       },
     );
 
-    return category;
+    return {category};
   }
 
-  async findAll(shopId: Types.ObjectId) {
-    const shop = await this.shopModel.findById(shopId);
-    if (!shop) {
-      throw new NotFoundException('this shop not found');
-    }
-    const categories = await this.categoryModel.find({
-      shopId,
-    });
-
-    return categories;
+  async findAll(query:QueryCategoryDto) {
+    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.categoryModel.find(),query);
+    const categories=await result;
+    if( categories.length == 0  ){
+      throw new HttpException("category not found",400);
+    };
+    return { categories , pagination : paginationObj };
   }
 
   async findOne(id: string, shopId: string) {
@@ -60,7 +61,7 @@ export class CategoryService {
       throw new NotFoundException('No Category is Found');
     }
 
-    return category;
+    return {category};
   }
 
   async update(
@@ -78,7 +79,7 @@ export class CategoryService {
       throw new NotFoundException('No Category is Found');
     }
 
-    return category;
+    return {category};
   }
 
   async remove(id: string, shopId: string) {
@@ -91,6 +92,6 @@ export class CategoryService {
       throw new NotFoundException('No Category is Found');
     }
 
-    return category;
+    return {category};
   }
 }
