@@ -32,7 +32,7 @@ export class Item {
   // @Prop()
   // brand: string;
 
-  @Prop({ type:Number , min: 0, max: 5 })
+  @Prop({ type:Number , min: 0, max: 5 ,default: 0 })
   rating?: number;
 
   @Prop()

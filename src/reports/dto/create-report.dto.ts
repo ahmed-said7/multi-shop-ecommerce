@@ -1,11 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReportDto {
-  @IsNotEmpty({ message: 'A shop must have a title' })
-  @IsString({ message: 'A shop must have a string title' })
+  @IsNotEmpty()
+  @IsString()
   report: string;
-
-  year?: string;
-
-  month?: string;
+  @IsOptional()
+  @IsNumber()
+  year?: number;
+  @IsOptional()
+  @IsNumber()
+  month?: number;
 }

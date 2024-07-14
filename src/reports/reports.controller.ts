@@ -1,28 +1,27 @@
-import { Controller, Get, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body,  UseGuards } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
-import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { IAuthUser } from 'src/common/enums';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { UserRole } from 'src/user/schemas/user_schema';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get()
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   findOne(
-    @Body('userId') userId: string,
-    @Body() createReportDto: CreateReportDto,
+    @AuthUser() user: IAuthUser,
+    @Body() body: CreateReportDto,
   ) {
-    console.log(createReportDto);
     return this.reportsService.findOne(
-      userId,
-      createReportDto.report,
-      createReportDto.year,
-      createReportDto.month,
+      user,
+      body
     );
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.reportsService.remove(+id);
   }
 }

@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, OrderDocument } from './schemas/order_schema';
-import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
+import { UserRole } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
 import { CouponService } from 'src/coupon/coupon.service';
@@ -20,8 +20,6 @@ import { Model } from 'mongoose';
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
     @InjectModel(Order.name)
     private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Shop.name)
