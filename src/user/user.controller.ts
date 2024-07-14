@@ -1,21 +1,15 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { EmailService } from './email/email.service';
-
-import { AuthService } from '../auth/auth.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { UserService } from './user.service';
-import { LoginUserDto } from 'src/auth/dto/login.dto';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { Roles } from 'src/common/decorator/roles';
@@ -26,19 +20,7 @@ import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private authService: AuthService,
-    // private readonly emailService: EmailService,
   ) {}
-
-  @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.register(createUserDto);
-  }
-
-  @Post('login')
-  async login(@Body() body: LoginUserDto ) {
-    return await this.authService.loginUser(body);
-  }
 
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)

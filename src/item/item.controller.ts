@@ -12,16 +12,11 @@ import {
   UploadedFiles,
   Logger,
 } from '@nestjs/common';
-
-import mongoose, { Types } from 'mongoose';
-
+import { Types } from 'mongoose';
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { UploadService } from 'src/upload/upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
@@ -86,7 +81,8 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images'))
   async update(
@@ -101,7 +97,8 @@ export class ItemController {
     return this.itemService.update(id, updateItemDto);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @Delete(':id')
   remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.itemService.remove(id);

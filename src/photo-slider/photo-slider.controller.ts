@@ -15,12 +15,7 @@ import {
 import { PhotoSliderService } from './photo-slider.service';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
 import { PhotoSlider } from './schemas/photo-slider_schema';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
-
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
@@ -43,8 +38,9 @@ export class PhotoSliderController {
     return this.photoSliderService.create(user.shopId);
   }
 
-  @UseGuards(MerchantGuard)
   @Post('preview')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @UseInterceptors(FilesInterceptor('images'))
   uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
     return this.photoSliderService.uploadFilesToView(files);
@@ -62,8 +58,10 @@ export class PhotoSliderController {
     return this.photoSliderService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Patch(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
@@ -71,8 +69,10 @@ export class PhotoSliderController {
     return this.photoSliderService.update(id, updatePhotoSliderDto);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Delete(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(
     @Req() req:Request,
     @Param('id', ValidateObjectIdPipe) id: string

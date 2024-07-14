@@ -11,12 +11,8 @@ import {
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
@@ -51,7 +47,8 @@ export class IntroPageController {
     return this.introPageService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @Patch(':id')
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -60,7 +57,8 @@ export class IntroPageController {
     return this.introPageService.update(id, updateIntroPageDto);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   @Delete(':id')
   remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.introPageService.remove(id);

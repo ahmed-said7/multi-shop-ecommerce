@@ -9,19 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-
 import { Types } from 'mongoose';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { applyCoupon } from './dto/apply-coupon.dto';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { UserRole } from 'src/user/schemas/user_schema';
@@ -43,8 +36,8 @@ export class CouponController {
     return this.couponService.create(createCouponDto, user.shopId);
   }
 
-  @UseGuards(JwtGuard)
   @Post('/apply')
+  @UseGuards(AuthenticationGuard)
   applyCoupon(
     @Body('userId', ValidateObjectIdPipe) userId: string,
     @Body() applyCoupon: applyCoupon,
@@ -52,8 +45,9 @@ export class CouponController {
     return this.couponService.applyCoupon(userId, applyCoupon);
   }
 
-  @UseGuards(MerchantGuard)
   @Get(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   findAll(
     @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
     @Query('page') page?: number,
@@ -66,8 +60,9 @@ export class CouponController {
     return this.couponService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Patch(':id')
+  @UseGuards(AuthenticationGuard)
   update(
     @Param('id', ValidateObjectIdPipe) id: Types.ObjectId,
     @Body() updateCouponDto: UpdateCouponDto,
@@ -75,8 +70,9 @@ export class CouponController {
     return this.couponService.update(id, updateCouponDto);
   }
 
-  @UseGuards(MerchantGuard)
+
   @Delete(':id')
+  @UseGuards(AuthenticationGuard)
   remove(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
     return this.couponService.remove(id);
   }

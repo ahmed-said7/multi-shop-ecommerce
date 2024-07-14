@@ -11,11 +11,7 @@ import {
 import { ReviewContainerService } from './review-container.service';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
@@ -46,8 +42,10 @@ export class ReviewContainerController {
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.reviewService.findOne(id);
   }
-  @UseGuards(MerchantGuard)
+  
   @Patch(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewContainerDto,

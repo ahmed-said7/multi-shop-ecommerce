@@ -9,15 +9,15 @@ import {
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateCartItemDto } from './dto/create-cart.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AuthenticationGuard)
   @Post()
   async getUserCart(
     @Body('userId') userId: string,
@@ -26,19 +26,19 @@ export class CartController {
     return this.cartService.getCart(userId, shopId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AuthenticationGuard)
   @Post('/add')
   addToCart(@Body('userId') userId: string, @Body() item: CreateCartItemDto) {
     return this.cartService.addToCart(userId, item);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AuthenticationGuard)
   @Delete('/remove/:id')
   removeFromCart(@Param('id', ValidateObjectIdPipe) cartItemId: string) {
     return this.cartService.removeFromCart(cartItemId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(AuthenticationGuard)
   @Put('/update/:id')
   updateItemQuantity(
     @Param('id', ValidateObjectIdPipe) itemId: string,

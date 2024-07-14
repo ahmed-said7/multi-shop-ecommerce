@@ -8,16 +8,10 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-
 import { Types } from 'mongoose';
-
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { IAuthUser } from 'src/common/enums';

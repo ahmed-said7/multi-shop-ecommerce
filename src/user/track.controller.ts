@@ -1,9 +1,5 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-
 import { TrackService } from './track.service';
-import { MerchantGuard } from '../auth/guards/merchant.guard';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { UserRole } from './schemas/user_schema';

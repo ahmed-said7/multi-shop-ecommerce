@@ -1,11 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { LocalStrategy } from './strategies/local-strategies';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user_schema';
-import { PassportModule } from '@nestjs/passport';
-import { RefreshJwtStrategy } from './strategies/refreshToken.strategy';
 import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
 import { Item, ItemSchema } from '../item/schemas/item-schema';
 import { Category, CategorySchema } from '../category/schemas/category_schema';
@@ -51,14 +48,11 @@ import { jwtTokenModule } from 'src/jwt/jwt.module';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    PassportModule,
     jwtTokenModule,
-    forwardRef(() => UserModule) 
+    UserModule
   ],
   providers: [
-    AuthService,
-    LocalStrategy,
-    RefreshJwtStrategy
+    AuthService
   ],
   controllers: [AuthController],
   exports: [AuthService],

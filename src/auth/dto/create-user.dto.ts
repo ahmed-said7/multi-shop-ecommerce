@@ -10,7 +10,7 @@ import {
   IsOptional,
 } from 'class-validator';
 
-import { UserRole } from '../schemas/user_schema';
+import { UserRole } from '../../user/schemas/user_schema';
 import { Transform } from 'class-transformer';
 import { GENDER_STATUS } from 'src/common/enums';
 

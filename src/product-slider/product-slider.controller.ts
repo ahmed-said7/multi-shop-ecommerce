@@ -11,11 +11,7 @@ import {
 import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { Types } from 'mongoose';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
@@ -51,8 +47,10 @@ export class ProductSliderController {
     return this.productSliderService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Patch(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateProductSliderDto: UpdateProductSliderDto,

@@ -12,10 +12,7 @@ import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { Types } from 'mongoose';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { UserRole } from 'src/user/schemas/user_schema';
@@ -45,14 +42,18 @@ export class VideoContainerController {
     return this.videoContainerService.findAll(new Types.ObjectId(id));
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Get('/one/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Patch(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateVideoContainerDto: UpdateVideoContainerDto,
@@ -60,8 +61,10 @@ export class VideoContainerController {
     return this.videoContainerService.update(id, updateVideoContainerDto);
   }
 
-  @UseGuards(MerchantGuard)
+  
   @Delete(':id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   remove(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.remove(id);
   }

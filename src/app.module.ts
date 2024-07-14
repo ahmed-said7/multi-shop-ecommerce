@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
@@ -21,7 +21,6 @@ import { AdminRequestsModule } from './admin-requests/admin-requests.module';
 import { VideoContainerModule } from './video-container/video-container.module';
 import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 import { ThemesModule } from './themes-req/themes.module';
-import { FileManagerModule } from './file-manager/file-manager.module';
 import { CartModule } from './cart/cart.module';
 import { BannerModule } from './banner/banner.module';
 import { UploadModule } from './upload/upload.module';
@@ -81,7 +80,6 @@ import { jwtTokenModule } from './jwt/jwt.module';
     AdminRequestsModule,
     VideoContainerModule,
     ThemesModule,
-    FileManagerModule,
     CartModule,
     UploadModule,
     MerchantModule,

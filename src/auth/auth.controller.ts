@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../user/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { LoginUserDto } from './dto/login.dto';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
@@ -16,7 +16,6 @@ import { jwtTokenService } from 'src/jwt/jwt.service';
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private userService: UserService,
     private jwt:jwtTokenService
   ) {}
 
@@ -27,7 +26,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.register(createUserDto);
+    return this.authService.register(createUserDto);
   }
 
   @Post('refresh')

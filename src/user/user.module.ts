@@ -1,12 +1,10 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UserController } from "./user.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
-import { PassportModule } from "@nestjs/passport";
 import { ConfigModule } from "@nestjs/config";
 import { User, UserSchema } from "./schemas/user_schema";
-import { Otp, OtpSchema } from "./schemas/otp-schema";
 import { Shop, ShopSchema } from "../shop/schemas/shop_schema";
 import { Item, ItemSchema } from "../item/schemas/item-schema";
 import { Category, CategorySchema } from "../category/schemas/category_schema";
@@ -24,9 +22,6 @@ import {
   ReviewContainerSchema,
 } from "../review-container/schemas/reviewContainer_schema";
 import { Order, OrderSchema } from "../order/schemas/order_schema";
-import { OtpService } from "./otp/otp.service";
-import { OtpController } from "./otp/otp.controller";
-import { EmailService } from "./email/email.service";
 import { UserTrackController } from "./track.controller";
 import { TrackService } from "./track.service";
 import { Coupon, CouponSchema } from "../coupon/schemas/coupon.schema";
@@ -41,7 +36,6 @@ import {
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
-import { AuthModule } from 'src/auth/auth.module';
 import { ApiModule } from 'src/common/filter/api.module';
 import { Merchant, merchantSchema } from "src/merchant/schema/merchant.schema";
 import { jwtTokenModule } from "src/jwt/jwt.module";
@@ -53,7 +47,6 @@ import { jwtTokenModule } from "src/jwt/jwt.module";
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Merchant.name, schema: merchantSchema },
-      { name: Otp.name, schema: OtpSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Category.name, schema: CategorySchema },
@@ -73,12 +66,10 @@ import { jwtTokenModule } from "src/jwt/jwt.module";
       signOptions: { expiresIn: "1h" },
     }),
     jwtTokenModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    forwardRef(()=>AuthModule),
     UploadModule,ApiModule
   ],
-  controllers: [UserController, OtpController, UserTrackController],
-  providers: [UserService, OtpService, EmailService, TrackService],
+  controllers: [UserController, UserTrackController],
+  providers: [UserService,  TrackService],
   exports: [UserService, MongooseModule],
 })
 export class UserModule {}
