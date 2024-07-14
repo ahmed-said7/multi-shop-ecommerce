@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 @Schema({
   timestamps: true,
 })
+
 export class Coupon {
   @Prop({ required: true, unique: true, minlength: 3, maxlength: 50 })
   text: string;

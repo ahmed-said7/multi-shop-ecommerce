@@ -28,6 +28,7 @@ import {
 } from 'src/video-container/schemas/videoContainer-schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -49,7 +50,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
-    ]),
+    ]),ApiModule
   ],
   controllers: [IntroPageController],
   providers: [IntroPageService],

@@ -1,5 +1,6 @@
 import { Model } from 'mongoose';
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,7 +20,7 @@ export class CartService {
         .populate('itemId', 'name price images');
 
       if (items.length == 0) {
-        return `no item in cart`;
+        throw new BadRequestException(`no item in cart`);
       };
 
       const totalPrice = items.reduce((total, item) => {
@@ -33,7 +34,7 @@ export class CartService {
   async addToCart(userId: string, item: CreateCartItemDto) {
     const cartItem = await this.cartModel.findOne({
       userId,
-      colors: item.colors,
+      color: item.color,
       itemId: item.itemId,
       shopId: item.shopId,
     });

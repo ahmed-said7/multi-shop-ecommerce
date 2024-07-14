@@ -1,6 +1,6 @@
 import {
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
@@ -9,6 +9,8 @@ import { IntroPage, IntroPageDocument } from './schemas/intro_page_schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryIntroPageDto } from './dto/query-intro-page.dto';
 
 @Injectable()
 export class IntroPageService {
@@ -16,96 +18,55 @@ export class IntroPageService {
     @InjectModel(IntroPage.name)
     private introPageModel: Model<IntroPageDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-  ) {}
-  async create(createIntroPageDto: CreateIntroPageDto, shopId: Types.ObjectId) {
-    try {
+    private apiService:ApiService<IntroPageDocument,QueryIntroPageDto>
+  ) {};
+  async create(createIntroPageDto: CreateIntroPageDto, shopId: string) {
       const payload = {
         ...createIntroPageDto,
-        shopId,
+        shopId
       };
       const introPage = await this.introPageModel.create(payload);
-      const shop = await this.shopModel.findById(shopId);
-      shop.introPages.push(introPage.id);
-      await shop.save();
-      return introPage;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
+      await this.shopModel
+          .findByIdAndUpdate(shopId,{$addToSet:{introPages:introPage._id}});
+      return {introPage};
+  };
 
-  async findAll(shopId?: Types.ObjectId) {
-    try {
-      const shop = await this.shopModel.findById(shopId);
-      if (!shop) {
-        throw new NotFoundException('this shop not found');
-      }
-      const introPage = await this.introPageModel.find({ shopId });
-      return introPage;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+  async findAll(query:QueryIntroPageDto) {
+    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.introPageModel.find(),query);
+    const IntroPages=await result;
+    if( IntroPages.length == 0  ){
+      throw new HttpException("coupon not found",400);
+    };
+    return { IntroPages , pagination : paginationObj };
   }
 
   async findOne(id: string) {
-    try {
-      const introPage = await this.introPageModel.findById(id);
-      if (!introPage) {
-        throw new NotFoundException('this page not found');
-      }
-      return introPage;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+    const introPage = await this.introPageModel.findById(id);
+    if (!introPage) {
+      throw new NotFoundException('this page not found');
+    };
+    return { introPage };
   }
 
-  async update(id: string, updateIntroPageDto: UpdateIntroPageDto) {
-    try {
-      const introPageExist = await this.introPageModel.findById(id);
-      if (!introPageExist) {
-        throw new NotFoundException('this page not found');
-      }
+  async update(id: string,shopId:string, updateIntroPageDto: UpdateIntroPageDto) {
       const introPage = await this.introPageModel.findByIdAndUpdate(
-        id,
+        { _id:id , shopId },
         updateIntroPageDto,
         { new: true },
       );
-      return introPage;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+      if( ! introPage ){
+        throw new HttpException("No intro page found",400);
+      };
+      return { introPage };
   }
 
-  async remove(id: string) {
-    try {
-      const introPageExist = await this.introPageModel.findById(id);
-      if (!introPageExist) {
+  async remove(id: string,shopId: string) {
+      const introPage = await this.introPageModel.findOneAndDelete({ _id:id , shopId });
+      if ( !introPage ) {
         throw new NotFoundException('this page not found');
       }
-      const introPage = await this.introPageModel.findByIdAndDelete(id);
-      const shop = await this.shopModel.findById(introPage.shopId);
-      for (let i = 0; i < shop.introPages.length; i++) {
-        if (id == shop.introPages[i]) shop.introPages.splice(i, 1);
-      }
-      await shop.save();
-      return 'Intro page has been deleted successfully';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+      await this.shopModel
+          .findByIdAndUpdate(shopId,{$pull:{introPages:introPage.id}});
+      return { status : 'Intro page has been deleted successfully' };
   }
 }

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
@@ -19,6 +20,7 @@ import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { IAuthUser } from 'src/common/enums';
+import { QueryIntroPageDto } from './dto/query-intro-page.dto';
 
 @Controller('intro-page')
 export class IntroPageController {
@@ -29,18 +31,18 @@ export class IntroPageController {
   @Roles(UserRole.MERCHANT)
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
-    @AuthUser() user: IAuthUser,
+    @AuthUser() user: IAuthUser
   ) {
     return this.introPageService.create(
       createIntroPageDto,
-      new Types.ObjectId(user.shopId),
+      user.shopId
     );
   }
 
-  @Get(':id')
-  findAll(@Param('id', ValidateObjectIdPipe) id?: Types.ObjectId) {
-    return this.introPageService.findAll(new Types.ObjectId(id));
-  }
+  @Get()
+  findAll(@Query() query: QueryIntroPageDto ) {
+    return this.introPageService.findAll(query);
+  };
 
   @Get('/one/:id')
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
@@ -53,14 +55,18 @@ export class IntroPageController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateIntroPageDto: UpdateIntroPageDto,
+    @AuthUser("shopId") shopId: string
   ) {
-    return this.introPageService.update(id, updateIntroPageDto);
+    return this.introPageService.update(id, shopId,updateIntroPageDto);
   }
 
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.introPageService.remove(id);
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser("shopId") shopId: string
+  ) {
+    return this.introPageService.remove(id,shopId);
   }
 }

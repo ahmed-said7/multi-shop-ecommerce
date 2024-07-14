@@ -20,8 +20,8 @@ export class CreateCategoryDto {
   })
   title: string;
   
-  @IsOptional()
-  @IsArray({ message: 'A Category must have a string array subCategory' })
-  @IsString({each: true})
-  subCategory: string[];
+//   @IsOptional()
+//   @IsArray({ message: 'A Category must have a string array subCategory' })
+//   @IsString({each: true})
+//   subCategory: string[];
 }

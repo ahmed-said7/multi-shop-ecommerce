@@ -7,7 +7,6 @@ export class CreateMerchantDto {
   @IsString()
   name: string;
   @IsNotEmpty()
-  @IsString()
   @IsEmail()
   email: string;
   @IsNotEmpty()

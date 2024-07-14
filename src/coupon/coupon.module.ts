@@ -31,6 +31,8 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CartModule } from 'src/cart/cart.module';
 
 @Module({
   imports: [
@@ -49,7 +51,8 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
-    ]),
+    ]),CartModule,
+    ApiModule
   ],
   controllers: [CouponController],
   providers: [CouponService],

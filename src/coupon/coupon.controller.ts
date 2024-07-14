@@ -21,6 +21,7 @@ import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
+import { QueryCouponDto } from './dto/query-coupon.dto';
 @Controller("coupon")
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
@@ -38,7 +39,7 @@ export class CouponController {
   @Post('/apply')
   @UseGuards(AuthenticationGuard)
   applyCoupon(
-    @Body("userId", ValidateObjectIdPipe) userId: string,
+    @AuthUser("_id") userId: string,
     @Body() applyCoupon: applyCoupon,
   ) {
     return this.couponService.applyCoupon(userId, applyCoupon);
@@ -49,30 +50,41 @@ export class CouponController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   findAll(
-    @Param("id", ValidateObjectIdPipe) id: Types.ObjectId,
-    @Query("page") page?: number,
+    @AuthUser("shopId" ) shopId: string,
+    @Query() query: QueryCouponDto,
   ) {
-    return this.couponService.findAll(new Types.ObjectId(id), page);
+    return this.couponService.findAll(query, shopId);
   }
 
   @Get("/one/:id")
-  findOne(@Param("id", ValidateObjectIdPipe) id: Types.ObjectId) {
-    return this.couponService.findOne(id);
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
+  findOne(
+    @Param("id", ValidateObjectIdPipe) id: string,
+    @AuthUser("shopId" ) shopId: string
+  ) {
+    return this.couponService.findOne(id,shopId);
   }
 
 
   @Patch(':id')
-  @UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
   update(
-    @Param("id", ValidateObjectIdPipe) id: Types.ObjectId,
+    @Param("id", ValidateObjectIdPipe) id: string,
     @Body() updateCouponDto: UpdateCouponDto,
+    @AuthUser("shopId" ) shopId: string
   ) {
-    return this.couponService.update(id, updateCouponDto);
+    return this.couponService.update(id,shopId, updateCouponDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthenticationGuard)
-  remove(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
-    return this.couponService.remove(id);
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(UserRole.MERCHANT)
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser("shopId" ) shopId: string
+  ) {
+    return this.couponService.remove(id,shopId);
   }
 }

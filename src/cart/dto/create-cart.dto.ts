@@ -23,9 +23,9 @@ export class CreateCartItemDto extends CreateCartDto {
   
   @IsOptional()
   @IsString()
-  sizes: string;
+  size: string;
   
   @IsNotEmpty()
   @IsString()
-  colors: string;
+  color: string;
 }

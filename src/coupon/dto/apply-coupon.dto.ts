@@ -1,18 +1,17 @@
 import { Types } from 'mongoose';
 
 import {
-  IsArray,
-  IsDateString,
   IsMongoId,
-  IsNumber,
+  IsNotEmpty,
   IsString,
 } from 'class-validator';
 
 export class applyCoupon {
+  @IsNotEmpty()
   @IsString({ message: 'text must be string' })
   text: string;
-
-  @IsString({ message: 'shop id must be string  ' })
+  
+  @IsNotEmpty()
   @IsMongoId({ message: 'should be valid id ' })
   shopId: string;
 }

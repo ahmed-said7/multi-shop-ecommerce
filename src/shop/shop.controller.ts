@@ -15,10 +15,7 @@ import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import mongoose from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
-import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
@@ -86,7 +83,7 @@ export class ShopController {
   @UseInterceptors(FileInterceptor('shop-logo'))
   @Roles(UserRole.MERCHANT)
   async update(
-    @MerchantUser() user: Merchant,
+    @AuthUser() user: IAuthUser,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -103,7 +100,7 @@ export class ShopController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.MERCHANT)
   remove(
-    @MerchantUser() user: Merchant,
+    @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string,
   ) {
     return this.shopService.remove(user.shopId, id);

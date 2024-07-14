@@ -1,18 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { OrderStatusTypes } from 'src/common/enums';
 
 // Define the document type for the shop schema
 export type OrderDocument = Order & Document;
 
-export enum OrderStatusTypes {
-  INPROGRESS = 'in progress',
-  DELIVERED = 'delivered',
-  CANCELED = 'canceled',
-}
+
 // Define the shop schema
 @Schema({
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
+
 export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: string;
@@ -23,7 +21,7 @@ export class Order {
         product: { type: Types.ObjectId, ref: 'Item' },
         quantity: Number,
         size: String,
-        colors: String,
+        color: String,
       },
     ],
     default: [],
@@ -33,17 +31,17 @@ export class Order {
       product: Types.ObjectId;
       quantity: number;
       size: string;
-      colors: string;
-    },
+      color: string;
+    }
   ];
 
-  @Prop({ required: true })
-  deliveryType: boolean;
+  @Prop({ type:Boolean,default:false })
+  delivered: boolean;
 
   @Prop({ required: true })
   priceTotal: number;
 
-  @Prop({ required: true, default: false })
+  @Prop({ type: Boolean, default: false })
   paid: boolean;
 
   @Prop({
@@ -61,16 +59,16 @@ export class Order {
       city: String,
       country: String,
       streetName: String,
-
       zipCode: Number,
+      mobile:String
     },
   })
   userAddress: {
     city: string;
     country?: string;
     streetName: string;
-
     zipCode: number;
+    mobile: string;
   };
 }
 

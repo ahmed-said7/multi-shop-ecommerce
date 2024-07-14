@@ -36,6 +36,7 @@ import { UploadModule } from 'src/upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -65,7 +66,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
         destination: './images/items',
       }),
     }),
-    AuthModule,
+    AuthModule,ApiModule,
     UploadModule,
   ],
   controllers: [ItemController],

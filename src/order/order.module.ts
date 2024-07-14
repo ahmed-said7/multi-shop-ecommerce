@@ -34,6 +34,7 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
     }),
     CouponModule,
     CartModule,
+    ApiModule
   ],
   controllers: [OrderController],
   providers: [OrderService],

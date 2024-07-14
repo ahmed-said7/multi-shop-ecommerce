@@ -48,6 +48,17 @@ export class ApiService< T , I extends IQuery > {
         };
         return this;
     };
+    private search( fields?:string[] ){
+        if( this.queryObj.keyword && fields?.length > 0 ) {
+            const value={ $regex: this.queryObj.keyword , $options: 'i'  }
+            const filter={ $or : [  ] };
+            fields.map((field)=>{
+                filter["$or"].push({ [ field ] : value });
+            });
+            this.query=this.query.find(filter);
+        };
+        return this;
+    };
     private async pagination(){
         this.paginationObj.numOfPages= (await (this.query.model.find({ ... this.query.getQuery() }))).length;
         this.paginationObj.currentPage=this.queryObj.page ? parseInt( this.queryObj.page ) : 1 ;
@@ -62,11 +73,11 @@ export class ApiService< T , I extends IQuery > {
         this.query=this.query.skip(this.paginationObj.skip).limit(this.paginationObj.limit);
         return this;
     };
-    getAllDocs( query:Query< T[] , T > , queryObj:I , obj={} )
+    getAllDocs( query:Query< T[] , T > , queryObj:I , fields?:string[]  )
         : Promise< { query : Query<T[],T> ; paginationObj:Pagination } > 
     {
         this.query = query;
         this.queryObj = queryObj;
-        return this.filter(obj).sort().select().pagination();
+        return this.filter().sort().select().search(fields).pagination();
     };
 };

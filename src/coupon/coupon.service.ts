@@ -1,37 +1,34 @@
 import { applyCoupon } from './dto/apply-coupon.dto';
 import {
   BadRequestException,
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
-
-import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Coupon } from './schemas/coupon.schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
-import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryCouponDto } from './dto/query-coupon.dto';
+import { Model, Types } from 'mongoose';
+import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class CouponService {
   constructor(
     @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<UserDocument>,
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
-    @InjectModel(Shop.name)
-    private readonly shopModel: mongoose.Model<ShopDocument>,
+    private apiService:ApiService<Coupon,QueryCouponDto>,
+    private cartService:CartService
   ) {}
 
   async create(createCouponDto: CreateCouponDto, shopId: string) {
-    try {
       const payload = {
         ...createCouponDto,
-        shopId: new Types.ObjectId(shopId),
+        shopId
       };
 
       const checkCoupon = await this.couponModel.findOne({
@@ -42,119 +39,73 @@ export class CouponService {
         throw new BadRequestException('this coupon already exists');
       }
 
-      const coupon = await new this.couponModel(payload).save();
-      return coupon;
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new InternalServerErrorException(error);
-    }
+      const coupon = await this.couponModel.create(payload);
+      return { coupon };
   }
 
-  async findAll(shopId: Types.ObjectId, page: number = 0) {
-    try {
-      const shop = await this.shopModel.findById(shopId);
-      if (!shop) {
-        throw new NotFoundException('this shop not found');
-      }
-      const coupons = await this.couponModel
-        .find({
-          shopId,
-        })
-        .limit(10)
-        .skip(10 * page);
-
-      return coupons;
-    } catch (error) {
-      throw error;
-    }
+  async findAll(query:QueryCouponDto,shopId:string) {
+    query.shopId=shopId;
+    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.couponModel.find(),query);
+    const coupons=await result;
+    if( coupons.length == 0  ){
+      throw new HttpException("coupon not found",400);
+    };
+    return { coupons , pagination : paginationObj };
   }
 
-  async findOne(id: Types.ObjectId) {
-    try {
-      const couponExist = await this.couponModel.findById(id);
-      if (!couponExist) {
+  async findOne(id: string,shopId: string) {
+      const coupon = await this.couponModel.findOne({_id:id,shopId});
+      if (!coupon) {
         throw new NotFoundException('this coupon not found');
       }
-      const coupon = await this.couponModel.findById(id);
-      return coupon;
-    } catch (error) {
-      throw error;
-    }
+      return {coupon};
   }
 
-  async update(id: Types.ObjectId, updateCouponDto: UpdateCouponDto) {
-    try {
-      const couponExist = await this.couponModel.findById(id);
-      if (!couponExist) {
+  async update(id: string, shopId:string,updateCouponDto: UpdateCouponDto) {
+    const coupon = await this.couponModel.findOneAndUpdate(
+      {_id:id,shopId},
+      updateCouponDto,
+      { new: true }
+    );
+    if (!coupon) {
+      throw new NotFoundException('this coupon not found');
+    }
+    return {coupon};
+  }
+
+  async remove(id: string,shopId:string) {
+      const coupon=await this.couponModel.findOneAndDelete({_id:id,shopId});
+      if (!coupon) {
         throw new NotFoundException('this coupon not found');
       }
-      const coupon = await this.couponModel.findByIdAndUpdate(
-        id,
-        updateCouponDto,
-        { new: true },
-      );
-
-      return coupon;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async remove(id: Types.ObjectId) {
-    try {
-      const couponExist = await this.couponModel.findById(id);
-      if (!couponExist) {
-        throw new NotFoundException('this coupon not found');
-      }
-      await this.couponModel.findByIdAndDelete(id);
-
-      return 'The coupon was deleted successfully';
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async calculateTotalPrice(userId: string, shopId: string): Promise<any> {
-    const items = await this.cartModel
-      .find({ userId, shopId })
-      .populate('itemId', 'name price images');
-
-    if (items.length < 1) {
-      throw new NotFoundException(`no item in cart`);
-    }
-
-    const totalPrice = items.reduce((total, item) => {
-      const itemPrice = (item.itemId as any).price;
-      return total + itemPrice * item.quantity;
-    }, 0);
-
-    return { items, totalPrice };
+      return {status:'The coupon was deleted successfully'};
   }
 
   async applyCoupon(userId: string, applyCoupon: applyCoupon): Promise<any> {
-    const totalPrice = await this.calculateTotalPrice(
+    const { totalPrice , items } = await this.cartService.getCart(
       userId,
       applyCoupon.shopId,
     );
-
+    if( items.length == 0 ){
+      throw new HttpException("No items available",400);
+    }
     const coupon = await this.couponModel.findOne({
       text: applyCoupon.text,
-      shopId: new Types.ObjectId(applyCoupon.shopId),
+      shopId: applyCoupon.shopId,
     });
     if (!coupon) throw new NotFoundException('Coupon not found');
-    if (coupon?.endDate < new Date())
+    if ( coupon?.endDate < new Date() )
       throw new BadRequestException('Coupon expired');
     if (coupon?.numOfTimes <= 0)
       throw new BadRequestException('Coupon usage limit reached');
-    if (!coupon.shopId.equals(applyCoupon.shopId))
+    if (! coupon.shopId.equals(applyCoupon.shopId) )
       throw new BadRequestException('Coupon not applicable to this shop');
 
     const discountAmount =
-      totalPrice.totalPrice * (coupon.discountPercentage / 100);
-    const finalPrice = totalPrice.totalPrice - discountAmount;
-
-    return { items: totalPrice.items, discountAmount, finalPrice };
+      totalPrice * (coupon.discountPercentage / 100);
+    const finalPrice = totalPrice - discountAmount;
+    coupon.numOfTimes -= 1;
+    await coupon.save();
+    return { items , discountAmount, finalPrice };
   }
 }
