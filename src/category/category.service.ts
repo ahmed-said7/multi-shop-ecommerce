@@ -36,10 +36,7 @@ export class CategoryService {
       payload.shopId,
       {
         $addToSet: { categories: category._id },
-      },
-      {
-        new: true,
-      },
+      }
     );
 
     return {category};
@@ -91,7 +88,12 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException('No Category is Found');
     }
-
+    await this.shopModel.findByIdAndUpdate(
+      shopId,
+      {
+        $addToSet: { categories: id },
+      }
+    );
     return {category};
   }
 }
