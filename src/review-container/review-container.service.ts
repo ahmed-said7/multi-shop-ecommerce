@@ -1,8 +1,9 @@
 import {
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,125 +15,84 @@ import {
   ReviewContainerDocument,
 } from './schemas/reviewContainer_schema';
 import { Review, ReviewDocument } from 'src/review/schemas/review_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryReviewContainerDto } from './dto/query-review.dto';
 
 @Injectable()
 export class ReviewContainerService {
   constructor(
     @InjectModel(ReviewContainer.name)
     private reviewContainerModel: Model<ReviewContainerDocument>,
-    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    private apiService: ApiService<ReviewContainerDocument,QueryReviewContainerDto>
+    ,@InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>
   ) {}
   async create(
-    createReviewContainerDto: CreateReviewContainerDto,
+    body: CreateReviewContainerDto,
     shopId: string,
   ) {
-    try {
-      const payload = {
-        ...createReviewContainerDto,
+      const reviewContainer = await this.reviewContainerModel.create(
+        { ... body, shopId }
+      )
+      await this.shopModel.findByIdAndUpdate(
         shopId,
-      };
-      const reviewContainer = await new this.reviewContainerModel(
-        payload,
-      ).save();
-
-      const shop = await this.shopModel.findById(shopId);
-
-      if (shop?.containers) {
-        shop.containers.push({
-          containerID: reviewContainer.id,
-          containerType: 'ReviewContainer',
-        });
-      } else {
-        shop.$set('containers', [
+        {
+          $addToSet:
           {
-            containerID: reviewContainer.id,
-            containerType: 'ReviewContainer',
-          },
-        ]);
-      }
-
-      await shop.save();
-
-      return reviewContainer;
-    } catch (err) {
-      console.log(err);
-      throw new InternalServerErrorException(err);
-    }
+            containers:{
+              containerID: reviewContainer.id,
+              containerType: 'ReviewContainer',
+            }
+          }
+        }
+      );
+      return {reviewContainer};
   }
 
-  async findAll(id: string) {
-    try {
-      return await this.reviewContainerModel.find({ shopId: id });
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
+  async findAll(query: QueryReviewContainerDto) {
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.reviewContainerModel.find(),query);
+    const reviewContainers=await result.populate("reviews");
+    if( reviewContainers.length == 0  ){
+      throw new HttpException("review containers not found",400);
+    };
+    return { reviewContainers , pagination : paginationObj };
+  };
 
   async findOne(id: string) {
-    try {
-      const reviewContainer = await this.reviewContainerModel.findById(id);
-      if (!reviewContainer) {
-        throw new NotFoundException('this review container not found');
+      const reviewContainer = await this.reviewContainerModel
+        .findById(id).populate("reviews");
+      if( ! reviewContainer ){
+        throw new HttpException("review container not found",400)
       }
-      return await this.reviewContainerModel.findById(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
-  }
+      return { reviewContainer };
+  };
 
-  async update(id: string, updatereviewContainerDto: UpdateReviewContainerDto) {
-    try {
-      const reviewContainer = await this.reviewContainerModel.findByIdAndUpdate(
-        id,
-        updatereviewContainerDto,
+  async update(id: string,shopId:string, body: UpdateReviewContainerDto) {
+      const reviewContainer = await this.reviewContainerModel.findOneAndUpdate(
+        {_id:id,shopId},
+        body,
         {
           new: true,
         },
       );
       if (!reviewContainer)
         throw new NotFoundException("This container doesn't exist");
-      return reviewContainer;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+      return {reviewContainer};
   }
 
-  async remove(id: string, shopId) {
-    try {
-      const reviewContainer = await this.reviewContainerModel.findById(id);
+  async remove( id: string , shopId:string ){ 
+      const reviewContainer = await this.reviewContainerModel
+        .findOneAndDelete({ _id : id , shopId });
       if (!reviewContainer) {
         throw new NotFoundException('this review container not found');
-      }
-      const shop = await this.shopModel.findById(shopId);
-
-      if (shop) {
-        for (let i = 0; i < shop.containers.length; i++) {
-          if (shop.containers[i].containerID.toString() === id) {
-            shop.containers.splice(i, 1);
-            break;
-          }
+      };
+      await this.shopModel.findByIdAndUpdate(shopId,{
+        $pull:{
+          containers : { containerID : id }
         }
-        await shop.save();
-      }
-      await this.reviewContainerModel.findByIdAndDelete(id);
-      return 'Review container deleted successfully';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(error);
-      }
-    }
+      });
+      return { reviewContainer };
   }
 }

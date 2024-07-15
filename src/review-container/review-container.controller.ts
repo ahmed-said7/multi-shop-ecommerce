@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ReviewContainerService } from './review-container.service';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
@@ -19,6 +20,7 @@ import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { IAuthUser } from 'src/common/enums';
+import { QueryReviewContainerDto } from './dto/query-review.dto';
 
 @Controller('review-container')
 export class ReviewContainerController {
@@ -34,8 +36,12 @@ export class ReviewContainerController {
   }
 
   @Get('/shop/:id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.reviewService.findAll(id);
+  findAll(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Query() query:QueryReviewContainerDto
+  ) {
+    query.shopId=id;
+    return this.reviewService.findAll(query);
   }
 
   @Get(':id')
@@ -49,9 +55,10 @@ export class ReviewContainerController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewContainerDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.reviewService.update(id, updateReviewDto);
-  }
+    return this.reviewService.update(id, user.shopId ,updateReviewDto);
+  };
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
@@ -61,5 +68,5 @@ export class ReviewContainerController {
     @AuthUser() user: IAuthUser,
   ) {
     return this.reviewService.remove(id, user.shopId);
-  }
-}
+  };
+};

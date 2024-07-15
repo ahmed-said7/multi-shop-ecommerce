@@ -1,7 +1,8 @@
-import { IsNotEmpty } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsArray, IsMongoId, IsNotEmpty } from 'class-validator';
 
 export class CreateReviewContainerDto {
   @IsNotEmpty({ message: 'review container must have a refrence review' })
+  @IsArray()
+  @IsMongoId({each:true})
   reviews: string[];
 }

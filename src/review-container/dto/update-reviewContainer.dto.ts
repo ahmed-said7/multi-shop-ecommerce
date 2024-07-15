@@ -1,10 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateReviewContainerDto } from './create-reviewContainer.dto';
-import { IsNotEmpty } from 'class-validator';
+import { IsArray, IsMongoId,  IsOptional } from 'class-validator';
 
 export class UpdateReviewContainerDto extends PartialType(
   CreateReviewContainerDto,
 ) {
-  @IsNotEmpty({ message: 'A review container must have a refrence review' })
+  @IsOptional()
+  @IsArray()
+  @IsMongoId({each:true})
   reviews: string[];
 }
