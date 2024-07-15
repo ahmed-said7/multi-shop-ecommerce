@@ -32,6 +32,7 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
+    ApiModule,
     JwtModule.register({
       secret: `${process.env.SECRET}`,
       signOptions: { expiresIn: '1h' },
