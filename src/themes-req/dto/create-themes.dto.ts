@@ -2,11 +2,11 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ThemeType } from '../schemas/theme.schema';
 
 export class CreateThemeDto {
-  @IsEnum(ThemeType)
   @IsNotEmpty()
+  @IsEnum(ThemeType)
   title: ThemeType;
-
-  @IsString()
+  
   @IsOptional()
+  @IsString()
   description?: string;
 }

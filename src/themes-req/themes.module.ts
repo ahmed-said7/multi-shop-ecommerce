@@ -27,6 +27,7 @@ import {
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
       { name: Category.name, schema: CategorySchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
+    ApiModule
   ],
   controllers: [ThemesController],
   providers: [ThemesService],

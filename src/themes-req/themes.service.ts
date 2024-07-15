@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
-
+import { HttpException, Injectable } from '@nestjs/common';
 import { Theme, ThemeDocument } from './schemas/theme.schema';
-
 import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryThemeDto } from './dto/query-themes.dto';
 
 @Injectable()
 export class ThemesService {
   constructor(
+    private apiService:ApiService<ThemeDocument,QueryThemeDto>,
     @InjectModel(Theme.name)
     private readonly themeModel: mongoose.Model<ThemeDocument>,
     @InjectModel(User.name)
@@ -19,31 +20,26 @@ export class ThemesService {
     title: string,
     description: string,
     userId: string,
-  ): Promise<ThemeDocument> {
-    const user = await this.userModel.findById(userId);
+  ) {
 
-    if (!user) {
-      throw new NotFoundException('There is no user with this id');
-    }
-
-    const createdTheme = new this.themeModel({
+    const createdTheme = await this.themeModel.create({
       title,
       description,
-      createdBy: user.email,
+      createdBy: userId,
     });
 
-    return await createdTheme.save();
+    return { createdTheme };
   }
 
   async getThemes(
-    page: number = 1,
-    limit: number = 10,
-  ): Promise<ThemeDocument[]> {
-    return await this.themeModel
-      .find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-      .exec();
+    query:QueryThemeDto
+  ) {
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.themeModel.find(),query);
+    const themes=await result;
+    if( themes.length == 0  ){
+      throw new HttpException("themes not found",400);
+    };
+    return { themes , pagination : paginationObj };
   }
 }
