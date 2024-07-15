@@ -1,13 +1,10 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsNotEmpty, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
 
 export class CreateShopDto {
   // Shop title, must not be empty, and should be a string
   @IsNotEmpty({ message: 'A shop must have a title' })
   @IsString({ message: 'A shop must have a string title' })
   title: string;
-
-  userID?: string;
 
   // Shop description, must not be empty, and should be a string
   @IsNotEmpty({ message: 'A shop must have a description' })
@@ -19,18 +16,20 @@ export class CreateShopDto {
     message: 'A shop description must be 150 chracters maximum',
   })
   description: string;
-
-  categories: string[];
-
-  customers: Types.ObjectId[];
-
-  containers: Types.ObjectId[];
-
+  
+  @IsOptional()
+  @IsString()
   twitter?: string;
-
+  
+  @IsOptional()
+  @IsString()
   facebook?: string;
-
+  
+  @IsOptional()
+  @IsString()
   instagram?: string;
-
+  
+  @IsOptional()
+  @IsString()
   whatsapp?: string;
 }

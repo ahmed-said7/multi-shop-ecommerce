@@ -3,7 +3,6 @@ import {
   HttpException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,33 +10,45 @@ import {
 import * as mongoose from 'mongoose';
 
 import { Shop, ShopDocument } from './schemas/shop_schema';
+
 import { InjectModel } from '@nestjs/mongoose';
+
 import { UpdateShopDto } from './dto/update-shop.dto';
+
 import { CreateShopDto } from './dto/create-shop.dto';
+
 import {
   ProductSlider,
   ProductSliderDocument,
 } from '../product-slider/schemas/productSlider_schema';
+
 import {
   PhotoSlider,
   PhotoSliderDocument,
 } from '../photo-slider/schemas/photo-slider_schema';
+
 import {
   Category,
   CategoryDocument,
 } from '../category/schemas/category_schema';
+
 import { Item, ItemDocument } from '../item/schemas/item-schema';
 import { User, UserDocument, UserRole } from '../user/schemas/user_schema';
+
 import {
   ReviewContainer,
   ReviewContainerDocument,
 } from '../review-container/schemas/reviewContainer_schema';
+
 import {
   VideoContainer,
   VideoContainerDocument,
 } from '../video-container/schemas/videoContainer-schema';
+
 import { Banner, BannerDocument } from '../banner/schemas/banner_schema';
-import { UploadService } from 'src/upload/upload.service';
+import { IAuthUser } from 'src/common/enums';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryShopDto } from './dto/query-shop.dto';
 
 @Injectable()
 export class ShopService {
@@ -60,136 +71,88 @@ export class ShopService {
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     @InjectModel(Banner.name)
     private readonly bannerModel: mongoose.Model<BannerDocument>,
-    private readonly uploadService: UploadService,
-  ) {}
-
-  private readonly logger = new Logger(ShopService.name);
-
-  async create(createShopDto: CreateShopDto, userId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      if (!user) throw new NotFoundException('There is no user with this id');
-      if (user.shopId) throw new BadRequestException('You already have a shop');
-
-      createShopDto.userID = user.id;
-
-      const shop = await this.shopModel.create(createShopDto);
-
-      await this.userModel.findByIdAndUpdate(user.id, {
-        role: UserRole.MERCHANT,
-        shop: shop.id,
+    private apiService:ApiService<ShopDocument,QueryShopDto>
+    // private readonly uploadService: UploadService,
+  ) {};
+  async create(body: CreateShopDto, user: IAuthUser) {
+      let shop;
+      if( user.shopId ){
+        shop=await this.shopModel.findById(user.shopId);
+      };
+      if( shop ){
+        throw new BadRequestException('You already have a shop');
+      }
+      shop = await this.shopModel.create({
+        ... body,userID:user._id
       });
-
-      return shop;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+      return {shop};
   }
 
-  async findAll(userId: string) {
-    const user = await this.userModel.findById(userId);
+  async findAll(query: QueryShopDto) {
+    const { paginationObj,query:result }=await this.apiService.
+      getAllDocs( this.shopModel.find(), query , ["title", "description"]);
+    const shops=await result;
+    return { shops, paginationObj };
+  };
 
-    if (user.role !== UserRole.ADMIN) {
-      throw new UnauthorizedException(
-        `The user ${userId} is not authrized to view all shops`,
-      );
-    }
-
-    try {
-      const shops = await this.shopModel.find();
-
-      const count = await this.shopModel.find().countDocuments();
-
-      return { count, shops };
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
-
-  async findOne(id: string): Promise<Shop> {
-    try {
-      const idValid = mongoose.isValidObjectId(id);
-      if (!idValid) throw new BadRequestException('Please enter correct Id');
-
-      const foundShop = await this.shopModel
-        .findById(id)
-        .populate('itemsIDs', 'name')
-        .populate({
-          path: 'customers',
-          model: 'User',
-          select: 'name email',
-        })
-        .populate({
-          path: 'categories',
-          model: 'Category',
-          select: 'name subCategory',
-        });
+  async findOne(id: string){
+    const foundShop = await this.shopModel
+      .findById(id)
+      .populate({path:'itemsIDs',select:'name'})
+      .populate({
+        path: 'customers',
+        model: 'User',
+        select: 'name email',
+      }).populate({
+        path: 'categories',
+        model: 'Category',
+        select: 'name',
+      });
       if (!foundShop)
         throw new NotFoundException('There is no shop with this id');
 
-      return foundShop;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return {foundShop};
   }
 
   async findUserShops(userId: string) {
-    try {
       const shops = await this.shopModel.find({
-        userID: userId,
+        userID: userId
       });
-
-      return shops;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
-  }
+      if(shops.length==0){
+        throw new NotFoundException("shops not found");
+      };
+      return {shops};
+  };
 
   async update(
     id: string,
     file: Express.Multer.File,
-    updateShopDto: UpdateShopDto,
+    body: UpdateShopDto,
   ) {
-    if (!id) {
-      throw new BadRequestException("Can't find shop");
-    }
-
-    try {
-      const url = await this.uploadService.uploadFile(file);
-
-      updateShopDto.logo = url;
-
-      const shop = await this.shopModel.findByIdAndUpdate(id, updateShopDto, {
+      // const url = await this.uploadService.uploadFile(file);
+      // updateShopDto.logo = url;
+      const shop = await this.shopModel.findByIdAndUpdate(id, body, {
         new: true,
       });
-
-      return shop;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+      if(!shop){
+        throw new HttpException("Shop not found",400);
+      }
+      return {shop};
   }
 
   async userJoin(shopId: mongoose.Types.ObjectId, userId: string) {
-    try {
       const user = await this.userModel.findById(userId);
 
       if (!user) throw new NotFoundException("This user doesn't exist");
 
       const shop = await this.shopModel.findByIdAndUpdate(shopId, {
-        $addToSet: { customers: user.id },
+        $addToSet: { customers: user._id },
       });
 
       if (!shop) throw new NotFoundException('There is no shop with this id');
 
-      return 'User added successfully!';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
-  }
+      return {status:'User added successfully!'};
+  };
 
   async addUser(
     shopId: mongoose.Types.ObjectId,
@@ -206,97 +169,46 @@ export class ShopService {
       throw new InternalServerErrorException(error);
     }
   }
-  async findShopItems(userId: string, id?: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      if (!user) {
-        throw new NotFoundException('There is no user with this id');
-      }
-
-      let shopId = new mongoose.Types.ObjectId(id);
-
-      if (!shopId && user.role == UserRole.MERCHANT) {
-        shopId = user.shopId;
-      }
-
+  async findShopItems( id: string) {
       const shop = await this.shopModel
-        .findById(shopId)
-        .populate('itemsIDs')
-        .exec();
-
+        .findById(id)
+        .populate('itemsIDs');
+      if( ! shop  ){
+        throw new HttpException("Shop not found",400);
+      };
       const items = shop.itemsIDs;
-      return items;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return {items};
   }
 
-  async remove(userId: string, shopId: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      if (!user) {
-        throw new NotFoundException('There is no user with this id');
-      }
-
+  async remove(user: IAuthUser , shopId: string) {
       const shop = await this.shopModel.findById(shopId);
-
       if (!shop) {
         throw new NotFoundException('Shop not found');
-      }
-
-      if (shop.userID != user.id && user.role !== UserRole.ADMIN) {
+      };
+      if ( 
+        shop.userID.toString() != user._id.toString() && 
+        user.role !== UserRole.ADMIN
+      ) {
         throw new UnauthorizedException(
           'You dont have the permission to delete this shop',
         );
-      }
-
-      await this.itemModel.deleteMany({ _id: { $in: shop.itemsIDs } });
-
-      await this.categoryModel.deleteMany({ _id: { $in: shop.categories } });
-
-      for (const container of shop.containers) {
-        switch (container.containerType) {
-          case 'ProductSlider':
-            await this.productSliderModel.findByIdAndDelete(
-              container.containerID,
-            );
-            break;
-          case 'PhotoSlider':
-            await this.photoSliderModel.findByIdAndDelete(
-              container.containerID,
-            );
-            break;
-          case 'ReviewContainer':
-            await this.reviewContainerModel.findByIdAndDelete(
-              container.containerID,
-            );
-            break;
-
-          case 'VideoContainer':
-            await this.videoContainerModel.findByIdAndDelete(
-              container.containerID,
-            );
-            break;
-          case 'Banner':
-            await this.bannerModel.findByIdAndDelete(container.containerID);
-            break;
-        }
-      }
-
+      };
+      const ids=shop.containers.map( ({containerID}) => containerID );
+      const promises=[
+        this.itemModel.deleteMany({ _id: { $in: shop.itemsIDs }  }),
+        this.categoryModel.deleteMany({ _id: { $in: shop.categories }  }),
+        this.productSliderModel.deleteMany({ _id : { $in : ids } , shopId }),
+        this.photoSliderModel.deleteMany({ _id : { $in : ids } , shopId }),
+        this.reviewContainerModel.deleteMany({ _id : { $in : ids } , shopId }),
+        this.videoContainerModel.deleteMany({ _id : { $in : ids } , shopId }),
+        this.bannerModel.deleteMany({ _id : { $in : ids } , shopId })
+      ];
+      await Promise.all(promises);
       await this.shopModel.findByIdAndDelete(user.shopId);
-
-      return 'Shop was deleted successfully';
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return {status:'Shop was deleted successfully'};
   }
 
-  async findShopContainers(id: string): Promise<any> {
-    try {
+  async findShopContainers(id: string) {
       const shop = await this.shopModel
         .findById(id)
         .populate({
@@ -313,16 +225,7 @@ export class ShopService {
               options: { strictPopulate: false },
             },
           ],
-        })
-        .exec();
-      if (!shop) {
-        throw new NotFoundException('shop not found');
-      }
-
+        });
       return { containers: shop.containers };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
   }
 }

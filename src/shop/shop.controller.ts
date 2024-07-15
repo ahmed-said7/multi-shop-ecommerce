@@ -8,7 +8,8 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
-  UploadedFile
+  UploadedFile,
+  Query
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
@@ -22,39 +23,41 @@ import { Roles } from 'src/common/decorator/roles';
 import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { IAuthUser } from 'src/common/enums';
+import { QueryShopDto } from './dto/query-shop.dto';
 
 @Controller('shop')
 export class ShopController {
   constructor(
     private readonly shopService: ShopService
-  ) {}
+  ) {};
   
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  @Roles(UserRole.MERCHANT)
   create(
-    @AuthUser('_id') userId: string,
+    @AuthUser() user: IAuthUser,
     @Body() createShopDto: CreateShopDto,
   ) {
-    return this.shopService.create(createShopDto, userId);
-  }
+    return this.shopService.create(createShopDto, user);
+  };
 
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
-  findAll(@AuthUser('_id') userId: string) {
-    return this.shopService.findAll(userId);
+  findAll(
+    @Query() query:QueryShopDto
+  ) {
+    return this.shopService.findAll(query);
   }
   
-  @Get('items')
+  @Get('items/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
   findShopItems(
-    @AuthUser('_id') userId: string,
-    @Param('id', ValidateObjectIdPipe) id?: string,
-  ) {
-    return this.shopService.findShopItems(userId, id);
-  }
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ){
+    return this.shopService.findShopItems(id);
+  };
 
   @Get('one/:id')
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
@@ -63,7 +66,7 @@ export class ShopController {
 
   @Patch('join/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(UserRole.USER)
   userJoin(
     @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
     @AuthUser() user: IAuthUser,
@@ -73,10 +76,10 @@ export class ShopController {
 
   @Get('user/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
-  findUserShops(@Param('id', ValidateObjectIdPipe) id: string) {
+  @Roles(UserRole.MERCHANT,UserRole.ADMIN,UserRole.USER)
+  findMerchantShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
-  }
+  };
 
   @Patch()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
@@ -87,13 +90,11 @@ export class ShopController {
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const shop = await this.shopService.update(
+    return  this.shopService.update(
       user.shopId,
       file,
-      updateShopDto,
+      updateShopDto
     );
-
-    return shop;
   }
 
   @Delete('/:id')
@@ -103,7 +104,7 @@ export class ShopController {
     @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string,
   ) {
-    return this.shopService.remove(user.shopId, id);
+    return this.shopService.remove(user, id);
   }
 
   @Get('containers/:id')
