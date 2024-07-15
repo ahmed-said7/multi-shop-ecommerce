@@ -7,10 +7,11 @@ import {
 } from '@nestjs/common';
 
 import type { Request } from 'express';
-import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
 import { Model } from 'mongoose';
+import { AllRoles } from '../enums';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
@@ -36,10 +37,10 @@ export class AuthenticationGuard implements CanActivate {
         };
         let user;
         switch(payload.role){
-            case UserRole.ADMIN || UserRole.USER:
+            case AllRoles.ADMIN || AllRoles.USER:
                 user=await this.userModel.findById(payload.userId);
                 break;
-            case UserRole.MERCHANT:
+            case AllRoles.MERCHANT:
                 user=await this.merchantModel.findById(payload.userId);
                 break;
         };

@@ -16,14 +16,12 @@ import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { Types } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from '../upload/upload.service';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { QueryBannerDto } from './dto/query-banner.dto';
 
 @Controller('banner')
@@ -34,7 +32,7 @@ export class BannerController {
 
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @UploadedFile() file: Express.Multer.File,
@@ -58,7 +56,7 @@ export class BannerController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard)
-  // @Roles(UserRole.MERCHANT,UserRole.ADMIN)
+  // @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
   findOne(
     @Param('id', ValidateObjectIdPipe) bannerId: string,
   ){
@@ -67,7 +65,7 @@ export class BannerController {
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @UploadedFile() file: Express.Multer.File,
@@ -83,7 +81,7 @@ export class BannerController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser

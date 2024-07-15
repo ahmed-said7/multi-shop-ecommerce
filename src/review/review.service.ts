@@ -7,7 +7,6 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Review, ReviewDocument } from './schemas/review_schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { QueryReviewDto } from './dto/query-review.dto';
 import { ApiService } from 'src/common/filter/api.service';
 import { IAuthUser } from 'src/common/enums';
@@ -33,7 +32,7 @@ export class ReviewService {
       .getAllDocs(this.reviewModel.find(),query);
     const reviews=await result
       .populate({ path: 'user', model: 'User', select: 'name' })
-      .populate({ path: 'item', model: 'Item', select: 'name images' });;
+      // .populate({ path: 'item', model: 'Item', select: 'name images' });
     if( reviews.length == 0  ){
       throw new HttpException("category not found",400);
     };
@@ -43,7 +42,8 @@ export class ReviewService {
   async findOne(id: string) {
       const review = await this.reviewModel
         .findById(id)
-        .populate({ path: 'user', model: 'User', select: 'name' });
+        .populate({ path: 'user', model: 'User', select: 'name' })
+        .populate({ path: 'item', model: 'Item', select: 'name images' });
       if(! review ){
         throw new HttpException("review not found",400);
       }

@@ -6,11 +6,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, OrderDocument } from './schemas/order_schema';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
 import { CouponService } from 'src/coupon/coupon.service';
-import { IAuthUser, OrderStatusTypes } from 'src/common/enums';
+import { AllRoles, IAuthUser, OrderStatusTypes } from 'src/common/enums';
 import { CartService } from 'src/cart/cart.service';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { QueryOrderDto } from './dto/order-query.dto';
@@ -76,23 +75,21 @@ export class OrderService {
 
   async findAllShopOrder( query:QueryOrderDto, user:IAuthUser ) {
     
-    if( user.role == UserRole.USER ){
+    if( user.role == AllRoles.USER ){
       query.userId=user._id;
     }
     
-    else if( user.role == UserRole.MERCHANT ){
+    else if( user.role == AllRoles.MERCHANT ){
       query.shopId=user.shopId;
     };
 
     let {query:result,paginationObj}=await this.apiService.getAllDocs(this.orderModel.find(),query);
     
-    result=result
+    result
       .populate({ path:"carItems.product",select:"name price images" });
-    
-    if( user.role != UserRole.USER ){
-      result=result.populate({ path:"userId",select:"name email"});
+    if( user.role != AllRoles.USER ){
+      result.populate({ path:"userId",select:"name email"});
     };
-    
     const orders=await result;
     
     if( orders.length == 0  ){
@@ -101,20 +98,21 @@ export class OrderService {
     
     return { orders , pagination : paginationObj };
   
-  }
+  };
 
   async findOne(id: string,user:IAuthUser) {
     let filter={}
-    if( user.role == UserRole.MERCHANT ){
+    if( user.role == AllRoles.MERCHANT ){
         filter={ shopId:user.shopId };
-    }else if( user.role == UserRole.USER ){
+    }else if( user.role == AllRoles.USER ){
         filter={ userId:user._id };
     };
-    let order= await this.orderModel.findOne({ _id:id , ... filter })
+    const query= this.orderModel.findOne({ _id:id , ... filter })
       .populate({ path:"carItems.product",select:"name price images" });
-    if( user.role != UserRole.USER && order ){
-      order.populate({ path:"userId",select:"name email"})
+    if( user.role != AllRoles.USER ){
+      query.populate({ path:"userId",select:"name email"})
     };
+    const order=await query;
     if(!order){
       throw new HttpException("Order not found",400);
     };

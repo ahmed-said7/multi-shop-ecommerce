@@ -24,16 +24,13 @@ export class CategoryService {
     private apiService:ApiService<UserDocument,QueryCategoryDto>
   ) {};
 
-  async create(shopId: string, createCategoryDto: CreateCategoryDto) {
-    const payload = {
-      ...createCategoryDto,
-      shopId
-    };
-
-    const category = await this.categoryModel.create(payload);
+  async create(shopId: string, body: CreateCategoryDto) {
+    const category = await this.categoryModel.create({
+      ... body , shopId
+    });
 
     await this.shopModel.findByIdAndUpdate(
-      payload.shopId,
+      category.shopId,
       {
         $addToSet: { categories: category._id },
       }
@@ -43,7 +40,8 @@ export class CategoryService {
   }
 
   async findAll(query:QueryCategoryDto) {
-    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.categoryModel.find(),query);
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.categoryModel.find(),query);
     const categories=await result;
     if( categories.length == 0  ){
       throw new HttpException("category not found",400);
@@ -51,12 +49,12 @@ export class CategoryService {
     return { categories , pagination : paginationObj };
   }
 
-  async findOne(id: string, shopId: string) {
-    const category = await this.categoryModel.findOne({ _id: id, shopId });
+  async findOne(id: string) {
+    const category = await this.categoryModel.findOne({ _id: id });
 
     if (!category) {
       throw new NotFoundException('No Category is Found');
-    }
+    };
 
     return {category};
   }
@@ -82,18 +80,21 @@ export class CategoryService {
   async remove(id: string, shopId: string) {
     const category = await this.categoryModel.findOneAndDelete({
       _id: id,
-      shopId,
+      shopId
     });
 
     if (!category) {
       throw new NotFoundException('No Category is Found');
-    }
+    };
+
     await this.shopModel.findByIdAndUpdate(
       shopId,
       {
-        $addToSet: { categories: id },
+        $pull: { categories: id },
       }
     );
+
     return {category};
-  }
+
+  };
 }

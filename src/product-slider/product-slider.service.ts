@@ -46,7 +46,7 @@ export class ProductSliderService {
 
   async findAll(query:QueryProductSliderDto) {
     const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.productSliderModel.find(),query,["title"]);
+      .getAllDocs(this.productSliderModel.find(),query);
     const productSliders=await result.populate({
       path: 'products',
       model: 'Item',

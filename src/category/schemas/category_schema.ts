@@ -12,8 +12,8 @@ export class Category {
   @Prop({ required: true }) // Ensure title is required and unique
   title: string;
 
-  // @Prop({ type: [String], default: [] }) // Set type to array of strings
-  // subCategory: string[];
+  @Prop({ type: String , required:true }) // Set type to array of strings
+  image: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;

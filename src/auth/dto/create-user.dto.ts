@@ -10,9 +10,8 @@ import {
   IsOptional,
 } from 'class-validator';
 
-import { UserRole } from '../../user/schemas/user_schema';
 import { Transform } from 'class-transformer';
-import { GENDER_STATUS } from 'src/common/enums';
+import { GENDER_STATUS, UserRole } from 'src/common/enums';
 
 export class CreateUserDto {
   // Shop title, must not be empty, and should be a string
@@ -28,7 +27,7 @@ export class CreateUserDto {
   password: string;
 
   // User Role, must not be empty and should be of the current options
-  @IsNotEmpty({ message: 'A user must have a role' })
+  @IsOptional({ message: 'A user must have a role' })
   @IsEnum(UserRole, { message: 'Invalid user role' })
   role: UserRole;
   

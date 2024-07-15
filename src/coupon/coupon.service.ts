@@ -26,11 +26,6 @@ export class CouponService {
   ) {}
 
   async create(createCouponDto: CreateCouponDto, shopId: string) {
-      const payload = {
-        ...createCouponDto,
-        shopId
-      };
-
       const checkCoupon = await this.couponModel.findOne({
         text: createCouponDto.text,
       });
@@ -39,7 +34,9 @@ export class CouponService {
         throw new BadRequestException('this coupon already exists');
       }
 
-      const coupon = await this.couponModel.create(payload);
+      const coupon = await this.couponModel.create({
+        ... createCouponDto , shopId
+      });
       return { coupon };
   }
 
@@ -84,11 +81,8 @@ export class CouponService {
   async applyCoupon(userId: string, applyCoupon: applyCoupon): Promise<any> {
     const { totalPrice , items } = await this.cartService.getCart(
       userId,
-      applyCoupon.shopId,
+      applyCoupon.shopId
     );
-    if( items.length == 0 ){
-      throw new HttpException("No items available",400);
-    }
     const coupon = await this.couponModel.findOne({
       text: applyCoupon.text,
       shopId: applyCoupon.shopId,
@@ -100,7 +94,6 @@ export class CouponService {
       throw new BadRequestException('Coupon usage limit reached');
     if (! coupon.shopId.equals(applyCoupon.shopId) )
       throw new BadRequestException('Coupon not applicable to this shop');
-
     const discountAmount =
       totalPrice * (coupon.discountPercentage / 100);
     const finalPrice = totalPrice - discountAmount;

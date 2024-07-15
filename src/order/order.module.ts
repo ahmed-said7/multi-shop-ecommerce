@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
-import { JwtModule } from '@nestjs/jwt';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import {
@@ -60,10 +59,6 @@ import { ApiModule } from 'src/common/filter/api.module';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
     CouponModule,
     CartModule,
     ApiModule

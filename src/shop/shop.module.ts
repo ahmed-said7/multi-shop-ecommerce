@@ -68,15 +68,6 @@ import { ApiModule } from 'src/common/filter/api.module';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './images/shop',
-      }),
-    }),
     AuthModule,
     ReviewContainerModule,
     ProductSliderModule,
@@ -90,7 +81,9 @@ import { ApiModule } from 'src/common/filter/api.module';
     ApiModule
   ],
   controllers: [ShopController],
-  providers: [ShopService],
-  exports: [MongooseModule, ShopService], // Export MongooseModule to make ShopModel available in other modules
+  providers: [ShopService,{provide:"field",useValue:"logo"}
+  ],
+  exports: [
+    MongooseModule, ShopService]
 })
 export class ShopModule {}

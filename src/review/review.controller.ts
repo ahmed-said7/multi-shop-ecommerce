@@ -16,9 +16,8 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { QueryReviewDto } from './dto/query-review.dto';
 
 
@@ -30,7 +29,7 @@ export class ReviewController {
 
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   create(
     @AuthUser() user:IAuthUser,
     @Body() body: CreateReviewDto
@@ -53,7 +52,7 @@ export class ReviewController {
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewDto,
@@ -64,7 +63,7 @@ export class ReviewController {
 
   @Delete(':id/:user')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   remove(
     @AuthUser() user:IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string

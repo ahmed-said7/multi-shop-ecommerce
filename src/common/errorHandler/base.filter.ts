@@ -56,7 +56,7 @@ export class catchExceptionsFilter extends BaseExceptionFilter {
       .join(" and ");
   }
   handleCastError(exception: Error.CastError, object: ServerError) {
-    object.message = `invalid mongoId value ${exception.value}`;
+    object.message = `invalid ${exception.path} value ${exception.value}`;
   }
   handleNestError(
     exception: { message: string[]; statusCode: number },

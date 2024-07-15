@@ -1,8 +1,7 @@
 import {
   BadRequestException,
   HttpException,
-  Injectable,
-  InternalServerErrorException,
+  Injectable
 } from '@nestjs/common';
 
 import { CreateAdminRequestDto } from './dto/create-admin-request.dto';
@@ -13,9 +12,9 @@ import {
   AdminRequest,
   AdminRequestDocument,
 } from './schemas/admin_request_schema';
-import { User, UserDocument, UserRole } from 'src/user/schemas/user_schema';
-import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { ApiService} from 'src/common/filter/api.service';
 import { QueryRequestDto } from './dto/query-request.dto';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 
 @Injectable()
 export class AdminRequestsService {
@@ -35,7 +34,7 @@ export class AdminRequestsService {
         this.adminRequestModel.find(),
         queryObj
       );
-      const data=await query;
+      const data=await query.populate("userId");
       if( data.length == 0 ){
         throw new HttpException("No documents found",400);
       };
@@ -59,12 +58,12 @@ export class AdminRequestsService {
     return {request};
   }
 
-  async remove(id: string, user: { _id: string; role:string } ) {
+  async remove(id: string, user: IAuthUser ) {
       const request = await this.adminRequestModel.findById(id);
       if (!request) throw new BadRequestException("This request doesn't exist");
-      if( user.role != UserRole.ADMIN || user._id.toString() != request.userId.toString())
+      if( user.role != AllRoles.ADMIN || user._id.toString() != request.userId.toString())
         throw new BadRequestException("You can't delete this request");
       await this.adminRequestModel.findByIdAndDelete(id);
       return {status:'Request deleted successfully'};
   };
-}
+};

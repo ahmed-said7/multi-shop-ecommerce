@@ -20,10 +20,10 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
 import { QueryShopDto } from './dto/query-shop.dto';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller('shop')
 export class ShopController {
@@ -33,7 +33,8 @@ export class ShopController {
   
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor('logo',optsImg),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   create(
     @AuthUser() user: IAuthUser,
     @Body() createShopDto: CreateShopDto,
@@ -43,7 +44,7 @@ export class ShopController {
 
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
   findAll(
     @Query() query:QueryShopDto
   ) {
@@ -52,7 +53,7 @@ export class ShopController {
   
   @Get('items/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
   findShopItems(
     @Param('id', ValidateObjectIdPipe) id: string,
   ){
@@ -66,7 +67,7 @@ export class ShopController {
 
   @Patch('join/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   userJoin(
     @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
     @AuthUser() user: IAuthUser,
@@ -76,15 +77,15 @@ export class ShopController {
 
   @Get('user/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT,UserRole.ADMIN,UserRole.USER)
+  @Roles(AllRoles.MERCHANT,AllRoles.ADMIN,AllRoles.USER)
   findMerchantShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
   };
 
   @Patch()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FileInterceptor('shop-logo'))
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor('logo',optsImg),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   async update(
     @AuthUser() user: IAuthUser,
     @Body() updateShopDto: UpdateShopDto,
@@ -99,7 +100,7 @@ export class ShopController {
 
   @Delete('/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
   remove(
     @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string,

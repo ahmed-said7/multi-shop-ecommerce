@@ -20,4 +20,4 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
   controllers: [AdminController, AdminStatisticsController],
   providers: [AdminService],
 })
-export class AdminModule {}
+export class AdminModule {};

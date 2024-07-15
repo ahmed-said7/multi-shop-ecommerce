@@ -21,8 +21,7 @@ export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {
   })
   title: string;
 
-//   @IsOptional()
-//   @IsArray({ message: 'A Category must have a string array subCategory' })
-//   @IsString({each: true})
-//   subCategory: string[];
+  @IsOptional()
+  @IsString()
+  image: string;
 }

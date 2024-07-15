@@ -2,7 +2,8 @@ import {
   IsNotEmpty,
   IsString,
   MinLength,
-  MaxLength
+  MaxLength,
+  IsOptional
 } from 'class-validator';
 
 export class CreateCategoryDto {
@@ -17,8 +18,7 @@ export class CreateCategoryDto {
   })
   title: string;
   
-//   @IsOptional()
-//   @IsArray({ message: 'A Category must have a string array subCategory' })
-//   @IsString({each: true})
-//   subCategory: string[];
+  @IsNotEmpty()
+  @IsString()
+  image: string;
 }

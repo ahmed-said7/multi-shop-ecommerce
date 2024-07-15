@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { CategoryService } from './category.service';
@@ -15,12 +16,13 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles,  IAuthUser, optsImg } from 'src/common/enums';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { QueryCategoryDto } from './dto/query-category.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller('category')
 export class CategoryController {
@@ -28,7 +30,8 @@ export class CategoryController {
 
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor("image",optsImg),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   create(
     @AuthUser() user: IAuthUser,
     @Body() createCategoryDto: CreateCategoryDto,
@@ -44,18 +47,16 @@ export class CategoryController {
   }
 
   @Get('/one/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
   findOne(
-    @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser,
+    @Param('id', ValidateObjectIdPipe) id: string
   ) {
-    return this.categoryService.findOne(id, user.shopId);
+    return this.categoryService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor("image",optsImg),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -67,7 +68,7 @@ export class CategoryController {
   
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser,

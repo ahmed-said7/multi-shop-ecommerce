@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cart } from './schemas/cart.schema';
-import { CreateCartItemDto } from './dto/create-cart.dto';
+import { IAuthUser } from 'src/common/enums';
+import { AddToCartDto } from './dto/add-to-cart.dto';
 
 
 @Injectable()
@@ -31,7 +32,7 @@ export class CartService {
       return { items , totalPrice };
   };
   // create cart and add or edit item in cart
-  async addToCart(userId: string, item: CreateCartItemDto) {
+  async addToCart(userId: string, item: AddToCartDto) {
     const cartItem = await this.cartModel.findOne({
       userId,
       color: item.color,
@@ -55,27 +56,21 @@ export class CartService {
   };
 
   // remove item from cart
-  async removeFromCart(cartItemId: string) {
-    const cart = await this.cartModel.findByIdAndDelete(cartItemId);
+  async removeFromCart(cartItemId: string,user:IAuthUser) {
+    const cart = await this.cartModel.findOneAndDelete({ _id:cartItemId , userId: user._id });
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
     return this.getCart( cart.userId.toString() , cart.shopId.toString()  );
-  }
+  };
 
   // update item quantity in global (not needed at now)
-  async updateItemQuantity( itemId: string , quantity: number ) {
-    const cart = await this.cartModel.findById(itemId);
-
+  async updateItemQuantity( itemId: string , quantity: number , user:IAuthUser ) {
+    const cart = await this.cartModel
+      .findOneAndUpdate({ _id:itemId , userId: user._id },{ quantity });;
     if (!cart) {
       throw new NotFoundException('Cart not found');
-    }
-
-    await this.cartModel.findByIdAndUpdate(
-      itemId,
-      { quantity },
-      { new: true },
-    );
+    };
     return this.getCart( cart.userId.toString() , cart.shopId.toString()  );
   }
 }

@@ -13,8 +13,8 @@ import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
+import { AllRoles } from 'src/common/enums';
 
 @Controller('admin')
 export class AdminController {
@@ -22,14 +22,14 @@ export class AdminController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.adminService.findOne(id);
   };
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateUserDto: UpdateUserDto
@@ -39,7 +39,7 @@ export class AdminController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN)
   remove(
     @Param('id', ValidateObjectIdPipe) deleteId: string
   ) {

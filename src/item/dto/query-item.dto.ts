@@ -3,9 +3,9 @@ import { FindQuery } from "src/common/enums";
 
 export class QueryItemDto extends FindQuery {
     @IsOptional()
-    price: number|object;
+    price: string|object;
     @IsOptional()
-    amount: number|object;
+    amount: string|object;
     @IsOptional()
     @IsMongoId()
     category: string;
@@ -13,5 +13,5 @@ export class QueryItemDto extends FindQuery {
     @IsMongoId()
     shopId: string;
     @IsOptional()
-    soldTimes?: number|object;
+    soldTimes?: string|object;
 };

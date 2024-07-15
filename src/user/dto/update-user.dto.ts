@@ -1,17 +1,14 @@
 import {
   IsOptional,
   IsString,
-  MinLength,
-  MaxLength,
   IsEnum,
   IsEmail,
   IsMobilePhone,
   IsDate
 } from 'class-validator';
 
-import { UserRole } from '../schemas/user_schema';
 import { Transform } from 'class-transformer';
-import { GENDER_STATUS } from 'src/common/enums';
+import { GENDER_STATUS, UserRole } from 'src/common/enums';
 
 export class UpdateUserDto {
   // Shop title, must not be empty, and should be a string

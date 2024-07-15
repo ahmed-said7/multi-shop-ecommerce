@@ -14,12 +14,11 @@ import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { QueryIntroPageDto } from './dto/query-intro-page.dto';
 
 @Controller('intro-page')
@@ -28,7 +27,7 @@ export class IntroPageController {
 
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
     @AuthUser() user: IAuthUser
@@ -50,7 +49,7 @@ export class IntroPageController {
   }
 
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   @Patch(':id')
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -61,7 +60,7 @@ export class IntroPageController {
   }
 
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   @Delete(':id')
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,

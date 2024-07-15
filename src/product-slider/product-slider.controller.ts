@@ -17,9 +17,8 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { User, UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { QueryProductSliderDto } from './dto/query-product-slider.dto';
 
 @Controller('product-slider')
@@ -28,7 +27,7 @@ export class ProductSliderController {
 
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
     @AuthUser() user: IAuthUser,
@@ -56,7 +55,7 @@ export class ProductSliderController {
   
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateProductSliderDto: UpdateProductSliderDto,
@@ -67,7 +66,7 @@ export class ProductSliderController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser

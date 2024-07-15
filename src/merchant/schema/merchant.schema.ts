@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
 import { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { AllRoles } from 'src/common/enums';
 
-import { UserRole } from '../../user/schemas/user_schema';
 
 export type MerchantDocument = HydratedDocument<Merchant>;
 
@@ -32,12 +32,12 @@ export class Merchant {
   gender: string;
 
   @Prop({
-    default: UserRole.MERCHANT,
-    enum: [UserRole.MERCHANT],
+    default: AllRoles.MERCHANT,
+    enum: [AllRoles.MERCHANT]
   })
   role: string;
 
-  @Prop({ unique: true, type: Types.ObjectId, ref: 'Shop' })
+  @Prop({  type: Types.ObjectId, ref: 'Shop' })
   shopId: string;
 }
 

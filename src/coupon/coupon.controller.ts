@@ -17,9 +17,8 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { applyCoupon } from './dto/apply-coupon.dto';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { Roles } from 'src/common/decorator/roles';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { QueryCouponDto } from './dto/query-coupon.dto';
 @Controller("coupon")
@@ -28,7 +27,7 @@ export class CouponController {
 
   @Post()
   @UseGuards(AuthenticationGuard, AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createCouponDto: CreateCouponDto,
     @AuthUser() user: IAuthUser,
@@ -37,7 +36,8 @@ export class CouponController {
   }
 
   @Post('/apply')
-  @UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(AllRoles.USER)
   applyCoupon(
     @AuthUser("_id") userId: string,
     @Body() applyCoupon: applyCoupon,
@@ -48,7 +48,7 @@ export class CouponController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   findAll(
     @AuthUser("shopId" ) shopId: string,
     @Query() query: QueryCouponDto,
@@ -58,7 +58,7 @@ export class CouponController {
 
   @Get("/one/:id")
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   findOne(
     @Param("id", ValidateObjectIdPipe) id: string,
     @AuthUser("shopId" ) shopId: string
@@ -69,7 +69,7 @@ export class CouponController {
 
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param("id", ValidateObjectIdPipe) id: string,
     @Body() updateCouponDto: UpdateCouponDto,
@@ -80,7 +80,7 @@ export class CouponController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser("shopId" ) shopId: string

@@ -25,8 +25,8 @@ export class ReportsService {
       let result: any;
       switch (report) {
         case 'monthlySales':
-          const reportYear = year
-          const reportMonth = month;
+          const reportYear = year || new Date().getFullYear();
+          const reportMonth = month || new Date().getMonth() + 1;
           result = await this.generateMonthlySalesReport(
             shopId.toString(),
             reportYear,
@@ -70,7 +70,9 @@ export class ReportsService {
         },
       },
     ]);
-
+    if( monthlySales.length == 0 ){
+      throw new NotFoundException("reports not found");
+    };
     const result=monthlySales.map(async ({_id,count})=>{
       const item= await this.itemModel.findById(_id);
       return { item , count }
@@ -95,6 +97,10 @@ export class ReportsService {
         },
       },
     ]);
+    
+    if( itemSales.length == 0 ){
+      throw new NotFoundException("reports not found");
+    };
 
     const result = itemSales.map(async ({_id,count})=>{
       const item= await this.itemModel.findById(_id);
@@ -130,6 +136,9 @@ export class ReportsService {
         $limit:1
       }
     ])
+    if( ratingsMap.length == 0 ){
+      throw new NotFoundException("reports not found");
+    };
     return ratingsMap[0];
   };
 
@@ -205,6 +214,9 @@ export class ReportsService {
         $limit:1
       }
     ]);
+    if( buyerWithMostOrders.length == 0 && daysWithMostOrders.length == 0 && hoursWithMostOrders.length == 0 ){
+      throw new NotFoundException("reports not found");
+    };
     return {
       buyerWithMostOrders:buyerWithMostOrders[0],
       daysWithMostOrders:daysWithMostOrders[0],

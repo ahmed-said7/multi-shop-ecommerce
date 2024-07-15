@@ -33,6 +33,7 @@ import {
 } from 'src/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -52,13 +53,9 @@ import { ApiModule } from 'src/common/filter/api.module';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
-    ApiModule
+    ApiModule,UploadModule
   ],
   controllers: [CategoryController],
-  providers: [CategoryService],
+  providers: [CategoryService,{provide:"field",useValue:"image"}],
 })
 export class CategoryModule {}

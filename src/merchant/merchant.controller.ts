@@ -16,9 +16,8 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { LoginMerchantDto } from './dto/loginMerchant.dt';
 
 @Controller('merchant')
@@ -37,28 +36,28 @@ export class MerchantController {
 
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN)
   findAll( @Query('page') page?: string ) {
     return this.merchantService.findAll(page);
   }
 
   @Get("logged")
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   findMe( @AuthUser() merchant : IAuthUser ) {
     return this.merchantService.findOne(merchant._id);
   };
 
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN,AllRoles.MERCHANT)
   findOne(@Param('id', ValidateObjectIdPipe) merchntId: string) {
     return this.merchantService.findOne(merchntId);
   };
 
   @Patch()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   update(
     @AuthUser() user :  IAuthUser,
     @Body() data: UpdateMerchantDto,
@@ -68,7 +67,7 @@ export class MerchantController {
 
   @Delete()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   delete(@AuthUser() user :  IAuthUser ) {
     return this.merchantService.delete(user._id);
   }

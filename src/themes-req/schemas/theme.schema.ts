@@ -1,10 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ThemeType } from 'src/common/enums';
 
-export enum ThemeType {
-  MOBILE = 'mobile',
-  WEB = 'web',
-}
 // Define the document type for the theme schema
 export type ThemeDocument = Theme & Document;
 

@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsDate, IsDateString, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { GENDER_STATUS } from 'src/common/enums';
 import { Transform } from 'class-transformer';
 
@@ -25,11 +25,11 @@ export class CreateMerchantDto {
   
 
   @IsOptional()
-  @Transform( ({ value }) => {
-    if( value ){
-      return new Date(value);
-    };
-  })
-  @IsDate()
+  // @Transform( ({ value }) => {
+  //   if( value ){
+  //     return new Date(value);
+  //   };
+  // })
+  @IsDateString()
   birthday: Date;
 }

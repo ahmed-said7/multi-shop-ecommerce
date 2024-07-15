@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ThemeType } from '../schemas/theme.schema';
+import { ThemeType } from 'src/common/enums';
+
 
 export class CreateThemeDto {
   @IsNotEmpty()

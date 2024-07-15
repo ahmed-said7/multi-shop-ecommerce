@@ -8,4 +8,7 @@ export class QueryRequestDto extends FindQuery {
     type:string;
     @IsOptional()
     status:string;
+    @IsOptional()
+    @IsMongoId()
+    adminId:string;
 };

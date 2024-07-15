@@ -13,8 +13,8 @@ import { UserService } from './user.service';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from './schemas/user_schema';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AllRoles } from 'src/common/enums';
 
 @Controller('user')
 export class UserController {
@@ -24,7 +24,7 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(AllRoles.ADMIN)
   findAll(@Param('page') page: string) {
     return this.userService.findAll(page);
   }
@@ -39,7 +39,7 @@ export class UserController {
   
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER,UserRole.ADMIN,UserRole.MERCHANT)
+  @Roles(AllRoles.USER,AllRoles.ADMIN,AllRoles.MERCHANT)
   findOneUser(@Param('id', ValidateObjectIdPipe) userId: string ) {
     return this.userService.findOne(userId);
   }
@@ -47,7 +47,7 @@ export class UserController {
   
   @Patch()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER,UserRole.ADMIN)
+  @Roles(AllRoles.USER,AllRoles.ADMIN)
   updateLoggedUser(@Body() updateUserDto: UpdateUserDto, @AuthUser('_id') userId: string ) {
     return this.userService.update(userId, updateUserDto);
   }
@@ -55,7 +55,7 @@ export class UserController {
   
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER,UserRole.ADMIN)
+  @Roles(AllRoles.USER,AllRoles.ADMIN)
   removeLoggedUser(
     @AuthUser('_id') userId: string
   ) {
@@ -65,7 +65,7 @@ export class UserController {
   
   @Patch('/fav/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   addFavorite(
     @Param('id', ValidateObjectIdPipe) itemId: string,
     @AuthUser('_id') userId: string
@@ -76,7 +76,7 @@ export class UserController {
 
   @Delete('/fav/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.USER)
+  @Roles(AllRoles.USER)
   removeFavorite(
     @Param('id', ValidateObjectIdPipe) itemId: string,
     @AuthUser('_id') userId: string

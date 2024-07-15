@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsDateString, IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString } from 'class-validator';
 import { GENDER_STATUS } from 'src/common/enums';
 
 export class UpdateMerchantDto  {
@@ -19,11 +19,6 @@ export class UpdateMerchantDto  {
     gender: GENDER_STATUS;
 
     @IsOptional()
-    @Transform( ({ value }) => {
-        if( value ){
-            return new Date(value);
-        };
-    })
-    @IsDate()
+    @IsDateString()
     birthday: Date;
 }

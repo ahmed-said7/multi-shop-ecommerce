@@ -15,7 +15,7 @@ export class Shop {
   @Prop({ type:String,default: 'default text' }) // Ensure description is required
   description: string;
 
-  @Prop({ required: false, type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   userID: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })

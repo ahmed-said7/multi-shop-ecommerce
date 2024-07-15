@@ -6,7 +6,7 @@ export class QueryCouponDto extends FindQuery {
     @IsMongoId()
     shopId: string;
     @IsOptional()
-    endDate: Date|object;
+    endDate: string|object;
     @IsOptional()
     numOfTimes: string|object;
     @IsOptional()

@@ -21,21 +21,20 @@ export class IntroPageService {
     private apiService:ApiService<IntroPageDocument,QueryIntroPageDto>
   ) {};
   async create(createIntroPageDto: CreateIntroPageDto, shopId: string) {
-      const payload = {
-        ...createIntroPageDto,
-        shopId
-      };
-      const introPage = await this.introPageModel.create(payload);
+      const introPage = await this.introPageModel.create({
+        ... createIntroPageDto , shopId
+      });
       await this.shopModel
           .findByIdAndUpdate(shopId,{$addToSet:{introPages:introPage._id}});
       return {introPage};
   };
 
   async findAll(query:QueryIntroPageDto) {
-    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.introPageModel.find(),query);
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.introPageModel.find(),query);
     const IntroPages=await result;
     if( IntroPages.length == 0  ){
-      throw new HttpException("coupon not found",400);
+      throw new HttpException("intro pages not found",400);
     };
     return { IntroPages , pagination : paginationObj };
   }
@@ -66,7 +65,7 @@ export class IntroPageService {
         throw new NotFoundException('this page not found');
       }
       await this.shopModel
-          .findByIdAndUpdate(shopId,{$pull:{introPages:introPage.id}});
+          .findByIdAndUpdate(shopId,{$pull:{introPages:id}});
       return { status : 'Intro page has been deleted successfully' };
   }
 }

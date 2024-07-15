@@ -53,10 +53,6 @@ import { ApiModule } from 'src/common/filter/api.module';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: process.env.SECRET,
-      signOptions: { expiresIn: '1h' },
-    }),
     UserModule,ApiModule
   ],
   controllers: [ProductSliderController],

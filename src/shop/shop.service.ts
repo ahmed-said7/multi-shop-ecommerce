@@ -33,8 +33,7 @@ import {
 } from '../category/schemas/category_schema';
 
 import { Item, ItemDocument } from '../item/schemas/item-schema';
-import { User, UserDocument, UserRole } from '../user/schemas/user_schema';
-
+import { User, UserDocument } from '../user/schemas/user_schema';
 import {
   ReviewContainer,
   ReviewContainerDocument,
@@ -46,9 +45,10 @@ import {
 } from '../video-container/schemas/videoContainer-schema';
 
 import { Banner, BannerDocument } from '../banner/schemas/banner_schema';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryShopDto } from './dto/query-shop.dto';
+import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
 
 @Injectable()
 export class ShopService {
@@ -71,7 +71,9 @@ export class ShopService {
     private readonly videoContainerModel: mongoose.Model<VideoContainerDocument>,
     @InjectModel(Banner.name)
     private readonly bannerModel: mongoose.Model<BannerDocument>,
-    private apiService:ApiService<ShopDocument,QueryShopDto>
+    private apiService:ApiService<ShopDocument,QueryShopDto>,
+    @InjectModel(Merchant.name)
+    private readonly merchantModel: mongoose.Model<MerchantDocument>
     // private readonly uploadService: UploadService,
   ) {};
   async create(body: CreateShopDto, user: IAuthUser) {
@@ -129,8 +131,6 @@ export class ShopService {
     file: Express.Multer.File,
     body: UpdateShopDto,
   ) {
-      // const url = await this.uploadService.uploadFile(file);
-      // updateShopDto.logo = url;
       const shop = await this.shopModel.findByIdAndUpdate(id, body, {
         new: true,
       });
@@ -158,16 +158,11 @@ export class ShopService {
     shopId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
   ) {
-    try {
       const shop = await this.shopModel.findByIdAndUpdate(shopId, {
-        $push: { customers: userId },
+        $addToSet: { customers: userId },
       });
-
       if (!shop) throw new NotFoundException('There is no shop with this id');
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
-    }
+      return {status:'User added successfully!'};
   }
   async findShopItems( id: string) {
       const shop = await this.shopModel
@@ -187,7 +182,7 @@ export class ShopService {
       };
       if ( 
         shop.userID.toString() != user._id.toString() && 
-        user.role !== UserRole.ADMIN
+        user.role !== AllRoles.ADMIN
       ) {
         throw new UnauthorizedException(
           'You dont have the permission to delete this shop',
@@ -205,6 +200,7 @@ export class ShopService {
       ];
       await Promise.all(promises);
       await this.shopModel.findByIdAndDelete(user.shopId);
+      await this.merchantModel.findByIdAndUpdate(shop.userID,{shopId:null});
       return {status:'Shop was deleted successfully'};
   }
 

@@ -31,7 +31,8 @@ export class ItemService {
   async findAll(
     query:QueryItemDto
   ) {
-    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.itemModel.find(),query,["name","description"]);
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.itemModel.find(),query,["name","description"]);
     const items=await result;
     if( items.length == 0  ){
       throw new HttpException("coupon not found",400);

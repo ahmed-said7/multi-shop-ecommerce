@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { reportTypes } from 'src/common/enums';
 
 export class CreateReportDto {
   @IsNotEmpty()
-  @IsString()
-  report: string;
+  @IsEnum(reportTypes)
+  report: reportTypes;
   @IsOptional()
   @IsNumber()
   year?: number;

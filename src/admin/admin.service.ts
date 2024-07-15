@@ -101,7 +101,7 @@ export class AdminService {
     
     if( result.length == 0 ){
       throw new HttpException("data not found",400)
-    }
+    };
     // Prepare the result array with counts for the last 12 months
     const mappedData = result.map(({ _id: { month, year }, count }) => ({
       month: `${year}-${month < 10 ? '0' + month : month}`,

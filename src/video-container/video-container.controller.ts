@@ -7,7 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
-  Query
+  Query,
+  UseInterceptors
 } from '@nestjs/common';
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
@@ -16,11 +17,12 @@ import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser, optsVideo } from 'src/common/enums';
 import { Roles } from 'src/common/decorator/roles';
 import { QueryVideoContainerDto } from './dto/query-video-container.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller("video-container")
 export class VideoContainerController {
@@ -28,7 +30,8 @@ export class VideoContainerController {
 
   @Post()
   @UseGuards(AuthenticationGuard, AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor("link",optsVideo),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   create(
     @AuthUser() user: IAuthUser,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
@@ -51,7 +54,7 @@ export class VideoContainerController {
   
   @Get('/one/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.findOne(id);
   }
@@ -59,7 +62,8 @@ export class VideoContainerController {
   
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @UseInterceptors(FileInterceptor("link",optsVideo),UploadSingleFileInterceptor)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param("id", ValidateObjectIdPipe) id: string,
     @Body() updateVideoContainerDto: UpdateVideoContainerDto,
@@ -71,7 +75,7 @@ export class VideoContainerController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser

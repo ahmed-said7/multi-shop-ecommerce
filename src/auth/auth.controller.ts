@@ -1,14 +1,12 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserService } from 'src/user/user.service';
 import { LoginUserDto } from './dto/login.dto';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { jwtTokenService } from 'src/jwt/jwt.service';
 
 
@@ -31,7 +29,7 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.ADMIN,UserRole.USER,UserRole.MERCHANT)
+  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
   async refreshToken(@AuthUser() user:IAuthUser ) {
     return this.jwt.createTokens({
       userId: user._id,

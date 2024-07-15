@@ -16,18 +16,17 @@ import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
-import { UserRole } from 'src/user/schemas/user_schema';
-import { Roles } from 'src/common/decorator/roles';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 import { QueryReviewContainerDto } from './dto/query-review.dto';
+import { Roles } from 'src/common/decorator/roles';
 
 @Controller('review-container')
 export class ReviewContainerController {
   constructor(private readonly reviewService: ReviewContainerService) {}
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createReviewDto: CreateReviewContainerDto,
     @AuthUser() user: IAuthUser,
@@ -51,7 +50,7 @@ export class ReviewContainerController {
   
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewContainerDto,
@@ -62,7 +61,7 @@ export class ReviewContainerController {
 
   @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(UserRole.MERCHANT)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser,

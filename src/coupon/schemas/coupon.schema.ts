@@ -5,19 +5,17 @@ import { Types } from 'mongoose';
 @Schema({
   timestamps: true,
 })
-
 export class Coupon {
   @Prop({ required: true, unique: true, minlength: 3, maxlength: 50 })
   text: string;
 
   @Prop({
-    required: true,
-    default: DateTime.now().plus({ days: 10 }).toJSDate(),
+    type:Date,
+    default: DateTime.now().plus({ days: 10 }).toJSDate()
   })
   endDate: Date;
 
   @Prop({
-    required: true,
     default: 1,
     min: 1,
   })
@@ -32,6 +30,6 @@ export class Coupon {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;
-}
+};
 
 export const CouponSchema = SchemaFactory.createForClass(Coupon);

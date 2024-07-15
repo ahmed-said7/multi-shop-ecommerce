@@ -14,13 +14,8 @@ import { Merchant, MerchantDocument } from './schema/merchant.schema';
 
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
-import { UserRole } from 'src/user/schemas/user_schema';
 import { jwtTokenService } from 'src/jwt/jwt.service';
-
-export type MerchantPayload = {
-  userId: string;
-  role: UserRole.MERCHANT;
-};
+import { AllRoles } from 'src/common/enums';
 
 @Injectable()
 export class MerchantService {
@@ -76,7 +71,7 @@ export class MerchantService {
 
     const { accessToken , refreshToken } = await this.jwt.createTokens({
       userId: merchant._id.toString(),
-      role: UserRole.MERCHANT 
+      role: AllRoles.MERCHANT 
     });
 
     return { accessToken ,  refreshToken };

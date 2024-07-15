@@ -1,5 +1,5 @@
 import {  Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -49,20 +49,25 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     jwtTokenModule
     ,
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './images/',
-        filename(_req, file, callback) {
-          const nowDate = DateTime.now().toISODate();
+    // MulterModule.register({
+    //   storage: diskStorage({
+    //     destination: './images/',
+    //     filename(_req, file, callback) {
+    // }),      const nowDate = DateTime.now().toISODate();
 
-          const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
+    //       const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
 
-          callback(null, name);
-        },
-      }),
-    }),
+    //       callback(null, name);
+    //     },
+    //   }),
+    
     EventEmitterModule.forRoot({global:true}),
-    MongooseModule.forRoot(process.env.DB_URI),
+    MongooseModule.forRootAsync({
+      useFactory( config:ConfigService ){
+        return { uri : config.get("DB_URI") }
+      },
+      inject:[ConfigService]
+    }),
     UserModule,
     AuthModule,
     ShopModule,

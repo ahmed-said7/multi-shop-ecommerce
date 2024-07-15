@@ -36,13 +36,7 @@ export class PhotoSliderService {
       }
     );
     return { photoSlider };
-  }
-
-  // async uploadFilesToView(images: Express.Multer.File[]) {
-  //   const links = await this.uploadFileService.uploadFiles(images);
-
-  //   return links;
-  // }
+  };
 
   async findAll(query:QueryPhotoSliderDto) {
     const {query:result,paginationObj}=await this.apiService
@@ -52,7 +46,7 @@ export class PhotoSliderService {
       throw new HttpException("photo sliders not found",400);
     };
     return { photoSliders , pagination : paginationObj };
-  }
+  };
 
   async findOne(id: string){
     const photoSlider= this.photoSliderModel.findById(id);
@@ -72,7 +66,7 @@ export class PhotoSliderService {
     if (!photoSlider)
       throw new InternalServerErrorException("this slider doesn't exist");
     return {photoSlider};
-  }
+  };
 
   async remove(id: string,shopId:string){
     const photoSlider = await this.photoSliderModel.findOneAndDelete({
@@ -82,7 +76,6 @@ export class PhotoSliderService {
       throw new InternalServerErrorException("this slider doesn't exist");
     await this.shopModel
       .findByIdAndUpdate(shopId,{$pull:{containers:{containerID:id }}});
-    await this.photoSliderModel.findByIdAndDelete(id);
     return {status:'Prouct Slider has been deleted successfully!'};
   }
-}
+;}
