@@ -23,8 +23,7 @@ export class VideoContainerService {
     private apiService: ApiService<VideoContainerDocument,QueryVideoContainerDto>,
     @InjectModel(VideoContainer.name)
     private videoContainerModel: Model<VideoContainerDocument>,
-    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    @InjectModel(User.name) private userModel: Model<UserDocument>
+    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>
   ) {};
 
   async create(
@@ -38,7 +37,7 @@ export class VideoContainerService {
     await this.shopModel.findByIdAndUpdate(shopId,{
       $addToSet : {
         containers : {
-          containerID: videoContainer.id,
+          containerID: videoContainer._id,
           containerType: 'VideoContainer'
         }
       }
