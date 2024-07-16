@@ -12,19 +12,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryItemDto } from './dto/query-item.dto';
+import { Category, CategoryDocument } from 'src/category/schemas/category_schema';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    @InjectModel(Category.name) private catModel: Model<CategoryDocument>,
     private apiService:ApiService<ItemDocument,QueryItemDto>
   ) {};
 
   async create(createItemDto: CreateItemDto, shopId: string) {
-      const item = await this.itemModel.create({ ... createItemDto , shopId });
-      await this.shopModel.findByIdAndUpdate(item.shopId,{$addToSet:{itemsIDs:item._id}});
-      return {item};
+    await this.validateCategory(createItemDto.category);
+    const item = await this.itemModel.create({ ... createItemDto , shopId });
+    await this.shopModel.findByIdAndUpdate(item.shopId,{$addToSet:{itemsIDs:item._id}});
+    return {item};
   }
 
   async findAll(
@@ -46,16 +49,23 @@ export class ItemService {
   }
 
   async update(id: string, shopId:string,updateItemDto: UpdateItemDto) {
-      const item = await this.itemModel.findOneAndUpdate({_id:id,shopId}, updateItemDto, {
-        new: true,
-      });
-      if (!item) throw new NotFoundException('Item not found!');
-      return { item };
+    if(updateItemDto.category){
+      await this.validateCategory(updateItemDto.category);
+    }
+    const item = await this.itemModel.findOneAndUpdate({_id:id,shopId}, updateItemDto, {
+      new: true,
+    });
+    if (!item) throw new NotFoundException('Item not found!');
+    return { item };
   }
 
   async remove( id: string , shopId: string ) {
     const item = await this.itemModel.findOneAndDelete({_id:id,shopId});
     if (!item) throw new NotFoundException('Item not found!');
     return { item };
-  }
+  };
+  private async validateCategory(id:string){
+    const category = await this.catModel.findById(id);
+    if (!category) throw new NotFoundException('id not found');
+  };
 }

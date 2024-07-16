@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateIntroPageDto } from './create-intro-page.dto';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {  IsOptional, IsString } from 'class-validator';
 
 export class UpdateIntroPageDto extends PartialType(CreateIntroPageDto) {
   @IsOptional()

@@ -16,4 +16,4 @@ export class AddToCartDto {
   @IsNotEmpty()
   @IsString()
   color: string;
-}
+};
