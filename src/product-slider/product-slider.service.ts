@@ -14,6 +14,7 @@ import {
 } from './schemas/productSlider_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryProductSliderDto } from './dto/query-product-slider.dto';
+import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 
 @Injectable()
 export class ProductSliderService {
@@ -21,15 +22,13 @@ export class ProductSliderService {
     @InjectModel(ProductSlider.name)
     private productSliderModel: Model<ProductSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private apiService: ApiService<ProductSliderDocument,QueryProductSliderDto>
+    private apiService: ApiService<ProductSliderDocument,QueryProductSliderDto>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>
   ) {};
 
   async create(body: CreateProductSliderDto, shopId: string) {
-      const payload = {
-        ... body ,
-        shopId
-      };
-      const productSlider = await this.productSliderModel.create(payload);
+      await this.validateProducts( body.products );
+      const productSlider = await this.productSliderModel.create({ ... body , shopId});
       await this.shopModel.findByIdAndUpdate(
         shopId,
         {
@@ -72,6 +71,9 @@ export class ProductSliderService {
   }
 
   async update( id: string , shopId:string , body: UpdateProductSliderDto ){
+    if( body.products ){
+      await this.validateProducts( body.products );
+    }
       const productSlider = await this.productSliderModel.findOneAndUpdate(
         { _id:id,shopId },
         body,
@@ -83,6 +85,12 @@ export class ProductSliderService {
         throw new NotFoundException('this product slider not found');
       }
       return {productSlider};
+  };
+  private async validateProducts(ids:string[]){
+    const products = await this.itemModel.find({ _id : { $in : ids } });
+    if( products.length != ids.length ){
+      throw new HttpException("Product ids not valid",400);
+    };
   };
 
   async remove(id: string, shopId: string) {
