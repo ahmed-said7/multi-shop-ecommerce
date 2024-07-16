@@ -17,7 +17,7 @@ export class CreateAdminRequestDto {
   @IsNotEmpty()
   @IsString()
   info: string;
-  @IsOptional()
-  @IsString()
+  // @IsOptional()
+  // @IsString()
   userId: string;
 }

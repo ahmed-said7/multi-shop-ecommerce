@@ -4,8 +4,8 @@ import { IsOptional, IsString } from 'class-validator';
 import { Prop } from '@nestjs/mongoose';
 
 export class UpdateAdminRequestDto extends PartialType(CreateAdminRequestDto) {
-  @IsOptional()
-  @IsString()
+  // @IsOptional()
+  // @IsString()
   adminId?: string;
   @IsOptional()
   @IsString()

@@ -39,10 +39,10 @@ export class AdminService {
     return { status : 'User Deleted Successfully'};
   };
 
+
   async getUsersPerMonth() {
     const now = new Date();
-
-    const twelveMonthsAgo = new Date( now.getFullYear(), now.getMonth() - 11, 1 );
+    const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
     const result = await this.userModel.aggregate([
       {
@@ -62,20 +62,41 @@ export class AdminService {
       {
         $sort: { '_id.year': 1, '_id.month': 1 },
       },
+      {
+        $addFields: {
+          month: {
+            $dateToString: {
+              format: '%Y-%m',
+              date: {
+                $dateFromParts: {
+                  year: '$_id.year',
+                  month: '$_id.month',
+                  day: 1,
+                },
+              },
+            },
+          },
+          count: '$count',
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          month: 1,
+          count: 1,
+        },
+      },
     ]);
-    if( result.length == 0 ){
-      throw new HttpException("data not found",400)
-    };
-    // Prepare the result array with counts for the last 12 months
-    const mappedData = result.map(({ _id: { month, year } ,  count }) => (
-      { month : `${year}-${ month < 10 ? '0' + month : month } `, count }
-    ));
 
-    return { data : mappedData };
+  if (result.length === 0) {
+    throw new HttpException('Data not found', 400);
   };
 
-  async getShopsPerMonth() {
+  return { data: result };
 
+};
+
+  async getShopsPerMonth() {
     const now = new Date();
     const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
@@ -97,17 +118,36 @@ export class AdminService {
       {
         $sort: { '_id.year': 1, '_id.month': 1 },
       },
+      {
+        $addFields: {
+          month: {
+            $dateToString: {
+              format: '%Y-%m',
+              date: {
+                $dateFromParts: {
+                  year: '$_id.year',
+                  month: '$_id.month',
+                  day: 1,
+                },
+              },
+            },
+          },
+          count: '$count',
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          month: 1,
+          count: 1
+        },
+      },
     ]);
-    
-    if( result.length == 0 ){
-      throw new HttpException("data not found",400)
-    };
-    // Prepare the result array with counts for the last 12 months
-    const mappedData = result.map(({ _id: { month, year }, count }) => ({
-      month: `${year}-${month < 10 ? '0' + month : month}`,
-      count,
-    }));
 
-    return { data : mappedData };
-  };
+    if (result.length === 0) {
+      throw new HttpException('Data not found', 400);
+    }
+
+    return { data: result };
+  }
 };

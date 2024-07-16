@@ -42,7 +42,7 @@ export class AdminRequestsService {
   }
 
   async findOne(id: string) {
-      const request = await this.adminRequestModel.findById(id);
+      const request = await this.adminRequestModel.findById(id).populate("userId");
       if( !request ){
         throw new HttpException("request not found",400);
       }
@@ -61,7 +61,7 @@ export class AdminRequestsService {
   async remove(id: string, user: IAuthUser ) {
       const request = await this.adminRequestModel.findById(id);
       if (!request) throw new BadRequestException("This request doesn't exist");
-      if( user.role != AllRoles.ADMIN || user._id.toString() != request.userId.toString())
+      if( user.role != AllRoles.ADMIN && user._id.toString() != request.userId.toString())
         throw new BadRequestException("You can't delete this request");
       await this.adminRequestModel.findByIdAndDelete(id);
       return {status:'Request deleted successfully'};
