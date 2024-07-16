@@ -8,7 +8,6 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { UserModule } from 'src/user/user.module'; // Import UserModule
-import { JwtModule } from '@nestjs/jwt';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';

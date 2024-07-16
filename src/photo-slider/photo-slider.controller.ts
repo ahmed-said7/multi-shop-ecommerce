@@ -44,7 +44,7 @@ export class PhotoSliderController {
   @Post('preview')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FilesInterceptor('images',10,optsImg))
+  @UseInterceptors(FilesInterceptor('images',50,optsImg))
   uploadPreviewImages( @UploadedFiles() files: Express.Multer.File[] ) {
     return this.uploadService.uploadFiles(files);
   };
