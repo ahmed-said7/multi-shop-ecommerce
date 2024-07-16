@@ -12,7 +12,6 @@ import {
   VideoContainer,
   VideoContainerDocument,
 } from './schemas/videoContainer-schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Types } from 'mongoose';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryVideoContainerDto } from './dto/query-video-container.dto';

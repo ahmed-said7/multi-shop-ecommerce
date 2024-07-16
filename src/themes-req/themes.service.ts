@@ -11,9 +11,7 @@ export class ThemesService {
   constructor(
     private apiService:ApiService<ThemeDocument,QueryThemeDto>,
     @InjectModel(Theme.name)
-    private readonly themeModel: mongoose.Model<ThemeDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<UserDocument>,
+    private readonly themeModel: mongoose.Model<ThemeDocument>
   ) {}
 
   async createTheme(
