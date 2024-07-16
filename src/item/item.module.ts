@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Item, ItemSchema } from './schemas/item-schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';
@@ -33,8 +32,6 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 

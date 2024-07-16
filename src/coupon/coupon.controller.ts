@@ -14,7 +14,6 @@ import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
-import { applyCoupon } from './dto/apply-coupon.dto';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
@@ -33,17 +32,17 @@ export class CouponController {
     @AuthUser() user: IAuthUser,
   ) {
     return this.couponService.create(createCouponDto, user.shopId);
-  }
+  };
 
-  @Post('/apply')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.USER)
-  applyCoupon(
-    @AuthUser("_id") userId: string,
-    @Body() applyCoupon: applyCoupon,
-  ) {
-    return this.couponService.applyCoupon(userId, applyCoupon);
-  }
+  // @Post('/apply')
+  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  // @Roles(AllRoles.USER)
+  // applyCoupon(
+  //   @AuthUser("_id") userId: string,
+  //   @Body() applyCoupon: applyCoupon,
+  // ) {
+  //   return this.couponService.applyCoupon(userId, applyCoupon);
+  // }
 
 
   @Get(':id')

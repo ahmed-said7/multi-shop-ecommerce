@@ -16,6 +16,7 @@ import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
 import { jwtTokenService } from 'src/jwt/jwt.service';
 import { AllRoles } from 'src/common/enums';
+import { QueryMerchantDto } from './dto/query-merchant.dto';
 
 @Injectable()
 export class MerchantService {
@@ -77,9 +78,9 @@ export class MerchantService {
     return { accessToken ,  refreshToken };
   }
 
-  async findAll(page:string) {
+  async findAll(filter:QueryMerchantDto) {
     const {paginationObj,query}=await this.apiService.
-      getAllDocs( this.merchantModel.find(), { page });
+      getAllDocs( this.merchantModel.find(), filter);
     const merchant=await query;
     return { merchant, paginationObj };
   }

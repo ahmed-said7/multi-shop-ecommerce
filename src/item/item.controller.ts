@@ -8,8 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
-  UseInterceptors,
-  UploadedFiles
+  UseInterceptors
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { ItemService } from './item.service';

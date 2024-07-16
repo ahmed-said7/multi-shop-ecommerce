@@ -1,7 +1,5 @@
-import { Transform } from 'class-transformer';
 import { IsDate, IsDateString, IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString } from 'class-validator';
 import { GENDER_STATUS } from 'src/common/enums';
-
 export class UpdateMerchantDto  {
     @IsOptional()
     @IsString()

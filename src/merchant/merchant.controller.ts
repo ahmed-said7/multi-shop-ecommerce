@@ -19,6 +19,7 @@ import { Roles } from 'src/common/decorator/roles';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { AllRoles, IAuthUser } from 'src/common/enums';
 import { LoginMerchantDto } from './dto/loginMerchant.dt';
+import { QueryMerchantDto } from './dto/query-merchant.dto';
 
 @Controller('merchant')
 export class MerchantController {
@@ -37,8 +38,8 @@ export class MerchantController {
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
-  findAll( @Query('page') page?: string ) {
-    return this.merchantService.findAll(page);
+  findAll( @Query() query: QueryMerchantDto) {
+    return this.merchantService.findAll(query);
   }
 
   @Get("logged")
