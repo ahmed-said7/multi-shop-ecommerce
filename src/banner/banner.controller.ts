@@ -18,11 +18,12 @@ import { Types } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { AllRoles, IAuthUser } from 'src/common/enums';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { Roles } from 'src/common/decorator/roles';
 import { QueryBannerDto } from './dto/query-banner.dto';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller('banner')
 export class BannerController {
@@ -33,9 +34,9 @@ export class BannerController {
   @Post()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image',optsImg),UploadSingleFileInterceptor)
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @AuthUser() user: IAuthUser,
     @Body() createBannerDto: CreateBannerDto,
   ) {
@@ -66,9 +67,9 @@ export class BannerController {
   @Patch(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image',optsImg),UploadSingleFileInterceptor)
   async update(
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateBannerDto: UpdateBannerDto,
     @AuthUser() user: IAuthUser

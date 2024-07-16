@@ -57,20 +57,10 @@ import { ApiModule } from 'src/common/filter/api.module';
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
-
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './images/banner',
-      }),
-    }),
     ApiModule,
-    UploadModule,
+    UploadModule
   ],
   controllers: [BannerController],
-  providers: [BannerService],
+  providers: [BannerService,{provide:"field",useValue:"image"}],
 })
 export class BannerModule {}

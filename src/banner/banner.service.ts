@@ -26,12 +26,10 @@ export class BannerService {
     shopId: string,
     createBannerDto: CreateBannerDto,
   ) {
-    const payload = {
-      ...createBannerDto,
-      shopId,
-    };
 
-    const createdBanner = await this.bannerModel.create(payload);
+    const createdBanner = await this.bannerModel.create({
+      ... createBannerDto , shopId
+    });
 
     const Shop = await this.shopModel.findById(shopId);
 
@@ -83,9 +81,9 @@ export class BannerService {
     });
     if (!banner) throw new NotFoundException("this banner doesn't exist");
 
-    const shop=await this.shopModel
+    await this.shopModel
       .findByIdAndUpdate( banner.shopId , { $pull : { containerID : id } });
-    if (!shop) throw new NotFoundException("this shop doesn't exist");
+    // if (!shop) throw new NotFoundException("this shop doesn't exist");
     
     await this.bannerModel.findByIdAndDelete(id);
     return {status:'banner has been deleted successfully!'};

@@ -8,6 +8,7 @@ import {
   IsMobilePhone,
   IsDate,
   IsOptional,
+  IsDateString,
 } from 'class-validator';
 
 import { Transform } from 'class-transformer';
@@ -45,11 +46,6 @@ export class CreateUserDto {
   
 
   @IsOptional()
-  @Transform( ({ value }) => {
-    if( value ){
-      return new Date(value);
-    };
-  })
-  @IsDate()
+  @IsDateString()
   birthday: string;
 }
