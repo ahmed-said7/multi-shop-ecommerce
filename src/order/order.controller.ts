@@ -40,7 +40,7 @@ export class OrderController {
     @AuthUser() user: IAuthUser,
     @Query() query:QueryOrderDto 
   ) {
-    return this.orderService.findAllShopOrder(query,user);
+    return this.orderService.findAllOrders(query,user);
   }
 
   
@@ -51,7 +51,7 @@ export class OrderController {
     @AuthUser() user: IAuthUser,
     @Query() query:QueryOrderDto 
   ) {
-    return this.orderService.findAllShopOrder(query, user);
+    return this.orderService.findAllOrders(query, user);
   }
 
 

@@ -73,7 +73,7 @@ export class OrderService {
       return { order };
   }
 
-  async findAllShopOrder( query:QueryOrderDto, user:IAuthUser ) {
+  async findAllOrders( query:QueryOrderDto, user:IAuthUser ) {
     
     if( user.role == AllRoles.USER ){
       query.userId=user._id;
@@ -88,7 +88,9 @@ export class OrderService {
     result
       .populate({ path:"carItems.product",select:"name price images" });
     if( user.role != AllRoles.USER ){
-      result.populate({ path:"userId",select:"name email"});
+      result
+        .populate({ path:"userId",select:"name email"})
+        .populate({path:"shopId",select:"name description"});
     };
     const orders=await result;
     
@@ -110,7 +112,7 @@ export class OrderService {
     const query= this.orderModel.findOne({ _id:id , ... filter })
       .populate({ path:"carItems.product",select:"name price images" });
     if( user.role != AllRoles.USER ){
-      query.populate({ path:"userId",select:"name email"})
+      query.populate({ path:"userId",select:"name email"});
     };
     const order=await query;
     if(!order){
@@ -119,7 +121,7 @@ export class OrderService {
     return { order };
   }
 
-  // only admin or merchant
+  // only admin
   async remove(id: string) {
       const order = await this.orderModel.findByIdAndDelete(id);
       if( ! order ){
@@ -128,7 +130,7 @@ export class OrderService {
       return order;
   }
   
-  // only admin or merchant
+  // only admin
   async confimeDelivery(id: string,user:IAuthUser ) {
     const order=await this.orderModel.findOneAndUpdate({ _id:id  }, {
       status: OrderStatusTypes.DELIVERED,
@@ -139,7 +141,7 @@ export class OrderService {
     return { order };
   }
   
-  // only admin or merchant
+  // only admin
   async confimePaid(id: string ,user:IAuthUser) {
     const order=await this.orderModel.findOneAndUpdate({ _id:id }, {
       paid:true,
