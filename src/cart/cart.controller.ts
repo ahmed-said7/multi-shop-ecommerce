@@ -7,6 +7,7 @@ import {
   UseGuards,
   Put,
   ParseIntPipe,
+  Get,
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
@@ -23,12 +24,12 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   
-  @Post()
+  @Get(":shopId")
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.USER)
   async getUserCart(
     @AuthUser() user: IAuthUser,
-    @Body('shopId',ValidateObjectIdPipe) shopId: string,
+    @Param('shopId',ValidateObjectIdPipe) shopId: string,
   ) {
     return this.cartService.getCart(user._id, shopId);
   }

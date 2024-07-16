@@ -2,8 +2,7 @@ import {
   IsNotEmpty,
   IsString,
   MinLength,
-  MaxLength,
-  IsOptional
+  MaxLength
 } from 'class-validator';
 
 export class CreateCategoryDto {
