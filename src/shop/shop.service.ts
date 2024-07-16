@@ -200,7 +200,11 @@ export class ShopService {
       ];
       await Promise.all(promises);
       await this.shopModel.findByIdAndDelete(user.shopId);
-      await this.merchantModel.findByIdAndUpdate(shop.userID,{shopId:null});
+      const merchant=await this.merchantModel.findById(shop.userID);
+      const newShop = await this.shopModel.create({
+        title: `${merchant.name}-Shop`,userID:user._id
+      });
+      await this.merchantModel.findByIdAndUpdate(shop.userID,{shopId:newShop._id});
       return {status:'Shop was deleted successfully'};
   }
 
