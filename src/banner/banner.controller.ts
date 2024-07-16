@@ -7,8 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
-  UseInterceptors,
-  UploadedFile,
+  UseInterceptors
 } from '@nestjs/common';
 
 import { BannerService } from './banner.service';

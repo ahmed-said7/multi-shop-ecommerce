@@ -76,7 +76,7 @@ export class BannerService {
   }
 
   async remove(id: string,user:IAuthUser) {
-    const banner = await this.bannerModel.findOne({
+    const banner = await this.bannerModel.findOneAndDelete({
       _id:id,shopId:user.shopId
     });
     if (!banner) throw new NotFoundException("this banner doesn't exist");
@@ -84,8 +84,7 @@ export class BannerService {
     await this.shopModel
       .findByIdAndUpdate( banner.shopId , { $pull : { containerID : id } });
     // if (!shop) throw new NotFoundException("this shop doesn't exist");
-    
-    await this.bannerModel.findByIdAndDelete(id);
+    // await this.bannerModel.findByIdAndDelete(id);
     return {status:'banner has been deleted successfully!'};
   }
 }
