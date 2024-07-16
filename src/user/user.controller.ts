@@ -15,6 +15,7 @@ import { AuthUser } from 'src/common/decorator/param.decorator';
 import { Roles } from 'src/common/decorator/roles';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AllRoles } from 'src/common/enums';
+import { QueryUserDto } from './dto/query-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -25,8 +26,8 @@ export class UserController {
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
-  findAll(@Param('page') page: string) {
-    return this.userService.findAll(page);
+  findAll(@Param() query: QueryUserDto) {
+    return this.userService.findAll(query);
   }
 
 

@@ -8,19 +8,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user_schema';
 import { Order, OrderDocument } from '../order/schemas/order_schema';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { QueryUserDto } from './dto/query-user.dto';
 
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private apiService:ApiService<User,IQuery>,
+    private apiService:ApiService<User,QueryUserDto>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
   ) {}
 
-  async findAll( page?: string ) {
+  async findAll( filter: QueryUserDto ) {
     const { paginationObj , query }=await this.apiService
-      .getAllDocs( this.userModel.find(),{ page } );
+      .getAllDocs( this.userModel.find(),filter );
     const users=await query;
     return { paginationObj , users };
   }
@@ -33,7 +34,7 @@ export class UserService {
         model: 'Item',
       })
       .populate({
-        path: 'wishList',
+        path: 'favorites',
         model: 'Item',
       }).select("-password");
     if (!foundUser) throw new NotFoundException('This user doesnt exist');

@@ -26,7 +26,7 @@ export class MerchantService {
     @InjectModel(Shop.name)
     private readonly shopModel: Model<ShopDocument>,
     private jwt:jwtTokenService,
-    private apiService:ApiService<MerchantDocument,IQuery>
+    private apiService:ApiService<MerchantDocument,QueryMerchantDto>
   ) {}
 
   async create(data: CreateDto) {
