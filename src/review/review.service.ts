@@ -12,6 +12,7 @@ import { ApiService } from 'src/common/filter/api.service';
 import { IAuthUser } from 'src/common/enums';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
+import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 
 @Injectable()
 export class ReviewService {
@@ -19,10 +20,18 @@ export class ReviewService {
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     private apiService:ApiService<ReviewDocument,QueryReviewDto>,
+    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     private eventEmitter:EventEmitter2
   ) {};
-  async create(createReviewDto: CreateReviewDto) {
-    const review = await  this.reviewModel.create(createReviewDto);
+  async create(body: CreateReviewDto) {
+    const shop=await this.shopModel.findById(body.shopId);
+    const item = await this.itemModel.findById(body.item);
+    if( !shop || !item ) {
+      throw new HttpException(`
+        invalid ids check id of shop item should be valid
+        `,400)
+    };
+    const review = await  this.reviewModel.create(body);
     this.eventEmitter.emit("review.saved",{ itemId: review.item });
     return { review };
   };
