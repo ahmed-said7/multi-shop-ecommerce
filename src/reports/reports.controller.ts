@@ -1,4 +1,4 @@
-import { Controller, Get, Body,  UseGuards, Post } from '@nestjs/common';
+import { Controller, Body,  UseGuards, Post } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { AuthUser } from 'src/common/decorator/param.decorator';
