@@ -10,8 +10,5 @@ export class QueryItemDto extends FindQuery {
     @IsMongoId()
     category: string;
     @IsOptional()
-    @IsMongoId()
-    shopId: string;
-    @IsOptional()
     soldTimes?: string|object;
 };

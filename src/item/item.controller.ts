@@ -53,9 +53,8 @@ export class ItemController {
     @Param('shop',ValidateObjectIdPipe) shopId: string,
     @Query() query:QueryItemDto
   ) {
-    query.shopId=shopId;
     return this.itemService.findAll(
-      query
+      query,shopId
     );
   }
 

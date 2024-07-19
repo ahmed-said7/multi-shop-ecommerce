@@ -31,13 +31,14 @@ export class ItemService {
   }
 
   async findAll(
-    query:QueryItemDto
+    query:QueryItemDto,shopId:string
   ) {
+    const filter={ shopId:new Types.ObjectId(shopId) };
     const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.itemModel.find(),query,["name","description"]);
+      .getAllDocs(this.itemModel.find(),query,["name","description"],filter);
     const items=await result;
     if( items.length == 0  ){
-      throw new HttpException("coupon not found",400);
+      throw new HttpException("items not found",400);
     };
     return { items , pagination : paginationObj };
   }
