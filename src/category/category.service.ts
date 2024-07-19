@@ -11,7 +11,6 @@ import mongoose, { Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';
-import { UserDocument } from 'src/user/schemas/user_schema';
 import { QueryCategoryDto } from './dto/query-category.dto';
 
 @Injectable()
@@ -39,10 +38,10 @@ export class CategoryService {
     return {category};
   }
 
-  async findAll(query:QueryCategoryDto,shopId:string) {
-    const filter={ shopId : new Types.ObjectId(shopId) };
+  async findAll(query:QueryCategoryDto) {
+    // const filter={ shopId : new Types.ObjectId(shopId) };
     const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.categoryModel.find(),query,[],filter);
+      .getAllDocs(this.categoryModel.find(),query,[]);
     const categories=await result;
     if( categories.length == 0  ){
       throw new HttpException("category not found",400);

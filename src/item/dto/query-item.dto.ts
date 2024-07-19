@@ -11,4 +11,5 @@ export class QueryItemDto extends FindQuery {
     category: string;
     @IsOptional()
     soldTimes?: string|object;
+    shopId:string;
 };

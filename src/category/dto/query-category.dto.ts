@@ -3,4 +3,5 @@ import { Types } from "mongoose";
 import { FindQuery } from "src/common/enums";
 
 export class QueryCategoryDto extends FindQuery {
+    shopId: string;
 };

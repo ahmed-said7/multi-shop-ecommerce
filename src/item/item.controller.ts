@@ -53,8 +53,9 @@ export class ItemController {
     @Param('shop',ValidateObjectIdPipe) shopId: string,
     @Query() query:QueryItemDto
   ) {
+    query.shopId=shopId;
     return this.itemService.findAll(
-      query,shopId
+      query
     );
   }
 
@@ -76,7 +77,6 @@ export class ItemController {
     // const imageUrls = await this.uploadService.uploadFiles(files);
 
     // updateItemDto.images = imageUrls;
-
     return this.itemService.update(id,user.shopId,updateItemDto);
   }
 

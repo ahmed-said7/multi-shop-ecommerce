@@ -51,7 +51,7 @@ export class AuthenticationGuard implements CanActivate {
         if( !user ){
             return false;
         };
-        request.user = { role:user.role , _id:payload.userId , shopId:user.shopId };
+        request.user = { role:user.role , _id:payload.userId , shopId:user.shopId?.toString() };
         return true;
     }
 }

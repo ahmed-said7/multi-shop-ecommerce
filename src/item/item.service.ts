@@ -31,11 +31,11 @@ export class ItemService {
   }
 
   async findAll(
-    query:QueryItemDto,shopId:string
+    query:QueryItemDto
   ) {
-    const filter={ shopId:new Types.ObjectId(shopId) };
+    // const filter={ shopId:new Types.ObjectId(shopId) };
     const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.itemModel.find(),query,["name","description"],filter);
+      .getAllDocs(this.itemModel.find(),query,["name","description"]);
     const items=await result;
     if( items.length == 0  ){
       throw new HttpException("items not found",400);
