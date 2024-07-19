@@ -22,7 +22,7 @@ export class ApiService< T , I extends IQuery > {
     query:Query< T[] , T >; 
     private queryObj:I;
     public paginationObj:Pagination={};
-    private filter( ){
+    private filter(obj={} ){
         let filter={ ... this.queryObj  };
         let fields : ('keyword'|'page'|'limit'|'select'|'sort')[]=['keyword','page','limit','select','sort'];
         fields.forEach( (field  ) => { delete filter[field] } );
@@ -30,7 +30,7 @@ export class ApiService< T , I extends IQuery > {
         queryStr=queryStr.replace( /lt|gt|lte|gte/ig , val => `$${val}` );
         filter=JSON.parse(queryStr);
         console.log(filter,"filter");
-        this.query=this.query.find({ ... filter });
+        this.query=this.query.find({ ... filter , ... obj });
         return this;
     };
     private sort(){
@@ -74,18 +74,11 @@ export class ApiService< T , I extends IQuery > {
         this.query=this.query.skip(this.paginationObj.skip).limit(this.paginationObj.limit);
         return this;
     };
-    getAllDocs( query:Query< T[] , T > , queryObj:I , fields?:string[]  )
+    getAllDocs( query:Query< T[] , T > , queryObj:I , fields?:string[] , obj={}  )
         : Promise< { query : Query<T[],T> ; paginationObj:Pagination } > 
     {
         this.query = query;
         this.queryObj = queryObj;
-        return this.filter().sort().select().search(fields).pagination();
-    };
-    getAllDocsWithoutFilter( query:Query< T[] , T > , queryObj:I , fields?:string[]  )
-        : Promise< { query : Query<T[],T> ; paginationObj:Pagination } > 
-    {
-        this.query = query;
-        this.queryObj = queryObj;
-        return this.sort().select().search(fields).pagination();
+        return this.filter(obj).sort().select().search(fields).pagination();
     };
 };

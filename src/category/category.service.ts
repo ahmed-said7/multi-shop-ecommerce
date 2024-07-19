@@ -39,9 +39,10 @@ export class CategoryService {
     return {category};
   }
 
-  async findAll(query:QueryCategoryDto) {
-    const {query:result,paginationObj}=await this.apiService.
-      getAllDocsWithoutFilter(this.categoryModel.find({ shopId:query.shopId }),query);
+  async findAll(query:QueryCategoryDto,shopId:string) {
+    const filter={ shopId : new Types.ObjectId(shopId) };
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.categoryModel.find(),query,[],filter);
     const categories=await result;
     if( categories.length == 0  ){
       throw new HttpException("category not found",400);

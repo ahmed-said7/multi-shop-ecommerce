@@ -44,8 +44,7 @@ export class CategoryController {
     @Param("shopId",ValidateObjectIdPipe) shopId: string,
     @Query() query:QueryCategoryDto
   ) {
-    query.shopId=new Types.ObjectId(shopId);
-    return this.categoryService.findAll(query);
+    return this.categoryService.findAll(query,shopId);
   }
 
   @Get('/one/:id')
