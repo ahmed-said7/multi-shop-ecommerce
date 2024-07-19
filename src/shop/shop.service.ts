@@ -198,12 +198,15 @@ export class ShopService {
         this.bannerModel.deleteMany({ _id : { $in : ids } , shopId })
       ];
       await Promise.all(promises);
-      await this.shopModel.findByIdAndDelete(user.shopId);
+      await this.shopModel.findByIdAndDelete(shopId);
       const merchant=await this.merchantModel.findById(shop.userID);
+      if(!merchant){
+        return {status:'Shop was deleted successfully'};
+      };
       const newShop = await this.shopModel.create({
-        title: `${merchant.name}-Shop`,userID:user._id
+        title: `${merchant._id}-Shop`,userID:merchant._id.toString()
       });
-      await this.merchantModel.findByIdAndUpdate(shop.userID,{shopId:newShop._id});
+      await this.merchantModel.findByIdAndUpdate( shop.userID , {shopId:newShop._id.toString() });
       return {status:'Shop was deleted successfully'};
   }
 

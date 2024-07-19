@@ -41,7 +41,10 @@ export class AuthenticationGuard implements CanActivate {
         };
         let user;
         switch(payload.role){
-            case AllRoles.ADMIN || AllRoles.USER:
+            case AllRoles.ADMIN:
+                user=await this.userModel.findById(payload.userId);
+                break;
+            case AllRoles.USER:
                 user=await this.userModel.findById(payload.userId);
                 break;
             case AllRoles.MERCHANT:
@@ -51,7 +54,7 @@ export class AuthenticationGuard implements CanActivate {
         if( !user ){
             return false;
         };
-        request.user = { role:user.role , _id:payload.userId , shopId:user.shopId?.toString() };
+        request.user = { role:user.role , _id:payload.userId.toString() , shopId:user.shopId?.toString() };
         return true;
     }
 }

@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import {v4} from "uuid";
 import { InjectModel } from '@nestjs/mongoose';
 
 import { CreateMerchantDto as CreateDto } from './dto/createMerchant.dto';
@@ -31,18 +32,18 @@ export class MerchantService {
 
   async create(data: CreateDto) {
       const shop = await this.shopModel.create({
-        title: `${data.name}-Shop`,
+        title: `${ v4() }-Shop`,
       });
 
       data.password=await bcrypt.hash(data.password,10);
       
       const merchant = await this.merchantModel.create({
         ...data,
-        shopId: shop?._id
+        shopId: shop._id.toString()
       });
 
       await this.shopModel.findByIdAndUpdate(shop._id, {
-        userID: merchant._id
+        userID: merchant._id.toString()
       });
 
       return { status:'Merchant Created Successfully'};
