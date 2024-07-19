@@ -26,7 +26,7 @@ export class VideoContainerService {
   ) {};
 
   async create(
-    shopId: Types.ObjectId,
+    shopId: string,
     body: CreateVideoContainerDto,
   ) {
     const videoContainer = await this.videoContainerModel.create({
@@ -45,6 +45,7 @@ export class VideoContainerService {
   }
 
   async findAll(query:QueryVideoContainerDto) {
+    console.log(query);
     const {query:result,paginationObj}=await this.apiService
       .getAllDocs(this.videoContainerModel.find(),query);
     const videos=await result;

@@ -37,7 +37,7 @@ export class VideoContainerController {
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
     return this.videoContainerService.create(
-      new Types.ObjectId(user.shopId),
+      user.shopId,
       createVideoContainerDto
     );
   }
@@ -53,8 +53,8 @@ export class VideoContainerController {
 
   
   @Get('/one/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.MERCHANT)
+  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  // @Roles(AllRoles.MERCHANT)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.findOne(id);
   }
