@@ -4,7 +4,8 @@ import {
   IsEnum,
   IsEmail,
   IsMobilePhone,
-  IsDate
+  IsDate,
+  IsDateString
 } from 'class-validator';
 
 import { Transform } from 'class-transformer';
@@ -35,11 +36,6 @@ export class UpdateUserDto {
   
 
   @IsOptional()
-  @Transform( ({ value }) => {
-    if( value ){
-      return new Date(value);
-    };
-  })
-  @IsDate()
+  @IsDateString()
   birthday: string;
 }

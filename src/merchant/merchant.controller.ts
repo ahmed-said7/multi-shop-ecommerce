@@ -51,7 +51,7 @@ export class MerchantController {
 
   @Get(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.ADMIN,AllRoles.MERCHANT)
+  @Roles(AllRoles.ADMIN)
   findOne(@Param('id', ValidateObjectIdPipe) merchntId: string) {
     return this.merchantService.findOne(merchntId);
   };

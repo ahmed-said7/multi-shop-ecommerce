@@ -32,7 +32,7 @@ export class AuthenticationGuard implements CanActivate {
         }catch(e){
             return false;
         };
-        if ( !payload || !payload.userId || payload.role ) {
+        if ( !payload || !payload.userId || !payload.role ) {
             return false;
         };
         let user;

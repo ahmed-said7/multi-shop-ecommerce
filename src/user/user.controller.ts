@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
@@ -26,7 +27,7 @@ export class UserController {
   @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
-  findAll(@Param() query: QueryUserDto) {
+  findAll(@Query() query: QueryUserDto) {
     return this.userService.findAll(query);
   }
 
@@ -54,7 +55,7 @@ export class UserController {
   }
 
   
-  @Delete(':id')
+  @Delete()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.USER,AllRoles.ADMIN)
   removeLoggedUser(

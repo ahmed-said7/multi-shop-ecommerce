@@ -1,6 +1,7 @@
-import { CallHandler, ExecutionContext, Inject, NestInterceptor } from "@nestjs/common";
+import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } from "@nestjs/common";
 import { Request } from "express";
 import { UploadService } from "src/upload/upload.service";
+@Injectable()
 export class UploadSingleFileInterceptor implements NestInterceptor {
     constructor( 
         @Inject("field") private field:string ,

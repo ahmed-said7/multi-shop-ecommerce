@@ -26,7 +26,7 @@ export class AuthService {
     }
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
     const savedUser=await this.userModel.create(createUserDto);
-    const { accessToken , refreshToken } = this.jwt.createTokens({
+    const { accessToken , refreshToken } =await this.jwt.createTokens({
       userId: savedUser._id.toString(),
       role:savedUser.role
     });
