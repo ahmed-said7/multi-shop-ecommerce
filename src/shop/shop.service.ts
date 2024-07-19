@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+import {v4} from "uuid";
 import * as mongoose from 'mongoose';
 
 import { Shop, ShopDocument } from './schemas/shop_schema';
@@ -204,7 +205,7 @@ export class ShopService {
         return {status:'Shop was deleted successfully'};
       };
       const newShop = await this.shopModel.create({
-        title: `${merchant._id}-Shop`,userID:merchant._id.toString()
+        title: `${v4()}-Shop`,userID:merchant._id.toString()
       });
       await this.merchantModel.findByIdAndUpdate( shop.userID , {shopId:newShop._id.toString() });
       return {status:'Shop was deleted successfully'};
