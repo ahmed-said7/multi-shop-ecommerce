@@ -22,14 +22,18 @@ export class AuthenticationGuard implements CanActivate {
     ) {};
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest<Request>();
-        if (!request.headers.authorization) {
+        if ( 
+            !request.headers.authorization ||
+            !request.headers.authorization.startsWith("Bearer") ) 
+        {
             throw new UnauthorizedException('Authorization header is missing');
         }
-        const token = request.header('authorization').split(' ')[1];
+        const token = request.headers.authorization.split(' ')[1];
         let payload: {userId:string; role:string }
         try{
             payload = await this.jwtService.verifyAsync(token);
         }catch(e){
+            console.log(e,"!!");
             return false;
         };
         if ( !payload || !payload.userId || !payload.role ) {
