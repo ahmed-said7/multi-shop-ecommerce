@@ -45,14 +45,14 @@ export class CouponController {
   // }
 
 
-  @Get(':id')
+  @Get()
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   findAll(
-    @AuthUser("shopId" ) shopId: string,
+    @AuthUser() user: IAuthUser,
     @Query() query: QueryCouponDto,
   ) {
-    return this.couponService.findAll(query, shopId);
+    return this.couponService.findAll(query, user.shopId);
   }
 
   @Get("/one/:id")
@@ -60,9 +60,9 @@ export class CouponController {
   @Roles(AllRoles.MERCHANT)
   findOne(
     @Param("id", ValidateObjectIdPipe) id: string,
-    @AuthUser("shopId" ) shopId: string
+    @AuthUser( ) user: IAuthUser
   ) {
-    return this.couponService.findOne(id,shopId);
+    return this.couponService.findOne(id,user.shopId);
   }
 
 
@@ -72,9 +72,9 @@ export class CouponController {
   update(
     @Param("id", ValidateObjectIdPipe) id: string,
     @Body() updateCouponDto: UpdateCouponDto,
-    @AuthUser("shopId" ) shopId: string
+    @AuthUser( ) user: IAuthUser
   ) {
-    return this.couponService.update(id,shopId, updateCouponDto);
+    return this.couponService.update(id,user.shopId, updateCouponDto);
   }
 
   @Delete(':id')
@@ -82,8 +82,8 @@ export class CouponController {
   @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser("shopId" ) shopId: string
+    @AuthUser() user: IAuthUser
   ) {
-    return this.couponService.remove(id,shopId);
+    return this.couponService.remove(id,user.shopId);
   }
 }

@@ -35,14 +35,16 @@ export class CouponService {
       }
 
       const coupon = await this.couponModel.create({
-        ... createCouponDto , shopId
+        ... createCouponDto , shopId:shopId.toString()
       });
       return { coupon };
   }
 
   async findAll(query:QueryCouponDto,shopId:string) {
     query.shopId=shopId;
-    const {query:result,paginationObj}=await this.apiService.getAllDocs(this.couponModel.find(),query);
+    console.log(query);
+    const {query:result,paginationObj}=await this.apiService
+      .getAllDocs(this.couponModel.find(),query);
     const coupons=await result;
     if( coupons.length == 0  ){
       throw new HttpException("coupon not found",400);
