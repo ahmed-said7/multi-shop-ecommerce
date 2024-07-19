@@ -155,8 +155,8 @@ export class ShopService {
   };
 
   async addUser(
-    shopId: mongoose.Types.ObjectId,
-    userId: mongoose.Types.ObjectId,
+    shopId: string,
+    userId: string,
   ) {
       const shop = await this.shopModel.findByIdAndUpdate(shopId, {
         $addToSet: { customers: userId },

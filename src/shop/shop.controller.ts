@@ -75,6 +75,16 @@ export class ShopController {
     return this.shopService.userJoin(id, user._id);
   }
 
+  @Patch('add/:id')
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  addJoin(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.shopService.addUser(user.shopId, id);
+  }
+
   @Get('user/:id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT,AllRoles.ADMIN,AllRoles.USER)
