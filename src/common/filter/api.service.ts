@@ -22,13 +22,14 @@ export class ApiService< T , I extends IQuery > {
     query:Query< T[] , T >; 
     private queryObj:I;
     public paginationObj:Pagination={};
-    private filter( obj={} ){
-        let filter={ ... this.queryObj , ... obj  };
+    private filter( ){
+        let filter={ ... this.queryObj  };
         let fields : ('keyword'|'page'|'limit'|'select'|'sort')[]=['keyword','page','limit','select','sort'];
         fields.forEach( (field  ) => { delete filter[field] } );
         let queryStr=JSON.stringify(filter);
-        queryStr=queryStr.replace( /lt|gt|lte|gte/g , val => `$${val}` );
+        queryStr=queryStr.replace( /lt|gt|lte|gte/ig , val => `$${val}` );
         filter=JSON.parse(queryStr);
+        console.log(filter,"filter");
         this.query=this.query.find({ ... filter });
         return this;
     };
@@ -79,5 +80,12 @@ export class ApiService< T , I extends IQuery > {
         this.query = query;
         this.queryObj = queryObj;
         return this.filter().sort().select().search(fields).pagination();
+    };
+    getAllDocsWithoutFilter( query:Query< T[] , T > , queryObj:I , fields?:string[]  )
+        : Promise< { query : Query<T[],T> ; paginationObj:Pagination } > 
+    {
+        this.query = query;
+        this.queryObj = queryObj;
+        return this.sort().select().search(fields).pagination();
     };
 };

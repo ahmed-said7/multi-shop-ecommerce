@@ -39,10 +39,12 @@ export class CategoryController {
     return this.categoryService.create(user.shopId, createCategoryDto);
   }
 
-  @Get()
+  @Get(":shopId")
   findAll(
+    @Param("shopId",ValidateObjectIdPipe) shopId: string,
     @Query() query:QueryCategoryDto
   ) {
+    query.shopId=new Types.ObjectId(shopId);
     return this.categoryService.findAll(query);
   }
 

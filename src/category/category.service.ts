@@ -21,7 +21,7 @@ export class CategoryService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    private apiService:ApiService<UserDocument,QueryCategoryDto>
+    private apiService:ApiService<CategoryDocument,QueryCategoryDto>
   ) {};
 
   async create(shopId: string, body: CreateCategoryDto) {
@@ -40,13 +40,13 @@ export class CategoryService {
   }
 
   async findAll(query:QueryCategoryDto) {
-    const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.categoryModel.find(),query);
+    const {query:result,paginationObj}=await this.apiService.
+      getAllDocsWithoutFilter(this.categoryModel.find({ shopId:query.shopId }),query);
     const categories=await result;
     if( categories.length == 0  ){
       throw new HttpException("category not found",400);
     };
-    return { categories , pagination : paginationObj };
+    return { categories , pagination:paginationObj };
   }
 
   async findOne(id: string) {
