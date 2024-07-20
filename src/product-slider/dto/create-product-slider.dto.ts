@@ -1,4 +1,4 @@
-import { IsArray, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateProductSliderDto {
   @IsOptional()
@@ -8,4 +8,7 @@ export class CreateProductSliderDto {
   @IsNotEmpty()
   @IsString()
   title: string;
+  @IsOptional()
+  @IsBoolean()
+  isSlider: boolean;
 }

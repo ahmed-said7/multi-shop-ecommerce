@@ -54,7 +54,9 @@ export class ProductSliderService {
     if( productSliders.length == 0  ){
       throw new HttpException("product sliders not found",400);
     };
-    return { productSliders , pagination : paginationObj };
+    return { productSliders 
+      , pagination : paginationObj 
+    };
   }
   async findOne(id: string) {
     const productSlider = await this.productSliderModel

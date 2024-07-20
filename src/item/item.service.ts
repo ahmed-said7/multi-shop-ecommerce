@@ -67,6 +67,6 @@ export class ItemService {
   };
   private async validateCategory(id:string){
     const category = await this.catModel.findById(id);
-    if (!category) throw new NotFoundException('id not found');
+    if (!category) throw new NotFoundException('category id not found');
   };
 }
