@@ -61,7 +61,7 @@ export class ReviewController {
     return this.reviewService.update(id, user,updateReviewDto);
   }
 
-  @Delete(':id/:user')
+  @Delete(':id')
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.USER)
   remove(

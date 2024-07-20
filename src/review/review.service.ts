@@ -24,13 +24,20 @@ export class ReviewService {
     private eventEmitter:EventEmitter2
   ) {};
   async create(body: CreateReviewDto) {
-    const shop=await this.shopModel.findById(body.shopId);
+    const reviewExist=await this.reviewModel.findOne({
+      user:body.user,
+      item:body.item
+    });
+    if( reviewExist ){
+      throw new HttpException("Review already exists",400);
+    }
     const item = await this.itemModel.findById(body.item);
-    if( !shop || !item ) {
+    if( !item ) {
       throw new HttpException(`
-        invalid ids check id of shop item should be valid
+        invalid ids check id of shop item 
         `,400)
     };
+    body.shopId=item.shopId.toString();
     const review = await  this.reviewModel.create(body);
     this.eventEmitter.emit("review.saved",{ itemId: review.item });
     return { review };

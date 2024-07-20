@@ -5,10 +5,8 @@ export class CreateReviewDto {
   @IsNotEmpty({ message: 'A review must have a rating!' })
   @IsNumber()
   @Min(1)
-  @Max(1)
+  @Max(5)
   rating: number;
-  @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  @IsMongoId()
   shopId: string;
   @IsOptional({ message: 'A review must belong to a shop!' })
   @IsMongoId()
