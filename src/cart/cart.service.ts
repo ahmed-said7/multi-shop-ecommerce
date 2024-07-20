@@ -1,6 +1,8 @@
 import { Model } from 'mongoose';
 import {
   BadRequestException,
+  Body,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,11 +10,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cart } from './schemas/cart.schema';
 import { IAuthUser } from 'src/common/enums';
 import { AddToCartDto } from './dto/add-to-cart.dto';
+import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 
 
 @Injectable()
 export class CartService {
-  constructor(@InjectModel(Cart.name) private cartModel: Model<Cart>) {}
+  constructor(
+    @InjectModel(Cart.name) private cartModel: Model<Cart>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>
+  ) {}
 
   // get user cart
   async getCart(userId: string, shopId: string) {
@@ -25,7 +31,7 @@ export class CartService {
       };
 
       const totalPrice = items.reduce((total, item) => {
-        const itemPrice = (item.itemId as any).price;
+        const itemPrice = (item.itemId as any)?.price || 0;
         return total + itemPrice * item.quantity;
       }, 0);
 
@@ -33,6 +39,11 @@ export class CartService {
   };
   // create cart and add or edit item in cart
   async addToCart(userId: string, item: AddToCartDto) {
+    const itemExists = await this.itemModel.findById(item.itemId);
+    if (!itemExists) {
+      throw new HttpException("Item not found",400)
+    };
+    item.shopId=itemExists.shopId.toString();
     const cartItem = await this.cartModel.findOne({
       userId,
       color: item.color,
