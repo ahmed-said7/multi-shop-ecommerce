@@ -48,9 +48,13 @@ export class BannerController {
     );
   }
 
-  @Get()
+  @Get("shop/:shopId")
   @UseGuards(AuthenticationGuard)
-  findAll( @Body() query:QueryBannerDto  ) {
+  findAll( 
+    @Param("shopId",ValidateObjectIdPipe) shopId:string,
+    @Body() query:QueryBannerDto  
+  ) {
+    query.shopId = shopId;
     return this.bannerService.findAll(query);
   }
 
