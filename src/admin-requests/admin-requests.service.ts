@@ -55,6 +55,9 @@ export class AdminRequestsService {
   ) {
     const request = await this.adminRequestModel
         .findByIdAndUpdate(id, updateAdminRequestDto, { new: true });
+    if(!request){
+      throw new HttpException("request not found",400);
+    }
     return {request};
   }
 
