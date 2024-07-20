@@ -32,7 +32,7 @@ export class OrderService {
   ) {};
   private orderItems(items:any,price:number,body:CreateOrderDto){
     body.priceTotal=price;
-    body.carItems=items.map((item)=>{
+    body.cartItems=items.map((item)=>{
       const { color , size , quantity ,itemId:{_id} }=item;
       return { product:_id,color,size,quantity };
     })
@@ -59,7 +59,7 @@ export class OrderService {
 
       await this.cartModel.deleteMany({ userId, shopId });
 
-      const promises=order.carItems.map((item)=>{
+      const promises=order.cartItems.map((item)=>{
         return this.itemModel.findByIdAndUpdate(
           item.product,{
             $inc: { soldTimes : item.quantity  }

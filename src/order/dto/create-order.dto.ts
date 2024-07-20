@@ -42,7 +42,7 @@ export class CreateOrderDto {
   @IsString()
   couponName: string;
   
-  carItems: 
+  cartItems: 
     {
       product: Types.ObjectId;
       quantity: number;

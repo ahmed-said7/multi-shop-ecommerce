@@ -6,6 +6,8 @@ export type ItemDocument = Item & Document;
 
 @Schema({
   timestamps: true
+  // toJSON:{virtuals:true},
+  // toObject:{virtuals:true}
 })
 export class Item {
   @Prop({ type:String, required: true })

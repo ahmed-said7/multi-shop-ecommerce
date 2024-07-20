@@ -10,6 +10,7 @@ import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { IAuthUser } from 'src/common/enums';
 import { CreateReportDto } from './dto/create-report.dto';
+import { User } from 'src/user/schemas/user_schema';
 
 @Injectable()
 export class ReportsService {
@@ -28,19 +29,19 @@ export class ReportsService {
           const reportYear = year || new Date().getFullYear();
           const reportMonth = month || new Date().getMonth() + 1;
           result = await this.generateMonthlySalesReport(
-            shopId.toString(),
+            shopId,
             reportYear,
             reportMonth,
           );
           return { monthlySales:result };
         case 'itemSales':
-          result = await this.generateItemSalesReport(shopId.toString());
+          result = await this.generateItemSalesReport(shopId);
           return { itemSales : result };
         case 'itemRatings':
-          result = await this.getShopItemRatings(shopId.toString());
+          result = await this.getShopItemRatings(shopId);
           return { itemRatings:result };
         case 'orderMetrics':
-          result = await this.getShopOrdersMetrics(shopId.toString());
+          result = await this.getShopOrdersMetrics(shopId);
           return { orderMetrics : result };
       }
   }
@@ -53,61 +54,83 @@ export class ReportsService {
     const monthlySales = await this.orderModel.aggregate([
       {
         $match: {
-          shopId: shopId,
-          createdAt: {
+          shopId: shopId
+          ,createdAt: {
             $gte: new Date(year, month - 1, 1),
             $lt: new Date(year, month, 1),
           }
-        },
+        }
       },
       {
-        $unwind: '$cartItems',
+        $unwind: '$cartItems'
       },
       {
+        $lookup: {
+          from: "items",
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product'
+        }
+      },{ $unwind: '$cartItems.product' }
+      ,{
         $group: {
-          _id: '$cartItems.product',
-          totalSales: { $sum: '$cartItems.quantity' },
-        },
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name:{$first:"$cartItems.product.name"},
+          price:{$first:"$cartItems.product.price"},
+          images:{$first:"$cartItems.product.images"}
+        }
       },
+      {
+        $project : {
+          _id:0
+        }
+      }
     ]);
     if( monthlySales.length == 0 ){
       throw new NotFoundException("reports not found");
     };
-    const result=monthlySales.map(async ({_id,count})=>{
-      const item= await this.itemModel.findById(_id);
-      return { item , count }
-    });
-
-    return result;
+    return monthlySales;
 
   }
 
   async generateItemSalesReport(shopId: string) {
     const itemSales = await this.orderModel.aggregate([
       {
-        $match: { shopId: shopId },
+        $match: {
+          shopId: shopId
+        }
       },
       {
-        $unwind: '$cartItems',
+        $unwind: '$cartItems'
       },
       {
+        $lookup: {
+          from: "items",
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product'
+        }
+      },{ $unwind: '$cartItems.product' }
+      ,{
         $group: {
-          _id: '$cartItems.product',
-          totalSales: { $sum: '$items.quantity' },
-        },
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name:{$first:"$cartItems.product.name"},
+          price:{$first:"$cartItems.product.price"},
+          images:{$first:"$cartItems.product.images"}
+        }
       },
+      {
+        $project : {
+          _id:0
+        }
+      }
     ]);
-    
     if( itemSales.length == 0 ){
       throw new NotFoundException("reports not found");
     };
-
-    const result = itemSales.map(async ({_id,count})=>{
-      const item= await this.itemModel.findById(_id);
-      return { item , count };
-    });
-
-    return result;
+    return itemSales;
   };
 
   async getShopItemRatings(shopId: string) {
@@ -125,9 +148,8 @@ export class ReportsService {
           count:{$sum:1}
         } 
       },
-      ,
       {
-        $addFields : { "rating":"$_id" , _id:0 }
+        $addFields : { "rating":"$_id" }
       },
       {
         $sort: { "count" : -1 }
@@ -156,64 +178,60 @@ export class ReportsService {
       throw new NotFoundException('Shop not found');
     };
     
-    const hoursWithMostOrders=await this.orderModel.aggregate([
-      { $match : {shopId} },
-      {
-        $group : {
-          _id : { 
-            day:{ $hour: '$createdAt'  }
-          },
-          count:{$sum:1}
-        }
-      },
-      {
-        $addFields : { "hour":"$_id.hour" , _id:0 }
-      },
-      {
-        $sort: { "count" : -1 }
-      },
-      {
-        $limit:1
+  const hoursWithMostOrders = await this.orderModel.aggregate([
+  { $match: { shopId } },
+  {
+    $group: {
+      _id: { hour: { $hour: '$createdAt' } },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $addFields: { hour: '$_id.hour', _id: 0 }
+  },
+  {
+    $sort: { count: -1 }
+  },
+  {
+    $limit: 1
+  }
+  ]);
+  const daysWithMostOrders = await this.orderModel.aggregate([
+    { $match: { shopId } },
+    {
+      $group: {
+        _id: { day: { $dayOfMonth: '$createdAt' } },
+        count: { $sum: 1 }
       }
-    ]);
-    const daysWithMostOrders=await this.orderModel.aggregate([
-      { $match : {shopId} },
-      {
-        $group : {
-          _id : { 
-            day:{ $day: '$createdAt'  }
-          },
-          count:{$sum:1}
-        }
-      },
-      {
-        $addFields : { "day":"$_id.day" , _id:0 }
-      },
-      {
-        $sort: { "count" : -1 }
-      },
-      {
-        $limit:1
+    },
+    {
+      $addFields: { day: '$_id.day', _id: 0 }
+    },
+    {
+      $sort: { count: -1 }
+    },
+    {
+      $limit: 1
+    }
+  ]);
+  const buyerWithMostOrders = await this.orderModel.aggregate([
+    { $match: { shopId } },
+    {
+      $group: {
+        _id: '$userId',
+        count: { $sum: 1 }
       }
-    ]);
-    const buyerWithMostOrders=await this.orderModel.aggregate([
-      { $match : {shopId} },
-      {
-        $group : {
-          _id : "userId",
-          count:{$sum:1}
-        }
-      },
-      {
-        $addFields : { "userId":"$_id" , _id:0 }
-      },
-      {
-        $sort: { "count" : -1 }
-      },
-      {
-        $limit:1
-      }
-    ]);
+    },
+    {
+      $addFields: { userId: '$_id', _id: 0 }
+    },
+    {
+      $sort: { count: -1 }
+    },
+    {
+      $limit: 1
+    }
+  ]);
     if( buyerWithMostOrders.length == 0 && daysWithMostOrders.length == 0 && hoursWithMostOrders.length == 0 ){
       throw new NotFoundException("reports not found");
     };

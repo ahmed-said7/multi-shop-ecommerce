@@ -8,7 +8,9 @@ export type OrderDocument = Order & Document;
 
 // Define the shop schema
 @Schema({
-  timestamps: true, // Add timestamps for createdAt and updatedAt
+  timestamps: true // Add timestamps for createdAt and updatedAt
+  // toJSON:{virtuals:true},
+  // toObject:{virtuals:true}
 })
 
 export class Order {
@@ -26,14 +28,13 @@ export class Order {
     ],
     default: [],
   })
-  carItems: [
+  cartItems: 
     {
       product: Types.ObjectId;
       quantity: number;
       size: string;
       color: string;
-    }
-  ];
+    }[];
 
   @Prop({ type:Boolean,default:false })
   delivered: boolean;
