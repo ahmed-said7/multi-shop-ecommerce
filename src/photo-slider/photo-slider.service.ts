@@ -49,7 +49,7 @@ export class PhotoSliderService {
   };
 
   async findOne(id: string){
-    const photoSlider= this.photoSliderModel.findById(id);
+    const photoSlider=await this.photoSliderModel.findById(id);
     if (!photoSlider)
       throw new InternalServerErrorException("this slider doesn't exist");
     return {photoSlider};

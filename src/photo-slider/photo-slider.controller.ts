@@ -18,7 +18,7 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { AllRoles,  optsImg } from 'src/common/enums';
+import { AllRoles,  IAuthUser,  optsImg } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { QueryPhotoSliderDto } from './dto/query-photo-slider.dto';
@@ -35,10 +35,10 @@ export class PhotoSliderController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   create(
-    @AuthUser("shopId") shopId: string,
+    @AuthUser() user: IAuthUser,
     @Body() body:CreatePhotoSliderDto 
   ) {
-    return this.photoSliderService.create(shopId,body);
+    return this.photoSliderService.create(user.shopId,body);
   };
 
   @Post('preview')
@@ -49,8 +49,12 @@ export class PhotoSliderController {
     return this.uploadService.uploadFiles(files);
   };
 
-  @Get()
-  findAll(@Query() query:QueryPhotoSliderDto ) {
+  @Get("shop/:shopId")
+  findAll(
+    @Param("shopId",ValidateObjectIdPipe) shopId: string,
+    @Query() query:QueryPhotoSliderDto 
+  ) {
+    query.shopId=shopId;
     return this.photoSliderService.findAll(query);
   };
 
@@ -68,9 +72,9 @@ export class PhotoSliderController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-    @AuthUser("shopId") shopId: string
+    @AuthUser() user: IAuthUser
   ){
-    return this.photoSliderService.update(id,shopId, updatePhotoSliderDto);
+    return this.photoSliderService.update(id,user.shopId, updatePhotoSliderDto);
   };
 
   
@@ -78,9 +82,9 @@ export class PhotoSliderController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
-    @AuthUser("shopId") shopId: string,
+    @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string
   ){
-    return this.photoSliderService.remove(id,shopId);
+    return this.photoSliderService.remove(id,user.shopId);
   };
 };

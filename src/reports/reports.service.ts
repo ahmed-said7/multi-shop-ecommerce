@@ -10,7 +10,6 @@ import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { IAuthUser } from 'src/common/enums';
 import { CreateReportDto } from './dto/create-report.dto';
-import { User } from 'src/user/schemas/user_schema';
 
 @Injectable()
 export class ReportsService {
