@@ -3,9 +3,9 @@ import { FindQuery } from "src/common/enums";
 
 export class QueryOrderDto extends FindQuery {
     @IsOptional()
-    delivered: boolean;
+    delivered: string;
     @IsOptional()
-    paid: boolean;
+    paid: string;
     @IsOptional()
     status: string;
     @IsOptional()

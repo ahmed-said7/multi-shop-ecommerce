@@ -44,7 +44,8 @@ export class OrderService {
         throw new NotFoundException("This shop doesn't exist");
       };
       if( couponName ){
-        const { items , finalPrice }=await this.couponService.applyCoupon(userId,{shopId,text:couponName});
+        const { items , finalPrice }=await this.couponService
+          .applyCoupon(userId,{shopId,text:couponName});
         this.orderItems(items,finalPrice,createOrderDto);
       }else{
         const { totalPrice , items }=await this.cartService.getCart(userId,shopId);
@@ -61,7 +62,7 @@ export class OrderService {
       const promises=order.carItems.map((item)=>{
         return this.itemModel.findByIdAndUpdate(
           item.product,{
-            $inc: { soldTimes : item.quantity , amount: item.quantity*-1 }
+            $inc: { soldTimes : item.quantity  }
           }
         )
       });
@@ -134,6 +135,7 @@ export class OrderService {
   async confimeDelivery(id: string,user:IAuthUser ) {
     const order=await this.orderModel.findOneAndUpdate({ _id:id  }, {
       status: OrderStatusTypes.DELIVERED,
+      delivered:true
       },{new:true});
     if(!order){
       throw new HttpException("order not found",400);

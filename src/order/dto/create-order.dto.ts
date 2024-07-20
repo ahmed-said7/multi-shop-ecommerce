@@ -18,7 +18,7 @@ export class ValidateAddresse {
     zipCode?: number;
     @IsNotEmpty()
     @IsString()
-    country?: number;
+    country?: string;
 };
 
 

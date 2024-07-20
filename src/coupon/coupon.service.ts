@@ -94,7 +94,7 @@ export class CouponService {
       throw new BadRequestException('Coupon expired');
     if (coupon?.numOfTimes <= 0)
       throw new BadRequestException('Coupon usage limit reached');
-    if (! coupon.shopId.equals(applyCoupon.shopId) )
+    if ( coupon.shopId.toString() !=  applyCoupon.shopId )
       throw new BadRequestException('Coupon not applicable to this shop');
     const discountAmount =
       totalPrice * (coupon.discountPercentage / 100);

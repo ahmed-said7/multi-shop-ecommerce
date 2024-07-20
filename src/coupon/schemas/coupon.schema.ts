@@ -16,8 +16,7 @@ export class Coupon {
   endDate: Date;
 
   @Prop({
-    default: 1,
-    min: 1,
+    default: 1
   })
   numOfTimes: number;
 

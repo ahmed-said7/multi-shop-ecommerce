@@ -27,10 +27,10 @@ export class OrderController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.USER)
   create(
-    @Body('userId') userId: string,
+    @AuthUser() user:IAuthUser,
     @Body() createOrderDto: CreateOrderDto,
   ) {
-    return this.orderService.create(userId, createOrderDto);
+    return this.orderService.create(user._id, createOrderDto);
   }
 
   @Get('/shop')
@@ -82,7 +82,7 @@ export class OrderController {
     @Param('id', ValidateObjectIdPipe) id: string,
     @AuthUser() user: IAuthUser
   ) {
-    return this.orderService.confimeDelivery(id,user);
+    return this.orderService.confimePaid(id,user);
   };
 
   @Delete(':id')
