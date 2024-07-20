@@ -27,11 +27,18 @@ export class ReviewContainerService {
     ,@InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>
-  ) {}
+  ) {};
+  private async validateReviews(ids:string[]){
+    const reviews=await this.reviewModel.find({ _id : { $in : ids } });
+      if( ids.length != reviews.length ){
+        throw new HttpException("reviews not found",400)
+      };
+  };
   async create(
     body: CreateReviewContainerDto,
     shopId: string,
   ) {
+      await this.validateReviews(body.reviews);
       const reviewContainer = await this.reviewContainerModel.create(
         { ... body, shopId }
       )
@@ -70,6 +77,9 @@ export class ReviewContainerService {
   };
 
   async update(id: string,shopId:string, body: UpdateReviewContainerDto) {
+    if(body.reviews){
+      await this.validateReviews(body.reviews);
+    };
       const reviewContainer = await this.reviewContainerModel.findOneAndUpdate(
         {_id:id,shopId},
         body,
