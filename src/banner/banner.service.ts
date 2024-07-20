@@ -67,7 +67,7 @@ export class BannerService {
     updateBannerDto: UpdateBannerDto,
     user:IAuthUser
   ) {
-    const banner= this.bannerModel
+    const banner=await this.bannerModel
       .findOneAndUpdate({ _id:id,shopId:user.shopId}, updateBannerDto, { new: true });
     if (!banner) {
       throw new NotFoundException('this banner not found');

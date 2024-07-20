@@ -49,7 +49,6 @@ export class BannerController {
   }
 
   @Get("shop/:shopId")
-  @UseGuards(AuthenticationGuard)
   findAll( 
     @Param("shopId",ValidateObjectIdPipe) shopId:string,
     @Body() query:QueryBannerDto  
@@ -59,7 +58,7 @@ export class BannerController {
   }
 
   @Get(':id')
-  @UseGuards(AuthenticationGuard)
+  // @UseGuards(AuthenticationGuard)
   // @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
   findOne(
     @Param('id', ValidateObjectIdPipe) bannerId: string,
