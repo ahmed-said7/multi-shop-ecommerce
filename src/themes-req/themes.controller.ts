@@ -6,7 +6,7 @@ import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { QueryThemeDto } from './dto/query-themes.dto';
-import { AllRoles } from 'src/common/enums';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 
 
 @Controller('themes')
@@ -17,13 +17,13 @@ export class ThemesController {
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Roles(AllRoles.USER,AllRoles.ADMIN)
   async createTheme(
-    @AuthUser('_id') userId: string,
+    @AuthUser() user: IAuthUser,
     @Body() themeData: CreateThemeDto,
   ) {
     return this.themesService.createTheme(
       themeData.title,
       themeData.description,
-      userId,
+      user._id
     );
   };
 

@@ -38,8 +38,12 @@ export class IntroPageController {
     );
   }
 
-  @Get()
-  findAll(@Query() query: QueryIntroPageDto ) {
+  @Get("shop/:shopId")
+  findAll(
+    @Param("shopId",ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryIntroPageDto 
+  ) {
+    query.shopId = shopId;
     return this.introPageService.findAll(query);
   };
 
@@ -54,9 +58,9 @@ export class IntroPageController {
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateIntroPageDto: UpdateIntroPageDto,
-    @AuthUser("shopId") shopId: string
+    @AuthUser() user: IAuthUser
   ) {
-    return this.introPageService.update(id, shopId,updateIntroPageDto);
+    return this.introPageService.update(id, user.shopId,updateIntroPageDto);
   }
 
   @UseGuards(AuthenticationGuard,AuthorizationGuard)
@@ -64,8 +68,8 @@ export class IntroPageController {
   @Delete(':id')
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser("shopId") shopId: string
+    @AuthUser() user: IAuthUser
   ) {
-    return this.introPageService.remove(id,shopId);
+    return this.introPageService.remove(id,user.shopId);
   }
 }
