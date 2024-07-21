@@ -88,6 +88,9 @@ export class ReportsService {
         $project : {
           _id:0
         }
+      },
+      {
+        $sort:{quantity:-1}
       }
     ]);
     if( monthlySales.length == 0 ){
@@ -128,6 +131,9 @@ export class ReportsService {
         $project : {
           _id:0
         }
+      },
+      {
+        $sort:{quantity:-1}
       }
     ]);
     if( itemSales.length == 0 ){
