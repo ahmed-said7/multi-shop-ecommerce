@@ -87,7 +87,8 @@ export enum reportTypes {
     monthlySales="monthlySales",
     itemSales="itemSales",
     itemRatings="itemRatings",
-    orderMetrics="orderMetrics"
+    orderMetrics="orderMetrics",
+    mostProfitable="mostProfitable"
 }
 
 export const optsImg={ fileFilter:fileFilter("image"),storage:memoryStorage() };

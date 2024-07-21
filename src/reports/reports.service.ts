@@ -42,6 +42,10 @@ export class ReportsService {
         case 'orderMetrics':
           result = await this.getShopOrdersMetrics(shopId);
           return { orderMetrics : result };
+        case 'mostProfitable':
+          result = await this.getTheMostProfitableItems(shopId);
+          return { mostProfitable : result };
+          // MostProfitable
       }
   }
 
@@ -131,6 +135,7 @@ export class ReportsService {
     };
     return itemSales;
   };
+
 
   async getShopItemRatings(shopId: string) {
     const shop = await this.shopModel.findById(shopId);
@@ -240,4 +245,50 @@ export class ReportsService {
       hoursWithMostOrders:hoursWithMostOrders[0]
     }
   };
-}
+
+  async getTheMostProfitableItems(shopId:string){
+    const mostProfitable = await this.orderModel.aggregate([
+      {
+        $match: {
+          shopId: shopId
+        }
+      },
+      {
+        $unwind: '$cartItems'
+      },
+      {
+        $lookup: {
+          from: "items",
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product'
+        }
+      },{ $unwind: '$cartItems.product' }
+      ,{
+        $group: {
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name:{$first:"$cartItems.product.name"},
+          price:{$first:"$cartItems.product.price"},
+          images:{$first:"$cartItems.product.images"},
+        }
+      },
+      {
+        $project : {
+          _id:0,
+          profit: { $multiply: ["$quantity", "$price"] },
+          name:1,price:1,images:1,quantity:1
+        }
+      },
+      {
+        $sort : { 
+          profit:-1
+        }
+      }
+    ]);
+    if( mostProfitable.length == 0 ){
+      throw new HttpException("reports not found",400);
+    };
+    return mostProfitable;
+  };
+};

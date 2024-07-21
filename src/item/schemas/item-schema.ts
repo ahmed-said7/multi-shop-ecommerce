@@ -13,7 +13,7 @@ export class Item {
   @Prop({ type:String, required: true })
   name: string;
 
-  @Prop({ type:String,required: true, min: 0 })
+  @Prop({ type:Number,required: true, min: 0 })
   price: number;
 
   @Prop({ type:String , required: true, min: 0 })
