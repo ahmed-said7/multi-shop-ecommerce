@@ -75,5 +75,8 @@
     ,
     "reviewContainer":{
         "notFound":"review container not found"
+    },
+    "theme":{
+        "notFound":"themes not found"
     }
 }

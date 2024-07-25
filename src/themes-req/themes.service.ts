@@ -5,6 +5,7 @@ import { Theme, ThemeDocument } from './schemas/theme.schema';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryThemeDto } from './dto/query-themes.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ThemesService {
@@ -12,6 +13,7 @@ export class ThemesService {
     private apiService:ApiService<ThemeDocument,QueryThemeDto>,
     @InjectModel(Theme.name)
     private readonly themeModel: mongoose.Model<ThemeDocument>
+    ,private i18n:CustomI18nService
   ) {}
 
   async createTheme(
@@ -36,7 +38,7 @@ export class ThemesService {
       .getAllDocs(this.themeModel.find(),query);
     const themes=await result;
     if( themes.length == 0  ){
-      throw new HttpException("themes not found",400);
+      throw new HttpException(this.i18n.translate("test.theme.notFound"),400);
     };
     return { themes , pagination : paginationObj };
   }
