@@ -26,5 +26,13 @@
     },
     "category":{
         "notFound":"category not found"
+    },
+    "coupon":{
+        "notFound":"coupon not found",
+        "limit":"Coupon usage limit reached",
+        "deleted":"The coupon was deleted successfully",
+        "applicable":"Coupon not applicable to this shop",
+        "duplicate":"This coupon already exists",
+        "expired": "This coupon has expired"
     }
 }

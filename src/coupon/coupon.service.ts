@@ -15,6 +15,7 @@ import { ApiService } from 'src/common/filter/api.service';
 import { QueryCouponDto } from './dto/query-coupon.dto';
 import { Model, Types } from 'mongoose';
 import { CartService } from 'src/cart/cart.service';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class CouponService {
@@ -22,7 +23,8 @@ export class CouponService {
     @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
     private apiService:ApiService<Coupon,QueryCouponDto>,
-    private cartService:CartService
+    private cartService:CartService,
+    private i18n:CustomI18nService
   ) {}
 
   async create(createCouponDto: CreateCouponDto, shopId: string) {
@@ -31,7 +33,7 @@ export class CouponService {
       });
 
       if (checkCoupon) {
-        throw new BadRequestException('this coupon already exists');
+        throw new BadRequestException(this.i18n.translate("test.coupon.duplicate"));
       }
 
       const coupon = await this.couponModel.create({
@@ -47,7 +49,7 @@ export class CouponService {
       .getAllDocs(this.couponModel.find(),query);
     const coupons=await result;
     if( coupons.length == 0  ){
-      throw new HttpException("coupon not found",400);
+      throw new HttpException(this.i18n.translate("test.coupon.notFound"),400);
     };
     return { coupons , pagination : paginationObj };
   }
@@ -55,7 +57,7 @@ export class CouponService {
   async findOne(id: string,shopId: string) {
       const coupon = await this.couponModel.findOne({_id:id,shopId});
       if (!coupon) {
-        throw new NotFoundException('this coupon not found');
+        throw new NotFoundException(this.i18n.translate("test.coupon.notFound"));
       }
       return {coupon};
   }
@@ -67,7 +69,7 @@ export class CouponService {
       { new: true }
     );
     if (!coupon) {
-      throw new NotFoundException('this coupon not found');
+      throw new NotFoundException(this.i18n.translate("test.coupon.notFound"));
     }
     return {coupon};
   }
@@ -75,9 +77,9 @@ export class CouponService {
   async remove(id: string,shopId:string) {
       const coupon=await this.couponModel.findOneAndDelete({_id:id,shopId});
       if (!coupon) {
-        throw new NotFoundException('this coupon not found');
+        throw new NotFoundException(this.i18n.translate("test.coupon.notFound"));
       }
-      return {status:'The coupon was deleted successfully'};
+      return {status:this.i18n.translate("test.coupon.deleted")};
   }
 
   async applyCoupon(userId: string, applyCoupon: applyCoupon): Promise<any> {
@@ -89,13 +91,13 @@ export class CouponService {
       text: applyCoupon.text,
       shopId: applyCoupon.shopId,
     });
-    if (!coupon) throw new NotFoundException('Coupon not found');
+    if (!coupon) throw new NotFoundException(this.i18n.translate("test.coupon.notFound"));
     if ( coupon?.endDate < new Date() )
-      throw new BadRequestException('Coupon expired');
+      throw new BadRequestException(this.i18n.translate("test.coupon.expired"));
     if (coupon?.numOfTimes <= 0)
-      throw new BadRequestException('Coupon usage limit reached');
+      throw new BadRequestException(this.i18n.translate("test.coupon.limit"));
     if ( coupon.shopId.toString() !=  applyCoupon.shopId )
-      throw new BadRequestException('Coupon not applicable to this shop');
+      throw new BadRequestException(this.i18n.translate("test.coupon.applicable"));
     const discountAmount =
       totalPrice * (coupon.discountPercentage / 100);
     const finalPrice = totalPrice - discountAmount;

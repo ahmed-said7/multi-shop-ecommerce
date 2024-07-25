@@ -138,6 +138,10 @@
         "discountPercentage": {
             "isNotEmpty": "يجب ألا يكون نسبة الخصم فارغة",
             "isNumber": "يجب أن تكون نسبة الخصم رقماً"
+        },
+        "shopId":{
+            "isNotEmpty": "معرف المتجر يجب ألا يكون فارغاً",
+            "isMongoId": "معرف المتجر يجب أن يكون معرف MongoDB صالحاً"
         }
     },
     "IntroPage": {

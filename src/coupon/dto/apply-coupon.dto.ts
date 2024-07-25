@@ -3,13 +3,14 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class applyCoupon {
-  @IsNotEmpty()
-  @IsString({ message: 'text must be string' })
+  @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.text.isNotEmpty") })
+  @IsString({ message:i18nValidationMessage("validation.coupon.text.isString") })
   text: string;
   
-  @IsNotEmpty()
-  @IsMongoId({ message: 'should be valid id ' })
+  @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.shopId.isNotEmpty") })
+  @IsMongoId({ message:i18nValidationMessage("validation.coupon.shopId.isMongoId") })
   shopId: string;
 }

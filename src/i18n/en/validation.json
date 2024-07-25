@@ -138,6 +138,10 @@
             "discountPercentage": {
                 "isNotEmpty": "Discount percentage should not be empty",
                 "isNumber": "Discount percentage must be a number"
+            },
+            "shopId": {
+                "isNotEmpty": "Shop ID must not be empty",
+                "isMongoId": "Shop ID must be a valid MongoDB ID"
             }
         },
         "IntroPage": {
