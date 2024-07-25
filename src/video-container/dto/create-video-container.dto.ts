@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateVideoContainerDto {
-  @IsNotEmpty()
-  @IsString({ message: 'link must be a string' })
+  @IsNotEmpty({message:i18nValidationMessage("validation.videoContainer.link.isNotEmpty")})
+  @IsString({message:i18nValidationMessage("validation.videoContainer.link.isString")})
   link: string;
 }

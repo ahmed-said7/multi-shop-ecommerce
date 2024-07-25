@@ -63,5 +63,9 @@
         "duplicate":"review already exists",
         "deleted":"review deleted successfully",
         "notFound": "review not found"
+    },
+    "videoContainer":{
+        "notFound": "user not found",
+        "deleted":"User Deleted Successfully."
     }
 }

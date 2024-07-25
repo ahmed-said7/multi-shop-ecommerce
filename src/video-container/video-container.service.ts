@@ -15,6 +15,7 @@ import {
 import { Types } from 'mongoose';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryVideoContainerDto } from './dto/query-video-container.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class VideoContainerService {
@@ -22,7 +23,8 @@ export class VideoContainerService {
     private apiService: ApiService<VideoContainerDocument,QueryVideoContainerDto>,
     @InjectModel(VideoContainer.name)
     private videoContainerModel: Model<VideoContainerDocument>,
-    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>
+    @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    private i18n:CustomI18nService
   ) {};
 
   async create(
@@ -50,7 +52,7 @@ export class VideoContainerService {
       .getAllDocs(this.videoContainerModel.find(),query);
     const videos=await result;
     if( videos.length == 0  ){
-      throw new HttpException("videos not found",400);
+      throw new HttpException(this.i18n.translate("test.videoContainer.notFound"),400);
     };
     return { videos , pagination : paginationObj };
   }
@@ -58,7 +60,7 @@ export class VideoContainerService {
   async findOne(id: string) {
       const video = await this.videoContainerModel.findById(id);
       if (!video) {
-        throw new NotFoundException('this video container not found');
+        throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
       }
       return { video };
   }
@@ -72,7 +74,7 @@ export class VideoContainerService {
         },
       );
       if (!video) {
-        throw new NotFoundException('this video container not found');
+        throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
       }
       return { video };
   }
@@ -81,7 +83,7 @@ export class VideoContainerService {
     const video= await this.videoContainerModel.findOneAndDelete(
       { _id:id , shopId });
     if (!video) {
-      throw new NotFoundException('this video container not found');
+      throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
     };
 
     await this.shopModel.findByIdAndUpdate(shopId,{
@@ -91,6 +93,6 @@ export class VideoContainerService {
         }
       }
     });
-    return {status:'Video Container deleted successfully'};
+    return {status:this.i18n.translate("test.videoContainer.deleted")};
   }
 }

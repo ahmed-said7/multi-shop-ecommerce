@@ -348,7 +348,7 @@
             "isString": "Title must be a string"
         }
     },
-    "review_container": {
+    "reviewContainer": {
         "reviews": {
             "isNotEmpty": "Review container must have a reference to at least one review",
             "isArray": "Reviews should be provided as an array",
