@@ -27,7 +27,7 @@ import {
 import {
   IntroPage,
   IntroPageSchema,
-} from "../i18n/intro-page/schemas/intro_page_schema";
+} from "../intro-page/schemas/intro_page_schema";
 import { UserModule } from "src/user/user.module";
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { jwtTokenModule } from 'src/jwt/jwt.module';
