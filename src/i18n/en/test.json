@@ -44,5 +44,8 @@
         "deleted":"merchant deleted successfully",
         "updated":"merchant updated successfully",
         "created":"merchant created successfully"
+    },
+    "order":{
+        "notFound":"orders not found"
     }
 }

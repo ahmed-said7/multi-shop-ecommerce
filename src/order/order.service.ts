@@ -15,6 +15,7 @@ import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { QueryOrderDto } from './dto/order-query.dto';
 import { ApiService } from 'src/common/filter/api.service';
 import { Model } from 'mongoose';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class OrderService {
@@ -28,7 +29,8 @@ export class OrderService {
     private readonly couponService: CouponService,
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     private cartService:CartService,
-    private apiService: ApiService<OrderDocument,QueryOrderDto>
+    private apiService: ApiService<OrderDocument,QueryOrderDto>,
+    private i18n:CustomI18nService
   ) {};
   private orderItems(items:any,price:number,body:CreateOrderDto){
     body.priceTotal=price;
@@ -41,7 +43,7 @@ export class OrderService {
       const { shopId, couponName } = createOrderDto;
       const shop = await this.shopModel.findById(shopId);
       if (!shop) {
-        throw new NotFoundException("This shop doesn't exist");
+        throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
       };
       if( couponName ){
         const { items , finalPrice }=await this.couponService
@@ -96,7 +98,7 @@ export class OrderService {
     const orders=await result;
     
     if( orders.length == 0  ){
-      throw new HttpException("orders not found",400);
+      throw new HttpException(this.i18n.translate("test.order.notFound"),400);
     };
     
     return { orders , pagination : paginationObj };
@@ -117,7 +119,7 @@ export class OrderService {
     };
     const order=await query;
     if(!order){
-      throw new HttpException("Order not found",400);
+      throw new HttpException(this.i18n.translate("test.order.notFound"),400);
     };
     return { order };
   }
@@ -138,7 +140,7 @@ export class OrderService {
       delivered:true
       },{new:true});
     if(!order){
-      throw new HttpException("order not found",400);
+      throw new HttpException(this.i18n.translate("test.order.notFound"),400);
     };
     return { order };
   }
@@ -149,7 +151,7 @@ export class OrderService {
       paid:true,
       },{new:true});
     if(!order){
-      throw new HttpException("order not found",400);
+      throw new HttpException(this.i18n.translate("test.order.notFound"),400);
     };
     return { order };
   }
