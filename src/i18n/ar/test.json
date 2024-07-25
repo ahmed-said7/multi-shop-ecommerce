@@ -65,5 +65,8 @@
     "videoContainer":{
         "notFound": "لم يتم العثور على حاوية الفيديو",
         "deleted":"تم حذف حاوية الفيديو بنجاح"
+    },
+    "reviewContainer":{
+        "notFound":"حاوية المراجعة غير موجودة"
     }
 }

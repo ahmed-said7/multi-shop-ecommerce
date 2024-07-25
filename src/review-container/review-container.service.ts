@@ -17,6 +17,7 @@ import {
 import { Review, ReviewDocument } from 'src/review/schemas/review_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryReviewContainerDto } from './dto/query-review.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ReviewContainerService {
@@ -26,12 +27,13 @@ export class ReviewContainerService {
     private apiService: ApiService<ReviewContainerDocument,QueryReviewContainerDto>
     ,@InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>
+    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+    private i18n:CustomI18nService
   ) {};
   private async validateReviews(ids:string[]){
     const reviews=await this.reviewModel.find({ _id : { $in : ids } });
       if( ids.length != reviews.length ){
-        throw new HttpException("reviews not found",400)
+        throw new HttpException(this.i18n.translate("test.review.notFound"),400)
       };
   };
   async create(
@@ -62,7 +64,7 @@ export class ReviewContainerService {
       .getAllDocs(this.reviewContainerModel.find(),query);
     const reviewContainers=await result.populate("reviews");
     if( reviewContainers.length == 0  ){
-      throw new HttpException("review containers not found",400);
+      throw new HttpException(this.i18n.translate("test.reviewContainer.notFound"),400);
     };
     return { reviewContainers , pagination : paginationObj };
   };
@@ -71,7 +73,7 @@ export class ReviewContainerService {
       const reviewContainer = await this.reviewContainerModel
         .findById(id).populate("reviews");
       if( ! reviewContainer ){
-        throw new HttpException("review container not found",400)
+        throw new HttpException(this.i18n.translate("test.reviewContainer.notFound"),400)
       }
       return { reviewContainer };
   };
@@ -88,7 +90,7 @@ export class ReviewContainerService {
         },
       );
       if (!reviewContainer)
-        throw new NotFoundException("This container doesn't exist");
+        throw new NotFoundException(this.i18n.translate("test.reviewContainer.notFound"));
       return {reviewContainer};
   }
 
@@ -96,7 +98,7 @@ export class ReviewContainerService {
       const reviewContainer = await this.reviewContainerModel
         .findOneAndDelete({ _id : id , shopId });
       if (!reviewContainer) {
-        throw new NotFoundException('this review container not found');
+        throw new NotFoundException(this.i18n.translate("test.reviewContainer.notFound"));
       };
       await this.shopModel.findByIdAndUpdate(shopId,{
         $pull:{
