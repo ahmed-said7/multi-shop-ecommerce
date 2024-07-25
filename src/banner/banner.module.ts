@@ -33,8 +33,6 @@ import {
 } from 'src/intro-page/schemas/intro_page_schema';
 
 import { UploadModule } from 'src/upload/upload.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 

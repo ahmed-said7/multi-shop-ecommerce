@@ -10,5 +10,21 @@
         "notFound":  "no requests found",
         "credentials":"You can't delete this request.",
         "deleted": "Request deleted successfully."
+    },
+    "shop":{
+        "notFound":  "no shops found"
+    },
+    "banner":{
+        "notFound": "banner not found",
+        "deleted":"banner has been deleted successfully!"
+    },
+    "items":{
+        "notFound":"items not found"
+    },
+    "cart":{
+        "notFound":"cart not found"
+    },
+    "category":{
+        "notFound":"category not found"
     }
 }

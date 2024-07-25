@@ -11,13 +11,15 @@ import { Cart } from './schemas/cart.schema';
 import { IAuthUser } from 'src/common/enums';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private cartModel: Model<Cart>,
-    @InjectModel(Item.name) private itemModel: Model<ItemDocument>
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+    private i18n:CustomI18nService
   ) {}
 
   // get user cart
@@ -27,7 +29,7 @@ export class CartService {
         .populate('itemId', 'name price images');
 
       if (items.length == 0) {
-        throw new BadRequestException(`no item in cart`);
+        throw new BadRequestException(this.i18n.translate("test.cart.notFound"));
       };
 
       const totalPrice = items.reduce((total, item) => {
@@ -41,7 +43,7 @@ export class CartService {
   async addToCart(userId: string, item: AddToCartDto) {
     const itemExists = await this.itemModel.findById(item.itemId);
     if (!itemExists) {
-      throw new HttpException("Item not found",400)
+      throw new HttpException(this.i18n.translate("test.items.notFound"),400)
     };
     item.shopId=itemExists.shopId.toString();
     const cartItem = await this.cartModel.findOne({
@@ -70,7 +72,7 @@ export class CartService {
   async removeFromCart(cartItemId: string,user:IAuthUser) {
     const cart = await this.cartModel.findOneAndDelete({ _id:cartItemId , userId: user._id });
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(this.i18n.translate("test.cart.notFound"));
     }
     return this.getCart( cart.userId.toString() , cart.shopId.toString()  );
   };
@@ -80,7 +82,7 @@ export class CartService {
     const cart = await this.cartModel
       .findOneAndUpdate({ _id:itemId , userId: user._id },{ quantity });;
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(this.i18n.translate("test.cart.notFound"));
     };
     return this.getCart( cart.userId.toString() , cart.shopId.toString()  );
   }

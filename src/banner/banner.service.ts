@@ -12,6 +12,7 @@ import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { QueryBannerDto } from './dto/query-banner.dto';
 import { ApiService } from 'src/common/filter/api.service';
 import { IAuthUser } from 'src/common/enums';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class BannerService {
@@ -19,7 +20,8 @@ export class BannerService {
     @InjectModel(Banner.name)
     private readonly bannerModel: Model<BannerDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private apiService:ApiService<BannerDocument,QueryBannerDto>
+    private apiService:ApiService<BannerDocument,QueryBannerDto>,
+    private i18n:CustomI18nService
   ) {};
 
   async create(
@@ -34,7 +36,7 @@ export class BannerService {
     const Shop = await this.shopModel.findById(shopId);
 
     if (!Shop) {
-      throw new NotFoundException("Couldn't find the shop");
+      throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
     };
     
     await this.shopModel.findByIdAndUpdate(shopId, {
@@ -49,7 +51,7 @@ export class BannerService {
     const {query:result,paginationObj}=await this.apiService.getAllDocs(this.bannerModel.find(),query);
     const banners=await result;
     if( banners.length == 0  ){
-      throw new HttpException("banner not found",400);
+      throw new HttpException(this.i18n.translate("test.banner.notFound"),400);
     };
     return { banners , pagination : paginationObj };
   }
@@ -57,7 +59,7 @@ export class BannerService {
   async findOne(id: string) {
     const banner = await this.bannerModel.findById(id);
     if (!banner) {
-      throw new NotFoundException('this banner not found');
+      throw new NotFoundException(this.i18n.translate("test.banner.notFound"));
     }
     return {banner};
   }
@@ -70,7 +72,7 @@ export class BannerService {
     const banner=await this.bannerModel
       .findOneAndUpdate({ _id:id,shopId:user.shopId}, updateBannerDto, { new: true });
     if (!banner) {
-      throw new NotFoundException('this banner not found');
+      throw new NotFoundException(this.i18n.translate("test.banner.notFound"));
     };
     return { banner };
   }
@@ -79,12 +81,13 @@ export class BannerService {
     const banner = await this.bannerModel.findOneAndDelete({
       _id:id,shopId:user.shopId
     });
-    if (!banner) throw new NotFoundException("this banner doesn't exist");
+    if (!banner) throw new NotFoundException(this.i18n.translate("test.banner.notFound"));
 
     await this.shopModel
       .findByIdAndUpdate( banner.shopId , { $pull : { containerID : id } });
     // if (!shop) throw new NotFoundException("this shop doesn't exist");
     // await this.bannerModel.findByIdAndDelete(id);
-    return {status:'banner has been deleted successfully!'};
+    return {status:this.i18n.translate("test.banner.deleted")};
+  
   }
 }
