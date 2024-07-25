@@ -224,6 +224,9 @@
                 "isNotEmpty": "An order must have a shop",
                 "isMongoId": "Invalid shop ID format"
             },
+            "userId": {
+                "isMongoId": "User ID must be a valid MongoDB ID"
+            },
             "userAddress": {
                 "isNotEmpty": "User address should not be empty"
             },

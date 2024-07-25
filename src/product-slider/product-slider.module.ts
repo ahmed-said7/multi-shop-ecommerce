@@ -30,7 +30,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 import {
   IntroPage,
   IntroPageSchema,
-} from 'src/intro-page/schemas/intro_page_schema';
+} from 'src/i18n/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 import { CustomI18nService } from 'src/common/custom-i18n.service';

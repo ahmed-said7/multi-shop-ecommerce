@@ -30,7 +30,7 @@ import {
 import {
   IntroPage,
   IntroPageSchema,
-} from 'src/intro-page/schemas/intro_page_schema';
+} from 'src/i18n/intro-page/schemas/intro_page_schema';
 
 import { UploadModule } from 'src/upload/upload.module';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';

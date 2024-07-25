@@ -1,33 +1,34 @@
 import { IsNotEmpty, IsMongoId, IsOptional, IsString, ValidateNested, IsMobilePhone, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class ValidateAddresse {
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.city.isNotEmpty") })
+    @IsString({ message:i18nValidationMessage("validation.addresse.city.isNotEmpty") })
     city?: string;
-    @IsNotEmpty()
-    @IsString()
-    @IsMobilePhone()
+    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.mobile.isNotEmpty") })
+    @IsString({ message:i18nValidationMessage("validation.addresse.mobile.isString") })
+    @IsMobilePhone("ar-EG",{},{ message:i18nValidationMessage("validation.addresse.mobile.isMobilePhone") })
     mobile?: string;
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.streetName.isNotEmpty") })
+    @IsString({ message:i18nValidationMessage("validation.addresse.streetName.isString") })
     streetName?: string;
     @IsOptional()
-    @IsNumber()
+    @IsNumber({},{ message:i18nValidationMessage("validation.addresse.zipCode.isNumber") })
     zipCode?: number;
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.country.isNotEmpty") })
+    @IsString({ message:i18nValidationMessage("validation.addresse.country.isString") })
     country?: string;
 };
 
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message: 'An order must have a shop' })
-  @IsMongoId()
+  @IsNotEmpty({ message:i18nValidationMessage("validation.order.shopId.isNotEmpty") })
+  @IsMongoId({ message:i18nValidationMessage("validation.order.shopId.isMongoId") })
   shopId: string;
 
-  @IsNotEmpty({message:"field should be object"})
+  @IsNotEmpty({ message:i18nValidationMessage("validation.order.userAddress.isNotEmpty") })
   @ValidateNested()
   @Type( ( ) => ValidateAddresse )
   userAddress?: {
@@ -39,7 +40,7 @@ export class CreateOrderDto {
   };
 
   @IsOptional()
-  @IsString()
+  @IsString({ message:i18nValidationMessage("validation.order.couponName.isString") })
   couponName: string;
   
   cartItems: 

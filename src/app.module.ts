@@ -16,7 +16,7 @@ import { ProductSliderModule } from './product-slider/product-slider.module';
 import { ReviewContainerModule } from './review-container/review-container.module';
 import { CategoryModule } from './category/category.module';
 import { ReviewModule } from './review/review.module';
-import { IntroPageModule } from './intro-page/intro-page.module';
+import { IntroPageModule } from './i18n/intro-page/intro-page.module';
 import { AdminRequestsModule } from './admin-requests/admin-requests.module';
 import { VideoContainerModule } from './video-container/video-container.module';
 import { PhotoSliderModule } from './photo-slider/photo-slider.module';
