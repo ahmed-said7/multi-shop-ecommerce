@@ -15,6 +15,7 @@ import {
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryProductSliderDto } from './dto/query-product-slider.dto';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ProductSliderService {
@@ -23,7 +24,8 @@ export class ProductSliderService {
     private productSliderModel: Model<ProductSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     private apiService: ApiService<ProductSliderDocument,QueryProductSliderDto>,
-    @InjectModel(Item.name) private itemModel: Model<ItemDocument>
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+    private i18n:CustomI18nService
   ) {};
 
   async create(body: CreateProductSliderDto, shopId: string) {
@@ -52,7 +54,7 @@ export class ProductSliderService {
       select: 'name price description images',
     });
     if( productSliders.length == 0  ){
-      throw new HttpException("product sliders not found",400);
+      throw new HttpException(this.i18n.translate("test.productSlider.notFound"),400);
     };
     
     return { productSliders 
@@ -68,7 +70,7 @@ export class ProductSliderService {
         select: 'name price description images',
       });
       if(!productSlider){
-        throw new HttpException("ProductSlider not found",400);
+        throw new HttpException(this.i18n.translate("test.productSlider.notFound"),400);
       }
       return {productSlider};
   }
@@ -85,21 +87,21 @@ export class ProductSliderService {
         },
       );
       if (!productSlider) {
-        throw new NotFoundException('this product slider not found');
+        throw new NotFoundException(this.i18n.translate("test.productSlider.notFound"));
       }
       return {productSlider};
   };
   private async validateProducts(ids:string[]){
     const products = await this.itemModel.find({ _id : { $in : ids } });
     if( products.length != ids.length ){
-      throw new HttpException("Product ids not valid",400);
+      throw new HttpException(this.i18n.translate("test.items.notFound"),400);
     };
   };
 
   async remove(id: string, shopId: string) {
     const productSlider = await this.productSliderModel.findOneAndDelete({ _id:id,shopId });
     if (!productSlider) {
-      throw new NotFoundException('this product slider not found');
+      throw new NotFoundException(this.i18n.translate("test.productSlider.notFound"));
     }
     await this.shopModel.findByIdAndUpdate(shopId,
     {
@@ -109,6 +111,6 @@ export class ProductSliderService {
         }
       }
     });
-    return {status:'Prouct Slider has been deleted successfully!'};
+    return {status:this.i18n.translate("test.productSlider.deleted")};
   }
 }

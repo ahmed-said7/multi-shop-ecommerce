@@ -51,5 +51,9 @@
     "photoSlider":{
         "notFound":"photoSlider not found",
         "deleted":"photo slider deleted successfully"
+    },
+    "productSlider":{
+        "notFound":"product Slider not found",
+        "deleted":"product slider deleted successfully"
     }
 }

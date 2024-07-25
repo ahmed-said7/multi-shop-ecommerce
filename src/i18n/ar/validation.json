@@ -305,6 +305,9 @@
         }
     },
     "productSlider": {
+        "shopId": {
+            "isMongoId": "تنسيق معرف المتجر غير صالح"
+        },
         "products": {
             "isArray": "يجب أن تكون المنتجات مصفوفة",
             "isMongoId": "يجب أن يكون معرف كل منتج صالحًا من نوع MongoDB"
