@@ -1,35 +1,32 @@
 import { IsNotEmpty, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateShopDto {
   // Shop title, must not be empty, and should be a string
-  @IsNotEmpty({ message: 'A shop must have a title' })
-  @IsString({ message: 'A shop must have a string title' })
+  @IsNotEmpty({ message: i18nValidationMessage("validation.shop.title.isNotEmpty") })
+  @IsString({ message: i18nValidationMessage("validation.shop.title.isString") })
   title: string;
 
   // Shop description, must not be empty, and should be a string
-  @IsNotEmpty({ message: 'A shop must have a description' })
-  @IsString({ message: 'A shop must have a string description' })
-  @MinLength(10, {
-    message: 'A shop description must be 10 chracters minimum',
-  })
-  @MaxLength(150, {
-    message: 'A shop description must be 150 chracters maximum',
-  })
+  @IsNotEmpty({ message: i18nValidationMessage("validation.shop.description.isNotEmpty") })
+  @IsString({ message: i18nValidationMessage("validation.shop.description.isString") })
+  @MinLength(10, { message: i18nValidationMessage("validation.shop.description.minLength") })
+  @MaxLength(150, { message: i18nValidationMessage("validation.shop.description.maxLength") })
   description: string;
   
   @IsOptional()
-  @IsString()
+  @IsString({ message: i18nValidationMessage("validation.shop.twitter.isString") })
   twitter?: string;
   
   @IsOptional()
-  @IsString()
+  @IsString({ message: i18nValidationMessage("validation.shop.facebook.isString") })
   facebook?: string;
   
   @IsOptional()
-  @IsString()
+  @IsString({ message: i18nValidationMessage("validation.shop.instagram.isString") })
   instagram?: string;
   
   @IsOptional()
-  @IsString()
+  @IsString({ message: i18nValidationMessage("validation.shop.whatsapp.isString") })
   whatsapp?: string;
 }

@@ -49,6 +49,7 @@ import { AllRoles, IAuthUser } from 'src/common/enums';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryShopDto } from './dto/query-shop.dto';
 import { Merchant, MerchantDocument } from 'src/merchant/schema/merchant.schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ShopService {
@@ -73,7 +74,8 @@ export class ShopService {
     private readonly bannerModel: mongoose.Model<BannerDocument>,
     private apiService:ApiService<ShopDocument,QueryShopDto>,
     @InjectModel(Merchant.name)
-    private readonly merchantModel: mongoose.Model<MerchantDocument>
+    private readonly merchantModel: mongoose.Model<MerchantDocument>,
+    private i18n:CustomI18nService
     // private readonly uploadService: UploadService,
   ) {};
   async create(body: CreateShopDto, user: IAuthUser) {
@@ -82,7 +84,7 @@ export class ShopService {
         shop=await this.shopModel.findById(user.shopId);
       };
       if( shop ){
-        throw new BadRequestException('You already have a shop');
+        throw new BadRequestException(this.i18n.translate("test.shop.duplicate"));
       }
       shop = await this.shopModel.create({
         ... body,userID:user._id
@@ -94,6 +96,9 @@ export class ShopService {
     const { paginationObj,query:result }=await this.apiService.
       getAllDocs( this.shopModel.find(), query , ["title", "description"]);
     const shops=await result;
+    if(shops.length == 0){
+      throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
+    }
     return { shops, paginationObj };
   };
 
@@ -111,7 +116,7 @@ export class ShopService {
         select: 'name',
       });
       if (!foundShop)
-        throw new NotFoundException('There is no shop with this id');
+        throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
 
       return {foundShop};
   }
@@ -121,7 +126,7 @@ export class ShopService {
         userID: userId
       });
       if(shops.length==0){
-        throw new NotFoundException("shops not found");
+        throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
       };
       return {shops};
   };
@@ -135,7 +140,7 @@ export class ShopService {
         new: true,
       });
       if(!shop){
-        throw new HttpException("Shop not found",400);
+        throw new HttpException(this.i18n.translate("test.shop.notFound"),400);
       }
       return {shop};
   }
@@ -143,15 +148,15 @@ export class ShopService {
   async userJoin(shopId: mongoose.Types.ObjectId, userId: string) {
       const user = await this.userModel.findById(userId);
 
-      if (!user) throw new NotFoundException("This user doesn't exist");
+      if (!user) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
 
       const shop = await this.shopModel.findByIdAndUpdate(shopId, {
         $addToSet: { customers: user._id },
       });
 
-      if (!shop) throw new NotFoundException('There is no shop with this id');
+      if (!shop) throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
 
-      return {status:'User added successfully!'};
+      return {status:this.i18n.translate("test.shop.added")};
   };
 
   async addUser(
@@ -161,15 +166,15 @@ export class ShopService {
       const shop = await this.shopModel.findByIdAndUpdate(shopId, {
         $addToSet: { customers: userId },
       });
-      if (!shop) throw new NotFoundException('There is no shop with this id');
-      return {status:'User added successfully!'};
+      if (!shop) throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
+      return {status:this.i18n.translate("test.shop.added")};
   }
   async findShopItems( id: string) {
       const shop = await this.shopModel
         .findById(id)
         .populate('itemsIDs');
       if( ! shop  ){
-        throw new HttpException("Shop not found",400);
+        throw new HttpException(this.i18n.translate("test.shop.notFound"),400);
       };
       const items = shop.itemsIDs;
       return {items};
@@ -178,15 +183,13 @@ export class ShopService {
   async remove(user: IAuthUser , shopId: string) {
       const shop = await this.shopModel.findById(shopId);
       if (!shop) {
-        throw new NotFoundException('Shop not found');
+        throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
       };
       if ( 
         shop.userID.toString() != user._id.toString() && 
         user.role !== AllRoles.ADMIN
       ) {
-        throw new UnauthorizedException(
-          'You dont have the permission to delete this shop',
-        );
+        throw new UnauthorizedException(this.i18n.translate("test.shop.credentials"));
       };
       const ids=shop.containers.map( ({containerID}) => containerID );
       const promises=[
@@ -202,13 +205,13 @@ export class ShopService {
       await this.shopModel.findByIdAndDelete(shopId);
       const merchant=await this.merchantModel.findById(shop.userID);
       if(!merchant){
-        return {status:'Shop was deleted successfully'};
+        return {status:this.i18n.translate("test.shop.deleted")};
       };
       const newShop = await this.shopModel.create({
         title: `${v4()}-Shop`,userID:merchant._id.toString()
       });
       await this.merchantModel.findByIdAndUpdate( shop.userID , {shopId:newShop._id.toString() });
-      return {status:'Shop was deleted successfully'};
+      return {status:this.i18n.translate("test.shop.deleted")};
   }
 
   async findShopContainers(id: string) {

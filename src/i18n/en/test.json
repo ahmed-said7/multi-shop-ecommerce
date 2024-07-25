@@ -12,7 +12,11 @@
         "deleted": "Request deleted successfully."
     },
     "shop":{
-        "notFound":  "no shops found"
+        "notFound":   "shop not found",
+        "duplicate":"you have already a shop",
+        "deleted": "shop deleted successfully",
+        "added":"shop added successfully",
+        "credentials":"you do not have access"
     },
     "banner":{
         "notFound": "banner not found",
