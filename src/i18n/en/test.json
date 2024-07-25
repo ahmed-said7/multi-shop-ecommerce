@@ -55,5 +55,8 @@
     "productSlider":{
         "notFound":"product Slider not found",
         "deleted":"product slider deleted successfully"
+    },
+    "report":{
+        "notFound":"report not found"
     }
 }

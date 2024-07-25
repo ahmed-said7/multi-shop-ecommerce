@@ -10,13 +10,15 @@ import { Item, ItemDocument } from 'src/item/schemas/item-schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { IAuthUser } from 'src/common/enums';
 import { CreateReportDto } from './dto/create-report.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectModel(Shop.name) private readonly shopModel: Model<ShopDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>
+    @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
+    private i18n:CustomI18nService
   ) {};
 
   async findOne(user: IAuthUser, body:CreateReportDto ) {
@@ -94,7 +96,7 @@ export class ReportsService {
       }
     ]);
     if( monthlySales.length == 0 ){
-      throw new NotFoundException("reports not found");
+      throw new NotFoundException(this.i18n.translate("test.report.notFound"));
     };
     return monthlySales;
 
@@ -137,7 +139,7 @@ export class ReportsService {
       }
     ]);
     if( itemSales.length == 0 ){
-      throw new NotFoundException("reports not found");
+      throw new NotFoundException(this.i18n.translate("test.report.notFound"));
     };
     return itemSales;
   };
@@ -147,7 +149,7 @@ export class ReportsService {
     const shop = await this.shopModel.findById(shopId);
 
     if (!shop) {
-      throw new NotFoundException('Shop not found');
+      throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
     }
 
     const ratingsMap = await this.itemModel.aggregate([
@@ -169,7 +171,7 @@ export class ReportsService {
       }
     ])
     if( ratingsMap.length == 0 ){
-      throw new NotFoundException("reports not found");
+      throw new NotFoundException(this.i18n.translate("test.report.notFound"));
     };
     return ratingsMap[0];
   };
@@ -177,7 +179,7 @@ export class ReportsService {
   async getShopCustomerCount(shopId: string) {
     const shop = await this.shopModel.findById(shopId);
     if(!shop){
-      throw new HttpException("shop not found",400);
+      throw new HttpException(this.i18n.translate("test.shop.notFound"),400);
     };
     return { customers:shop.customers.length };
   }
@@ -185,7 +187,7 @@ export class ReportsService {
   async getShopOrdersMetrics(shopId: string) {
     const shop = await this.shopModel.findById(shopId);
     if (!shop) {
-      throw new NotFoundException('Shop not found');
+      throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
     };
     
   const hoursWithMostOrders = await this.orderModel.aggregate([
@@ -243,7 +245,7 @@ export class ReportsService {
     }
   ]);
     if( buyerWithMostOrders.length == 0 && daysWithMostOrders.length == 0 && hoursWithMostOrders.length == 0 ){
-      throw new NotFoundException("reports not found");
+      throw new NotFoundException(this.i18n.translate("test.report.notFound"));
     };
     return {
       buyerWithMostOrders:buyerWithMostOrders[0],
@@ -293,7 +295,7 @@ export class ReportsService {
       }
     ]);
     if( mostProfitable.length == 0 ){
-      throw new HttpException("reports not found",400);
+      throw new HttpException(this.i18n.translate("test.report.notFound"),400);
     };
     return mostProfitable;
   };
