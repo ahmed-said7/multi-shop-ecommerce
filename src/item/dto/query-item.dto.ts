@@ -1,4 +1,5 @@
 import { IsMongoId, IsOptional } from "class-validator";
+import { i18nValidationMessage } from "nestjs-i18n";
 import { FindQuery } from "src/common/enums";
 
 export class QueryItemDto extends FindQuery {
@@ -7,7 +8,7 @@ export class QueryItemDto extends FindQuery {
     @IsOptional()
     amount: string|object;
     @IsOptional()
-    @IsMongoId()
+    @IsMongoId({ message: i18nValidationMessage("validation.item.category.isMongoId") })
     category: string;
     @IsOptional()
     soldTimes?: string|object;

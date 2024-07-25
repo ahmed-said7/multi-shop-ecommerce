@@ -13,6 +13,7 @@ import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryItemDto } from './dto/query-item.dto';
 import { Category, CategoryDocument } from 'src/category/schemas/category_schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ItemService {
@@ -20,7 +21,8 @@ export class ItemService {
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
     @InjectModel(Category.name) private catModel: Model<CategoryDocument>,
-    private apiService:ApiService<ItemDocument,QueryItemDto>
+    private apiService:ApiService<ItemDocument,QueryItemDto>,
+    private i18n:CustomI18nService
   ) {};
 
   async create(createItemDto: CreateItemDto, shopId: string) {
@@ -38,14 +40,14 @@ export class ItemService {
       .getAllDocs(this.itemModel.find(),query,["name","description"]);
     const items=await result;
     if( items.length == 0  ){
-      throw new HttpException("items not found",400);
+      throw new HttpException(this.i18n.translate("test.items.notFound"),400);
     };
     return { items , pagination : paginationObj };
   }
 
   async findOne(id: string) {
       const item = await this.itemModel.findById(id);
-      if (!item) throw new NotFoundException('Item not found!');
+      if (!item) throw new NotFoundException(this.i18n.translate("test.items.notFound"));
       return {item};
   }
 
@@ -56,17 +58,17 @@ export class ItemService {
     const item = await this.itemModel.findOneAndUpdate({_id:id,shopId}, updateItemDto, {
       new: true,
     });
-    if (!item) throw new NotFoundException('Item not found!');
+    if (!item) throw new NotFoundException(this.i18n.translate("test.items.notFound"));
     return { item };
   }
 
   async remove( id: string , shopId: string ) {
     const item = await this.itemModel.findOneAndDelete({_id:id,shopId});
-    if (!item) throw new NotFoundException('Item not found!');
+    if (!item) throw new NotFoundException(this.i18n.translate("test.items.notFound"));
     return { item };
   };
   private async validateCategory(id:string){
     const category = await this.catModel.findById(id);
-    if (!category) throw new NotFoundException('category id not found');
+    if (!category) throw new NotFoundException(this.i18n.translate("test.category.notFound"));
   };
 }
