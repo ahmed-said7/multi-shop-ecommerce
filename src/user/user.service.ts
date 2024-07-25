@@ -9,6 +9,7 @@ import { User, UserDocument } from './schemas/user_schema';
 import { Order, OrderDocument } from '../order/schemas/order_schema';
 import { ApiService, IQuery } from 'src/common/filter/api.service';
 import { QueryUserDto } from './dto/query-user.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 
 @Injectable()
@@ -17,6 +18,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private apiService:ApiService<User,QueryUserDto>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    private i18n:CustomI18nService
   ) {}
 
   async findAll( filter: QueryUserDto ) {
@@ -37,13 +39,13 @@ export class UserService {
         path: 'favorites',
         model: 'Item',
       }).select("-password");
-    if (!foundUser) throw new NotFoundException('This user doesnt exist');
+    if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
     return { user:foundUser };
   }
 
   async findOneWithEmail( email: string ) {
     const foundUser= await this.userModel.findOne({ email });
-    if (!foundUser) throw new NotFoundException('This user doesnt exist');
+    if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
     return { foundUser };
   }
 
@@ -60,7 +62,7 @@ export class UserService {
 
     await this.userModel.findByIdAndDelete(userId);
 
-    return { status : 'User Deleted Successfully'};
+    return { status : this.i18n.translate("test.user.deleted")};
   }
 
   async addFav(itemId: string, userId: string ) {
