@@ -31,6 +31,7 @@ import {
 import { UserModule } from "src/user/user.module";
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { jwtTokenModule } from 'src/jwt/jwt.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { jwtTokenModule } from 'src/jwt/jwt.module';
     UserModule
   ],
   providers: [
-    AuthService
+    AuthService,CustomI18nService
   ],
   controllers: [AuthController],
   exports: [AuthService],

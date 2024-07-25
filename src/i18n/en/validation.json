@@ -19,6 +19,9 @@
             "info": {
                 "isNotEmpty": "Info should not be empty",
                 "isString": "Info should be a string"
+            },
+            "userId": {
+                "isMongoId": "User ID must be a valid MongoDB ID"
             }
         },
         "user": {

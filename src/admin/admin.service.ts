@@ -8,6 +8,7 @@ import mongoose, { Model } from 'mongoose';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
 import { User, UserDocument } from '../user/schemas/user_schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class AdminService {
@@ -15,11 +16,12 @@ export class AdminService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
+    private i18n:CustomI18nService
   ) {};
 
   async findOne(id: string) {
       const foundUser = await this.userModel.findById(id).select("-password");
-      if (!foundUser) throw new NotFoundException('This user doesnt exist');
+      if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
       return { foundUser };
   }
 
@@ -27,16 +29,16 @@ export class AdminService {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateUserDto , { new: true })
       .select("-password");
-      if (!updatedUser) throw new NotFoundException('This user doesnt exist');
+      if (!updatedUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
     return { updatedUser };
   };
 
   async remove( deleteId: string) {
     const deletedUser = this.userModel.findByIdAndDelete(deleteId);
     if (!deletedUser) {
-      throw new NotFoundException('User to delete not found');
+      throw new NotFoundException(this.i18n.translate("test.user.notFound"));
     };
-    return { status : 'User Deleted Successfully'};
+    return { status : this.i18n.translate("test.user.deleted")};
   };
 
 
@@ -89,7 +91,7 @@ export class AdminService {
     ]);
 
   if (result.length === 0) {
-    throw new HttpException('Data not found', 400);
+    throw new HttpException(this.i18n.translate("test.user.statistics"), 400);
   };
 
   return { data: result };
@@ -145,7 +147,7 @@ export class AdminService {
     ]);
 
     if (result.length === 0) {
-      throw new HttpException('Data not found', 400);
+      throw new HttpException(this.i18n.translate("test.user.statistics"), 400);
     }
 
     return { data: result };

@@ -7,11 +7,13 @@ import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Model } from 'mongoose';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private i18n:CustomI18nService,
     private readonly userService: UserService,
     private jwt:jwtTokenService
   ) {};
@@ -22,7 +24,7 @@ export class AuthService {
       $or:[{ email } , { phone } ]
     });
     if (foundUser) {
-      throw new BadRequestException('There is a user with the same email or phone!');
+      throw new BadRequestException(this.i18n.translate("test.user.duplicate"));
     }
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
     const savedUser=await this.userModel.create(createUserDto);
@@ -37,7 +39,7 @@ export class AuthService {
     const { foundUser : user } = await this.userService.findOneWithEmail(body.email);
     const valid=await bcrypt.compare(body.password, user.password);
     if ( ! valid ) {
-      throw new HttpException("email or password is not correct",400)
+      throw new HttpException(this.i18n.translate("test.user.credentials"),400)
     };
     const {accessToken,refreshToken}=await this.jwt.createTokens({
       userId: user._id.toString(),

@@ -10,7 +10,6 @@ import {
   IsDateString,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
-
 import { GENDER_STATUS, UserRole } from 'src/common/enums';
 
 export class CreateUserDto {
@@ -25,7 +24,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(UserRole, { message: i18nValidationMessage("validation.user.role.isEnum")})
   role: UserRole;
-  @IsNotEmpty()
+  @IsNotEmpty({ message : i18nValidationMessage("validation.user.email.isNotEmpty")})
   @IsEmail({},{ message : i18nValidationMessage("validation.user.email.isEmail")})
   email: string;
   @IsNotEmpty({ message: i18nValidationMessage("validation.user.phone.isNotEmpty")})

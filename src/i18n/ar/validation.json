@@ -1,5 +1,8 @@
 {
     "admin_request": {
+        "userId": {
+            "isMongoId": "يجب أن يكون معرف المستخدم صالحًا من نوع MongoDB"
+        },
         "title": {
             "isNotEmpty": "العنوان يجب ألا يكون فارغاً",
             "isString": "العنوان يجب أن يكون نصاً"

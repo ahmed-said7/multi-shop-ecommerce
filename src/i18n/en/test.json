@@ -1,3 +1,14 @@
 {
-    
+    "user":{
+        "duplicate": "There is a user with the same email or phone!",
+        "credentials": "Email or password is not correct.",
+        "notFound": "This user doesn't exist.",
+        "deleted": "User Deleted Successfully.",
+        "statistics": "Statistics Data not found."
+    },
+    "admin_request":{
+        "notFound":  "no requests found",
+        "credentials":"You can't delete this request.",
+        "deleted": "Request deleted successfully."
+    }
 }
