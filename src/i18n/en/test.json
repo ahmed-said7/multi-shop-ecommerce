@@ -38,5 +38,11 @@
     "introPage": {
         "notFound":"intro pages not found",
         "deleted":"Intro page has been deleted successfully"
+    },
+    "merchant":{
+        "notFound":"merchant not found",
+        "deleted":"merchant deleted successfully",
+        "updated":"merchant updated successfully",
+        "created":"merchant created successfully"
     }
 }

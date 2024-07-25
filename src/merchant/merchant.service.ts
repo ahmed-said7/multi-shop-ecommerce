@@ -18,6 +18,7 @@ import { ApiService, IQuery } from 'src/common/filter/api.service';
 import { jwtTokenService } from 'src/jwt/jwt.service';
 import { AllRoles } from 'src/common/enums';
 import { QueryMerchantDto } from './dto/query-merchant.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class MerchantService {
@@ -27,7 +28,8 @@ export class MerchantService {
     @InjectModel(Shop.name)
     private readonly shopModel: Model<ShopDocument>,
     private jwt:jwtTokenService,
-    private apiService:ApiService<MerchantDocument,QueryMerchantDto>
+    private apiService:ApiService<MerchantDocument,QueryMerchantDto>,
+    private i18n:CustomI18nService
   ) {}
 
   async create(data: CreateDto) {
@@ -46,14 +48,14 @@ export class MerchantService {
         userID: merchant._id.toString()
       });
 
-      return { status:'Merchant Created Successfully'};
+      return { status:this.i18n.translate("test.merchant.created")};
   }
 
   async findOne(id: string) {
       const merchant = await this.merchantModel
         .findById(id).select("-password");
       if( ! merchant ){
-        throw new HttpException("merchant not found",400)
+        throw new HttpException(this.i18n.translate("test.merchant.notFound"),400)
       };
       return {merchant};
   }
@@ -67,7 +69,7 @@ export class MerchantService {
 
     const valid=await bcrypt.compare(password, merchant.password);
     if(!valid) {
-      throw new HttpException("email or password is incorrect",400);
+      throw new HttpException(this.i18n.translate("test.user.credentials"),400);
     };
 
 
@@ -88,11 +90,11 @@ export class MerchantService {
 
   async update(id: string, data: UpdateDto) {
       await this.merchantModel.findByIdAndUpdate(id, data, { new: true });
-      return {status:'Merchant Updated Successfully'};
+      return {status:this.i18n.translate("test.merchant.updated")};
   }
 
   async delete(id: string) {
       await this.merchantModel.findByIdAndDelete(id);
-      return {status:'Merchant Deleted Successfully'};
+      return {status:this.i18n.translate("test.merchant.deleted")};
   }
 }
