@@ -7,7 +7,7 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user_schema';
 import { Order, OrderDocument } from '../order/schemas/order_schema';
-import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { ApiService } from 'src/common/filter/api.service';
 import { QueryUserDto } from './dto/query-user.dto';
 import { CustomI18nService } from 'src/common/custom-i18n.service';
 

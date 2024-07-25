@@ -391,7 +391,7 @@
             "isString": "Description must be a string"
         }
     },
-    "video": {
+    "videoContainer": {
         "link": {
             "isNotEmpty": "Video link must not be empty",
             "isString": "Video link must be a string"
