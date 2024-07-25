@@ -25,14 +25,16 @@ export class catchExceptionsFilter extends BaseExceptionFilter {
     console.log(exception);
     object.code = 400;
     const res = host.switchToHttp().getResponse<Response>();
-    if (
-      exception?.response?.message &&
-      Array.isArray(exception.response.message)
-    ) {
-      this.handleNestError(exception.response, object);
-    } else if (exception instanceof HttpException) {
+    // if (
+    //   exception?.response?.message &&
+    //   Array.isArray(exception.response.message)
+    // ) {
+    //   this.handleNestError(exception.response, object);
+    // } else 
+    if (exception instanceof HttpException) {
       this.handleHttpException(exception, object);
-    } else if (exception.name === "ValidationError") {
+    } 
+    else if (exception.name === "ValidationError") {
       this.handleMongoValidatioError(exception, object);
     } else if (exception.name === "CastError") {
       this.handleCastError(exception, object);
@@ -58,13 +60,13 @@ export class catchExceptionsFilter extends BaseExceptionFilter {
   handleCastError(exception: Error.CastError, object: ServerError) {
     object.message = `invalid ${exception.path} value ${exception.value}`;
   }
-  handleNestError(
-    exception: { message: string[]; statusCode: number },
-    object: ServerError,
-  ) {
-    object.message = exception.message.join(" and ");
-    object.code = exception.statusCode;
-  }
+  // handleNestError(
+  //   exception: { message: string[]; statusCode: number },
+  //   object: ServerError,
+  // ) {
+  //   object.message = exception.message.join(" and ");
+  //   object.code = exception.statusCode;
+  // }
   handleHttpException(exception: HttpException, object: ServerError) {
     object.message = exception.message;
     object.code = exception.getStatus();

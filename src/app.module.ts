@@ -25,16 +25,12 @@ import { CartModule } from './cart/cart.module';
 import { BannerModule } from './banner/banner.module';
 import { UploadModule } from './upload/upload.module';
 import { MerchantModule } from './merchant/merchant.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { DateTime } from 'luxon';
-import { v4 as uuid } from 'uuid';
-import { extension } from 'mime-types';
 import { APP_FILTER } from '@nestjs/core';
 import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 import { ShopModule } from './shop/shop.module';
 import { jwtTokenModule } from './jwt/jwt.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { I18nModule, I18nValidationExceptionFilter, QueryResolver } from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -49,6 +45,14 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     jwtTokenModule
     ,
+    I18nModule.forRoot({
+      loaderOptions:{
+        path:"src/i18n/"
+        ,watch:true
+      },
+      fallbackLanguage:"ar",
+      resolvers:[ { use:QueryResolver , options:["lang"] } ]
+    })
     // MulterModule.register({
     //   storage: diskStorage({
     //     destination: './images/',
@@ -60,7 +64,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     //       callback(null, name);
     //     },
     //   }),
-    
+    ,
     EventEmitterModule.forRoot({global:true}),
     MongooseModule.forRootAsync({
       useFactory( config:ConfigService ){
@@ -92,7 +96,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     MerchantModule,
   ],
   controllers: [AppController],
-  providers: [ AppService , { provide:APP_FILTER , useClass: catchExceptionsFilter } ],
+  providers: [ 
+    AppService 
+    , { provide:APP_FILTER , useClass: catchExceptionsFilter } 
+    // ,{ provide:APP_FILTER , useClass: I18nValidationExceptionFilter } 
+  ],
   exports: [MongooseModule],
 })
 export class AppModule {}

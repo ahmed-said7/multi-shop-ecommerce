@@ -1,4 +1,4 @@
-import { IsMongoId, IsOptional } from "class-validator";
+import { IsOptional } from "class-validator";
 import { FindQuery } from "src/common/enums";
 
 export class QueryCouponDto extends FindQuery {

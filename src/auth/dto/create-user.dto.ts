@@ -9,37 +9,32 @@ import {
   IsOptional,
   IsDateString,
 } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 import { GENDER_STATUS, UserRole } from 'src/common/enums';
 
 export class CreateUserDto {
-  @IsNotEmpty({ message: 'A user must have a name' })
-  @IsString({ message: 'A user must have a string name' })
+  @IsNotEmpty({ message: i18nValidationMessage("validation.user.name.isNotEmpty")})
+  @IsString({ message: i18nValidationMessage("validation.user.name.isString")})
   name: string;
-  @IsNotEmpty({ message: 'A user must have a password' })
-  @IsString({ message: 'A user must have a string password' })
-  @MinLength(6, { message: 'A user password must be 6 chracters minimum' })
-  @MaxLength(25, { message: 'A user password must be 25 chracters maximum' })
+  @IsNotEmpty({ message: i18nValidationMessage("validation.user.password.isNotEmpty")})
+  @IsString({ message: i18nValidationMessage("validation.user.password.isString")})
+  @MinLength(6, { message: i18nValidationMessage("validation.user.password.minLength")})
+  @MaxLength(25, { message: i18nValidationMessage("validation.user.password.maxLength")})
   password: string;
-
-  @IsOptional({ message: 'A user must have a role' })
-  @IsEnum(UserRole, { message: 'Invalid user role' })
-  role: UserRole;
-  
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsMobilePhone()
-  phone: string;
-
-  @IsNotEmpty()
-  @IsEnum(GENDER_STATUS)
-  gender: GENDER_STATUS;
-  
-
   @IsOptional()
-  @IsDateString()
+  @IsEnum(UserRole, { message: i18nValidationMessage("validation.user.role.isEnum")})
+  role: UserRole;
+  @IsNotEmpty()
+  @IsEmail({},{ message : i18nValidationMessage("validation.user.email.isEmail")})
+  email: string;
+  @IsNotEmpty({ message: i18nValidationMessage("validation.user.phone.isNotEmpty")})
+  @IsMobilePhone("ar-EG",{},{ message: i18nValidationMessage("validation.user.phone.isMobilePhone")})
+  phone: string;
+  @IsNotEmpty({ message: i18nValidationMessage("validation.user.gender.isNotEmpty")})
+  @IsEnum(GENDER_STATUS,{ message: i18nValidationMessage("validation.user.gender.isEnum")})
+  gender: GENDER_STATUS;
+  @IsOptional()
+  @IsDateString({},{ message: i18nValidationMessage("validation.user.birthday.isDateString")})
   birthday: string;
 }
