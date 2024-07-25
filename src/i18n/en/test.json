@@ -47,5 +47,9 @@
     },
     "order":{
         "notFound":"orders not found"
+    },
+    "photoSlider":{
+        "notFound":"photoSlider not found",
+        "deleted":"photo slider deleted successfully"
     }
 }
