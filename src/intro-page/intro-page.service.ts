@@ -11,6 +11,7 @@ import { Model, Types } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryIntroPageDto } from './dto/query-intro-page.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class IntroPageService {
@@ -18,7 +19,8 @@ export class IntroPageService {
     @InjectModel(IntroPage.name)
     private introPageModel: Model<IntroPageDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private apiService:ApiService<IntroPageDocument,QueryIntroPageDto>
+    private apiService:ApiService<IntroPageDocument,QueryIntroPageDto>,
+    private i18n:CustomI18nService
   ) {};
   async create(createIntroPageDto: CreateIntroPageDto, shopId: string) {
       const introPage = await this.introPageModel.create({
@@ -34,7 +36,7 @@ export class IntroPageService {
       .getAllDocs(this.introPageModel.find(),query);
     const IntroPages=await result;
     if( IntroPages.length == 0  ){
-      throw new HttpException("intro pages not found",400);
+      throw new HttpException(this.i18n.translate("test.introPage.notFound"),400);
     };
     return { IntroPages , pagination : paginationObj };
   }
@@ -42,7 +44,7 @@ export class IntroPageService {
   async findOne(id: string) {
     const introPage = await this.introPageModel.findById(id);
     if (!introPage) {
-      throw new NotFoundException('this page not found');
+      throw new NotFoundException(this.i18n.translate("test.introPage.notFound"));
     };
     return { introPage };
   }
@@ -54,7 +56,7 @@ export class IntroPageService {
         { new: true },
       );
       if( ! introPage ){
-        throw new HttpException("No intro page found",400);
+        throw new HttpException(this.i18n.translate("test.introPage.notFound"),400);
       };
       return { introPage };
   }
@@ -62,10 +64,10 @@ export class IntroPageService {
   async remove(id: string,shopId: string) {
       const introPage = await this.introPageModel.findOneAndDelete({ _id:id , shopId });
       if ( !introPage ) {
-        throw new NotFoundException('this page not found');
+        throw new NotFoundException(this.i18n.translate("test.introPage.notFound"));
       }
       await this.shopModel
           .findByIdAndUpdate(shopId,{$pull:{introPages:id}});
-      return { status : 'Intro page has been deleted successfully' };
+      return { status : this.i18n.translate("test.introPage.deleted")};
   }
 }

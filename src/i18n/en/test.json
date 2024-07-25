@@ -34,5 +34,9 @@
         "applicable":"Coupon not applicable to this shop",
         "duplicate":"This coupon already exists",
         "expired": "This coupon has expired"
+    },
+    "introPage": {
+        "notFound":"intro pages not found",
+        "deleted":"Intro page has been deleted successfully"
     }
 }
