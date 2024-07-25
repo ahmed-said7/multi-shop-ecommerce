@@ -227,7 +227,7 @@
         "userId": {
             "isMongoId": "يجب أن يكون معرف المستخدم صالحًا من نوع MongoDB"
         },
-        "userAddress": {
+        "userAddresse": {
             "isNotEmpty": "يجب ألا يكون عنوان المستخدم فارغاً"
         },
         "couponName": {

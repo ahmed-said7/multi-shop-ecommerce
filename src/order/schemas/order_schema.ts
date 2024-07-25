@@ -64,7 +64,7 @@ export class Order {
       mobile:String
     },
   })
-  userAddress: {
+  userAddresse: {
     city: string;
     country?: string;
     streetName: string;

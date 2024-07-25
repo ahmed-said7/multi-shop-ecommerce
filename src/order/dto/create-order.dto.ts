@@ -28,10 +28,10 @@ export class CreateOrderDto {
   @IsMongoId({ message:i18nValidationMessage("validation.order.shopId.isMongoId") })
   shopId: string;
 
-  @IsNotEmpty({ message:i18nValidationMessage("validation.order.userAddress.isNotEmpty") })
+  @IsNotEmpty({ message:i18nValidationMessage("validation.order.userAddresse.isNotEmpty") })
   @ValidateNested()
   @Type( ( ) => ValidateAddresse )
-  userAddress?: {
+  userAddresse?: {
     city?: string;
     country?: string;
     streetName?: string;

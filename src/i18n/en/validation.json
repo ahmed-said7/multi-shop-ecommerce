@@ -227,7 +227,7 @@
             "userId": {
                 "isMongoId": "User ID must be a valid MongoDB ID"
             },
-            "userAddress": {
+            "userAddresse": {
                 "isNotEmpty": "User address should not be empty"
             },
             "couponName": {
