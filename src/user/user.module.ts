@@ -39,6 +39,7 @@ import { UploadModule } from 'src/upload/upload.module';
 import { ApiModule } from 'src/common/filter/api.module';
 import { Merchant, merchantSchema } from "src/merchant/schema/merchant.schema";
 import { jwtTokenModule } from "src/jwt/jwt.module";
+import { CustomI18nService } from "src/common/custom-i18n.service";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -69,7 +70,7 @@ import { jwtTokenModule } from "src/jwt/jwt.module";
     UploadModule,ApiModule
   ],
   controllers: [UserController, UserTrackController],
-  providers: [UserService,  TrackService],
+  providers: [UserService,  TrackService,CustomI18nService],
   exports: [UserService, MongooseModule],
 })
 export class UserModule {}

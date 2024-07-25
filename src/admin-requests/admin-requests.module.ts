@@ -9,6 +9,7 @@ import {
 } from './schemas/admin_request_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { ApiModule } from 'src/common/filter/api.module';
     ApiModule
   ],
   controllers: [AdminRequestsController],
-  providers: [AdminRequestsService],
+  providers: [AdminRequestsService,CustomI18nService],
 })
 export class AdminRequestsModule {}

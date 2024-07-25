@@ -28,6 +28,7 @@ import {
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -52,6 +53,6 @@ import { ApiModule } from 'src/common/filter/api.module';
     ApiModule
   ],
   controllers: [ThemesController],
-  providers: [ThemesService],
+  providers: [ThemesService,CustomI18nService],
 })
 export class ThemesModule {}

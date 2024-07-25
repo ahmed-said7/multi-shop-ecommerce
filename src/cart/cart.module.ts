@@ -27,6 +27,7 @@ import {
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -50,7 +51,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
     ]),
   ],
   controllers: [CartController],
-  providers: [CartService],
+  providers: [CartService,CustomI18nService],
   exports: [CartService],
 })
 export class CartModule {}

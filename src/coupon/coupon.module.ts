@@ -33,6 +33,7 @@ import {
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 import { CartModule } from 'src/cart/cart.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -55,7 +56,7 @@ import { CartModule } from 'src/cart/cart.module';
     ApiModule
   ],
   controllers: [CouponController],
-  providers: [CouponService],
+  providers: [CouponService,CustomI18nService],
   exports: [CouponService],
 })
 export class CouponModule {}

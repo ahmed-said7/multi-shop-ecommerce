@@ -9,6 +9,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ApiModule } from 'src/common/filter/api.module';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { jwtTokenModule } from 'src/jwt/jwt.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { jwtTokenModule } from 'src/jwt/jwt.module';
     ApiModule
   ],
   controllers: [MerchantController],
-  providers: [MerchantService],
+  providers: [MerchantService,CustomI18nService],
 })
 export class MerchantModule {}

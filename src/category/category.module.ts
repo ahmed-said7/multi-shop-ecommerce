@@ -34,6 +34,7 @@ import {
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 import { UploadModule } from 'src/upload/upload.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -56,6 +57,6 @@ import { UploadModule } from 'src/upload/upload.module';
     ApiModule,UploadModule
   ],
   controllers: [CategoryController],
-  providers: [CategoryService,{provide:"field",useValue:"image"}],
+  providers: [CategoryService,{provide:"field",useValue:"image"},CustomI18nService],
 })
 export class CategoryModule {}

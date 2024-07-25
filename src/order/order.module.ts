@@ -34,6 +34,7 @@ import {
 } from 'src/intro-page/schemas/intro_page_schema';
 import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -64,6 +65,6 @@ import { ApiModule } from 'src/common/filter/api.module';
     ApiModule
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService,CustomI18nService]
 })
 export class OrderModule {}

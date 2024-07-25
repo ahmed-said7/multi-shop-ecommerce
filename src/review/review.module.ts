@@ -8,6 +8,7 @@ import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
 import { ApiModule } from 'src/common/filter/api.module';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
     ,ApiModule
   ],
   controllers: [ReviewController],
-  providers: [ReviewService],
+  providers: [ReviewService,CustomI18nService],
   exports: [ReviewService],
 })
 export class ReviewModule {}
