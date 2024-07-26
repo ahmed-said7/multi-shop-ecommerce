@@ -3,7 +3,7 @@ import { i18nValidationMessage } from 'nestjs-i18n';
 import { reportTypes } from 'src/common/enums';
 
 export class CreateReportDto {
-  @IsNotEmpty({ message:i18nValidationMessage("validation.report.report.isNotEmpty") })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.report.report.isNotEmpty") })
   @IsEnum(reportTypes,{ message:i18nValidationMessage("validation.report.report.isEnum") })
   report: reportTypes;
   @IsOptional()

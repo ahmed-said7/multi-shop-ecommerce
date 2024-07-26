@@ -2,19 +2,19 @@ import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "
 import { i18nValidationMessage } from "nestjs-i18n";
 
 export class CreateItemDto {
-  @IsNotEmpty({ message: i18nValidationMessage("validation.item.name.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.item.name.isNotEmpty") })
   @IsString({ message: i18nValidationMessage("validation.item.name.isString") })
   name: string;
-  @IsNotEmpty({ message: i18nValidationMessage("validation.item.price.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.item.price.isNotEmpty") })
   @IsNumber({},{ message: i18nValidationMessage("validation.item.price.isNumber") })
   price: number;
-  @IsNotEmpty({ message: i18nValidationMessage("validation.item.amount.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.item.amount.isNotEmpty") })
   @IsNumber({},{ message: i18nValidationMessage("validation.item.amount.isNumber") })
   amount: number;
-  @IsNotEmpty({ message: i18nValidationMessage("validation.item.description.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.item.description.isNotEmpty") })
   @IsString({ message: i18nValidationMessage("validation.item.description.isString") })
   description: string;
-  @IsNotEmpty({ message: i18nValidationMessage("validation.item.category.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.item.category.isNotEmpty") })
   @IsMongoId({ message: i18nValidationMessage("validation.item.category.isMongoId") })
   category: string;
   @IsOptional()

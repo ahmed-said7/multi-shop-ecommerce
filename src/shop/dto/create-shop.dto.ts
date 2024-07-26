@@ -3,12 +3,12 @@ import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateShopDto {
   // Shop title, must not be empty, and should be a string
-  @IsNotEmpty({ message: i18nValidationMessage("validation.shop.title.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.shop.title.isNotEmpty") })
   @IsString({ message: i18nValidationMessage("validation.shop.title.isString") })
   title: string;
 
   // Shop description, must not be empty, and should be a string
-  @IsNotEmpty({ message: i18nValidationMessage("validation.shop.description.isNotEmpty") })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.shop.description.isNotEmpty") })
   @IsString({ message: i18nValidationMessage("validation.shop.description.isString") })
   @MinLength(10, { message: i18nValidationMessage("validation.shop.description.minLength") })
   @MaxLength(150, { message: i18nValidationMessage("validation.shop.description.maxLength") })

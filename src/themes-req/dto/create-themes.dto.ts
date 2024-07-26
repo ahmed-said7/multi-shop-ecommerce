@@ -4,7 +4,7 @@ import { ThemeType } from 'src/common/enums';
 
 
 export class CreateThemeDto {
-  @IsNotEmpty({ message:i18nValidationMessage("theme.title.isNotEmpty") })
+  // @IsNotEmpty({ message:i18nValidationMessage("theme.title.isNotEmpty") })
   @IsEnum(ThemeType,{ message:i18nValidationMessage("theme.title.isEnum") })
   title: ThemeType;
   

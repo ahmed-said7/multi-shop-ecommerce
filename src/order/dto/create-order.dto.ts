@@ -4,27 +4,27 @@ import { Types } from 'mongoose';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class ValidateAddresse {
-    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.city.isNotEmpty") })
+    // @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.city.isNotEmpty") })
     @IsString({ message:i18nValidationMessage("validation.addresse.city.isNotEmpty") })
     city?: string;
-    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.mobile.isNotEmpty") })
+    // @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.mobile.isNotEmpty") })
     @IsString({ message:i18nValidationMessage("validation.addresse.mobile.isString") })
     @IsMobilePhone("ar-EG",{},{ message:i18nValidationMessage("validation.addresse.mobile.isMobilePhone") })
     mobile?: string;
-    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.streetName.isNotEmpty") })
+    // @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.streetName.isNotEmpty") })
     @IsString({ message:i18nValidationMessage("validation.addresse.streetName.isString") })
     streetName?: string;
     @IsOptional()
     @IsNumber({},{ message:i18nValidationMessage("validation.addresse.zipCode.isNumber") })
     zipCode?: number;
-    @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.country.isNotEmpty") })
+    // @IsNotEmpty({ message:i18nValidationMessage("validation.addresse.country.isNotEmpty") })
     @IsString({ message:i18nValidationMessage("validation.addresse.country.isString") })
     country?: string;
 };
 
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message:i18nValidationMessage("validation.order.shopId.isNotEmpty") })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.order.shopId.isNotEmpty") })
   @IsMongoId({ message:i18nValidationMessage("validation.order.shopId.isMongoId") })
   shopId: string;
 
