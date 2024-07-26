@@ -31,7 +31,7 @@ export class MerchantService {
     private jwt:jwtTokenService,
     private apiService:ApiService<MerchantDocument,QueryMerchantDto>,
     private i18n:CustomI18nService
-  ) {}
+  ) {};
 
   async create(data: CreateDto) {
 
@@ -98,8 +98,9 @@ export class MerchantService {
   }
 
   async update(id: string, data: UpdateDto) {
-      await this.merchantModel.findByIdAndUpdate(id, data, { new: true });
-      return {status:this.i18n.translate("test.merchant.updated")};
+    delete data.password;
+    await this.merchantModel.findByIdAndUpdate(id, data, { new: true });
+    return {status:this.i18n.translate("test.merchant.updated")};
   }
 
   async delete(id: string) {
