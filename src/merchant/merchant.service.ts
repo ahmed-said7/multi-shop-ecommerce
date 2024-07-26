@@ -1,6 +1,7 @@
 import { Model, Types } from 'mongoose';
 import * as bcrypt from "bcrypt";
 import {
+  BadRequestException,
   HttpException,
   Injectable,
   NotFoundException,
@@ -33,12 +34,20 @@ export class MerchantService {
   ) {}
 
   async create(data: CreateDto) {
+
       const shop = await this.shopModel.create({
         title: `${ v4() }-Shop`,
       });
 
       data.password=await bcrypt.hash(data.password,10);
       
+      const merchantExist=await this.merchantModel.findOne({
+        $or : [ { email:data.email },{ phone:data.phone }]
+      })
+      if( merchantExist ){
+        throw new BadRequestException(this.i18n.translate("test.user.duplicate"))
+      };
+
       const merchant = await this.merchantModel.create({
         ...data,
         shopId: shop._id.toString()
