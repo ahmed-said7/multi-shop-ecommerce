@@ -20,28 +20,20 @@ import { AuthUser } from 'src/common/decorator/param.decorator';
 import { AllRoles, IAuthUser } from 'src/common/enums';
 import { QueryReviewDto } from './dto/query-review.dto';
 
-
 @Controller('review')
 export class ReviewController {
-  constructor(
-    private readonly reviewService: ReviewService
-  ) {};
+  constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
-  create(
-    @AuthUser() user:IAuthUser,
-    @Body() body: CreateReviewDto
-  ) {
-    body.user=user._id;
+  create(@AuthUser() user: IAuthUser, @Body() body: CreateReviewDto) {
+    body.user = user._id;
     return this.reviewService.create(body);
   }
 
   @Get()
-  findAll(
-    @Query() query:QueryReviewDto,
-  ) {
+  findAll(@Query() query: QueryReviewDto) {
     return this.reviewService.findAll(query);
   }
 
@@ -51,22 +43,22 @@ export class ReviewController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewDto,
-    @AuthUser() user:IAuthUser,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.reviewService.update(id, user,updateReviewDto);
+    return this.reviewService.update(id, user, updateReviewDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
   remove(
-    @AuthUser() user:IAuthUser,
-    @Param('id', ValidateObjectIdPipe) id: string
+    @AuthUser() user: IAuthUser,
+    @Param('id', ValidateObjectIdPipe) id: string,
   ) {
     return this.reviewService.remove(id, user);
   }

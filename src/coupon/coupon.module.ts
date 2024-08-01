@@ -52,11 +52,12 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
-    ]),CartModule,
-    ApiModule
+    ]),
+    CartModule,
+    ApiModule,
   ],
   controllers: [CouponController],
-  providers: [CouponService,CustomI18nService],
+  providers: [CouponService, CustomI18nService],
   exports: [CouponService],
 })
 export class CouponModule {}

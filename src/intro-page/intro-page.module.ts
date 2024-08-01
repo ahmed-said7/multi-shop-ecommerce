@@ -51,9 +51,10 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
-    ]),ApiModule
+    ]),
+    ApiModule,
   ],
   controllers: [IntroPageController],
-  providers: [IntroPageService,CustomI18nService],
+  providers: [IntroPageService, CustomI18nService],
 })
 export class IntroPageModule {}

@@ -19,10 +19,10 @@ async function bootstrap() {
     new I18nValidationPipe({
       whitelist: true,
       transform: true,
-      transformOptions:{
-          enableImplicitConversion:true
-      }
-    })
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
   );
   app.useGlobalFilters(
     new I18nValidationExceptionFilter({ detailedErrors: false }),

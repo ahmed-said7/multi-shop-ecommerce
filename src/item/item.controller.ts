@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { ItemService } from './item.service';
@@ -27,15 +27,18 @@ import { UploadMultibleFilesInterceptor } from 'src/common/interceptors/upload-f
 @Controller('item')
 export class ItemController {
   constructor(
-    private readonly itemService: ItemService
+    private readonly itemService: ItemService,
     // private readonly uploadService: UploadService,
   ) {}
 
   // private readonly logger = new Logger(ItemController.name);
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FilesInterceptor('images',10,optsImg),UploadMultibleFilesInterceptor)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FilesInterceptor('images', 10, optsImg),
+    UploadMultibleFilesInterceptor,
+  )
   @Roles(AllRoles.MERCHANT)
   // @UseInterceptors(File)
   async create(
@@ -50,13 +53,11 @@ export class ItemController {
 
   @Get('all-items/:shop')
   findAll(
-    @Param('shop',ValidateObjectIdPipe) shopId: string,
-    @Query() query:QueryItemDto
+    @Param('shop', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryItemDto,
   ) {
-    query.shopId=shopId;
-    return this.itemService.findAll(
-      query
-    );
+    query.shopId = shopId;
+    return this.itemService.findAll(query);
   }
 
   @Get('one-item/:id')
@@ -64,29 +65,32 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   @Patch(':id')
-  @UseInterceptors(FilesInterceptor('images',10,optsImg),UploadMultibleFilesInterceptor)
+  @UseInterceptors(
+    FilesInterceptor('images', 10, optsImg),
+    UploadMultibleFilesInterceptor,
+  )
   async update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateItemDto: UpdateItemDto,
-    @AuthUser() user:IAuthUser,
+    @AuthUser() user: IAuthUser,
     // @UploadedFiles() files: Express.Multer.File[],
   ) {
     // const imageUrls = await this.uploadService.uploadFiles(files);
 
     // updateItemDto.images = imageUrls;
-    return this.itemService.update(id,user.shopId,updateItemDto);
+    return this.itemService.update(id, user.shopId, updateItemDto);
   }
 
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   @Delete(':id')
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user:IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.itemService.remove(id,user.shopId);
+    return this.itemService.remove(id, user.shopId);
   }
 }

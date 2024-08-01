@@ -19,6 +19,6 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     UserModule,
   ],
   controllers: [AdminController, AdminStatisticsController],
-  providers: [AdminService,CustomI18nService],
+  providers: [AdminService, CustomI18nService],
 })
-export class AdminModule {};
+export class AdminModule {}

@@ -62,9 +62,9 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     ]),
     CouponModule,
     CartModule,
-    ApiModule
+    ApiModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService,CustomI18nService]
+  providers: [OrderService, CustomI18nService],
 })
 export class OrderModule {}

@@ -9,7 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  Query
+  Query,
 } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { CreateShopDto } from './dto/create-shop.dto';
@@ -27,38 +27,32 @@ import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file
 
 @Controller('shop')
 export class ShopController {
-  constructor(
-    private readonly shopService: ShopService
-  ) {};
-  
+  constructor(private readonly shopService: ShopService) {}
+
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FileInterceptor('logo',optsImg),UploadSingleFileInterceptor)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('logo', optsImg),
+    UploadSingleFileInterceptor,
+  )
   @Roles(AllRoles.MERCHANT)
-  create(
-    @AuthUser() user: IAuthUser,
-    @Body() createShopDto: CreateShopDto,
-  ) {
+  create(@AuthUser() user: IAuthUser, @Body() createShopDto: CreateShopDto) {
     return this.shopService.create(createShopDto, user);
-  };
+  }
 
   @Get()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
-  findAll(
-    @Query() query:QueryShopDto
-  ) {
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER, AllRoles.MERCHANT)
+  findAll(@Query() query: QueryShopDto) {
     return this.shopService.findAll(query);
   }
-  
+
   @Get('items/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
-  findShopItems(
-    @Param('id', ValidateObjectIdPipe) id: string,
-  ){
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER, AllRoles.MERCHANT)
+  findShopItems(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findShopItems(id);
-  };
+  }
 
   @Get('one/:id')
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
@@ -66,7 +60,7 @@ export class ShopController {
   }
 
   @Patch('join/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
   userJoin(
     @Param('id', ValidateObjectIdPipe) id: mongoose.Types.ObjectId,
@@ -76,7 +70,7 @@ export class ShopController {
   }
 
   @Patch('add/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   addJoin(
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -86,31 +80,30 @@ export class ShopController {
   }
 
   @Get('user/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.MERCHANT,AllRoles.ADMIN,AllRoles.USER)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT, AllRoles.ADMIN, AllRoles.USER)
   findMerchantShops(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.shopService.findUserShops(id);
-  };
+  }
 
   @Patch()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FileInterceptor('logo',optsImg),UploadSingleFileInterceptor)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('logo', optsImg),
+    UploadSingleFileInterceptor,
+  )
   @Roles(AllRoles.MERCHANT)
   async update(
     @AuthUser() user: IAuthUser,
     @Body() updateShopDto: UpdateShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return  this.shopService.update(
-      user.shopId,
-      file,
-      updateShopDto
-    );
+    return this.shopService.update(user.shopId, file, updateShopDto);
   }
 
   @Delete('/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT, AllRoles.ADMIN)
   remove(
     @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) id: string,

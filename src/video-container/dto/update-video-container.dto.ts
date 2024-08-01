@@ -3,5 +3,5 @@ import { CreateVideoContainerDto } from './create-video-container.dto';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateVideoContainerDto extends PartialType(
-  CreateVideoContainerDto
-) {};
+  CreateVideoContainerDto,
+) {}

@@ -12,7 +12,7 @@ export class Category {
   @Prop({ required: true }) // Ensure title is required and unique
   title: string;
 
-  @Prop({ type: String , required:true }) // Set type to array of strings
+  @Prop({ type: String, required: true }) // Set type to array of strings
   image: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })

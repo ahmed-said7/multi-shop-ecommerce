@@ -9,16 +9,15 @@ import { AuthUser } from 'src/common/decorator/param.decorator';
 import { AllRoles, IAuthUser } from 'src/common/enums';
 import { jwtTokenService } from 'src/jwt/jwt.service';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private jwt:jwtTokenService
+    private jwt: jwtTokenService,
   ) {}
 
   @Post('login')
-  async login(@Body() body:LoginUserDto) {
+  async login(@Body() body: LoginUserDto) {
     return this.authService.loginUser(body);
   }
 
@@ -28,12 +27,12 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.ADMIN,AllRoles.USER,AllRoles.MERCHANT)
-  async refreshToken(@AuthUser() user:IAuthUser ) {
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER, AllRoles.MERCHANT)
+  async refreshToken(@AuthUser() user: IAuthUser) {
     return this.jwt.createTokens({
       userId: user._id,
-      role:user.role
-    })
+      role: user.role,
+    });
   }
 }

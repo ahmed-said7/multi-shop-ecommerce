@@ -1,4 +1,4 @@
-import { Controller, Body,  UseGuards, Post } from '@nestjs/common';
+import { Controller, Body, UseGuards, Post } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { AuthUser } from 'src/common/decorator/param.decorator';
@@ -12,15 +12,9 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  findOne(
-    @AuthUser() user: IAuthUser,
-    @Body() body: CreateReportDto,
-  ) {
-    return this.reportsService.findOne(
-      user,
-      body
-    );
+  findOne(@AuthUser() user: IAuthUser, @Body() body: CreateReportDto) {
+    return this.reportsService.findOne(user, body);
   }
 }

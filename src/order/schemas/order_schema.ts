@@ -5,14 +5,12 @@ import { OrderStatusTypes } from 'src/common/enums';
 // Define the document type for the shop schema
 export type OrderDocument = Order & Document;
 
-
 // Define the shop schema
 @Schema({
-  timestamps: true // Add timestamps for createdAt and updatedAt
+  timestamps: true, // Add timestamps for createdAt and updatedAt
   // toJSON:{virtuals:true},
   // toObject:{virtuals:true}
 })
-
 export class Order {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId: string;
@@ -28,15 +26,14 @@ export class Order {
     ],
     default: [],
   })
-  cartItems: 
-    {
-      product: Types.ObjectId;
-      quantity: number;
-      size: string;
-      color: string;
-    }[];
+  cartItems: {
+    product: Types.ObjectId;
+    quantity: number;
+    size: string;
+    color: string;
+  }[];
 
-  @Prop({ type:Boolean,default:false })
+  @Prop({ type: Boolean, default: false })
   delivered: boolean;
 
   @Prop({ required: true })
@@ -61,7 +58,7 @@ export class Order {
       country: String,
       streetName: String,
       zipCode: Number,
-      mobile:String
+      mobile: String,
     },
   })
   userAddresse: {

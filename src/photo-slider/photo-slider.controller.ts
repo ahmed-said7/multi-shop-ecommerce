@@ -18,7 +18,7 @@ import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
-import { AllRoles,  IAuthUser,  optsImg } from 'src/common/enums';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
 import { QueryPhotoSliderDto } from './dto/query-photo-slider.dto';
@@ -28,63 +28,60 @@ import { UploadService } from 'src/upload/upload.service';
 export class PhotoSliderController {
   constructor(
     private readonly photoSliderService: PhotoSliderService,
-    private uploadService:UploadService
-  ) {};
+    private uploadService: UploadService,
+  ) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  create(
-    @AuthUser() user: IAuthUser,
-    @Body() body:CreatePhotoSliderDto 
-  ) {
-    return this.photoSliderService.create(user.shopId,body);
-  };
+  create(@AuthUser() user: IAuthUser, @Body() body: CreatePhotoSliderDto) {
+    return this.photoSliderService.create(user.shopId, body);
+  }
 
   @Post('preview')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FilesInterceptor('images',50,optsImg))
-  uploadPreviewImages( @UploadedFiles() files: Express.Multer.File[] ) {
+  @UseInterceptors(FilesInterceptor('images', 50, optsImg))
+  uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
     return this.uploadService.uploadFiles(files);
-  };
+  }
 
-  @Get("shop/:shopId")
+  @Get('shop/:shopId')
   findAll(
-    @Param("shopId",ValidateObjectIdPipe) shopId: string,
-    @Query() query:QueryPhotoSliderDto 
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryPhotoSliderDto,
   ) {
-    query.shopId=shopId;
+    query.shopId = shopId;
     return this.photoSliderService.findAll(query);
-  };
+  }
 
   @Get(':id')
-  findOne(
-    @Param('id', ValidateObjectIdPipe) id: string,
-  ){
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.photoSliderService.findOne(id);
-  };
+  }
 
-  
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-    @AuthUser() user: IAuthUser
-  ){
-    return this.photoSliderService.update(id,user.shopId, updatePhotoSliderDto);
-  };
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.photoSliderService.update(
+      id,
+      user.shopId,
+      updatePhotoSliderDto,
+    );
+  }
 
-  
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
     @AuthUser() user: IAuthUser,
-    @Param('id', ValidateObjectIdPipe) id: string
-  ){
-    return this.photoSliderService.remove(id,user.shopId);
-  };
-};
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ) {
+    return this.photoSliderService.remove(id, user.shopId);
+  }
+}

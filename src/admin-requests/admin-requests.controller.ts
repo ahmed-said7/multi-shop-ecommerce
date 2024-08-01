@@ -25,49 +25,40 @@ export class AdminRequestsController {
   constructor(private readonly adminRequestsService: AdminRequestsService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
-  create(
-    @Body() body: CreateAdminRequestDto,
-    @AuthUser() user:IAuthUser
-  ) {
+  create(@Body() body: CreateAdminRequestDto, @AuthUser() user: IAuthUser) {
     body.userId = user._id;
     return this.adminRequestsService.create(body);
-  };
+  }
 
   @Get()
-  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  // @Roles(AllReoles.ADMIN)
-  findAll(
-    @Query() query:QueryRequestDto
-  ) {
+  findAll(@Query() query: QueryRequestDto) {
     return this.adminRequestsService.findAll(query);
-  };
+  }
 
   @Get(':id')
-  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  // @Roles(AllReoles.ADMIN)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.adminRequestsService.findOne(id);
-  };
+  }
 
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user:IAuthUser,
-    @Body() updateAdminRequestDto: UpdateAdminRequestDto
+    @AuthUser() user: IAuthUser,
+    @Body() updateAdminRequestDto: UpdateAdminRequestDto,
   ) {
-    updateAdminRequestDto.adminId=user._id;
+    updateAdminRequestDto.adminId = user._id;
     return this.adminRequestsService.update(id, updateAdminRequestDto);
-  };
+  }
 
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @Roles(AllRoles.ADMIN,AllRoles.USER)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER)
   remove(
-    @AuthUser() user:IAuthUser,
+    @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) reqId: string,
   ) {
     return this.adminRequestsService.remove(reqId, user);

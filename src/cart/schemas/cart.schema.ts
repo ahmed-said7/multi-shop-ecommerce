@@ -15,10 +15,10 @@ export class Cart {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
 
-  @Prop({ type:Number , default:1 })
+  @Prop({ type: Number, default: 1 })
   quantity: number;
 
-  @Prop({ type:String })
+  @Prop({ type: String })
   size: string;
 
   @Prop({ required: true })

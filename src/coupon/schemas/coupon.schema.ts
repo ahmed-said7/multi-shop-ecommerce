@@ -10,13 +10,13 @@ export class Coupon {
   text: string;
 
   @Prop({
-    type:Date,
-    default: DateTime.now().plus({ days: 10 }).toJSDate()
+    type: Date,
+    default: DateTime.now().plus({ days: 10 }).toJSDate(),
   })
   endDate: Date;
 
   @Prop({
-    default: 1
+    default: 1,
   })
   numOfTimes: number;
 
@@ -29,6 +29,6 @@ export class Coupon {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;
-};
+}
 
 export const CouponSchema = SchemaFactory.createForClass(Coupon);

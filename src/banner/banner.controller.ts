@@ -7,7 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { BannerService } from './banner.service';
@@ -26,14 +26,15 @@ import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file
 
 @Controller('banner')
 export class BannerController {
-  constructor(
-    private readonly bannerService: BannerService
-  ) {}
+  constructor(private readonly bannerService: BannerService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FileInterceptor('image',optsImg),UploadSingleFileInterceptor)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   async create(
     // @UploadedFile() file: Express.Multer.File,
     @AuthUser() user: IAuthUser,
@@ -42,16 +43,13 @@ export class BannerController {
     // const url = await this.uploadService.uploadFile(file);
     // createBannerDto.image = url as string;
 
-    return this.bannerService.create(
-      user.shopId,
-      createBannerDto,
-    );
+    return this.bannerService.create(user.shopId, createBannerDto);
   }
 
-  @Get("shop/:shopId")
-  findAll( 
-    @Param("shopId",ValidateObjectIdPipe) shopId:string,
-    @Body() query:QueryBannerDto  
+  @Get('shop/:shopId')
+  findAll(
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Body() query: QueryBannerDto,
   ) {
     query.shopId = shopId;
     return this.bannerService.findAll(query);
@@ -60,35 +58,35 @@ export class BannerController {
   @Get(':id')
   // @UseGuards(AuthenticationGuard)
   // @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
-  findOne(
-    @Param('id', ValidateObjectIdPipe) bannerId: string,
-  ){
+  findOne(@Param('id', ValidateObjectIdPipe) bannerId: string) {
     return this.bannerService.findOne(bannerId);
   }
 
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  @UseInterceptors(FileInterceptor('image',optsImg),UploadSingleFileInterceptor)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   async update(
     // @UploadedFile() file: Express.Multer.File,
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateBannerDto: UpdateBannerDto,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
     // const url = await this.uploadService.uploadFile(file);
     // updateBannerDto.image = url as string;
-    return this.bannerService.update(id, updateBannerDto,user);
+    return this.bannerService.update(id, updateBannerDto, user);
   }
 
-
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.bannerService.remove(id,user);
+    return this.bannerService.remove(id, user);
   }
 }

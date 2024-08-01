@@ -22,39 +22,43 @@ export class PhotoSliderService {
     @InjectModel(PhotoSlider.name)
     private readonly photoSliderModel: Model<PhotoSliderDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private apiService:ApiService<PhotoSliderDocument,QueryPhotoSliderDto>,
-    private i18n:CustomI18nService
-  ) {};
+    private apiService: ApiService<PhotoSliderDocument, QueryPhotoSliderDto>,
+    private i18n: CustomI18nService,
+  ) {}
 
-  async create(shopId: string,body:CreatePhotoSliderDto) {
+  async create(shopId: string, body: CreatePhotoSliderDto) {
     body.shopId = shopId;
-    const photoSlider=await this.photoSliderModel.create(body);
-    await this.shopModel.findByIdAndUpdate(
-      shopId,
-      {
-        $addToSet : { 
-          containers : { containerId:photoSlider._id ,type : "PhotoSlider" } 
-        }
-      }
-    );
+    const photoSlider = await this.photoSliderModel.create(body);
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $addToSet: {
+        containers: { containerId: photoSlider._id, type: 'PhotoSlider' },
+      },
+    });
     return { photoSlider };
-  };
+  }
 
-  async findAll(query:QueryPhotoSliderDto) {
-    const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.photoSliderModel.find(),query);
-    const photoSliders=await result;
-    if( photoSliders.length == 0  ){
-      throw new HttpException(this.i18n.translate("test.photoSlider.notFound"),400);
-    };
-    return { photoSliders , pagination : paginationObj };
-  };
+  async findAll(query: QueryPhotoSliderDto) {
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.photoSliderModel.find(),
+      query,
+    );
+    const photoSliders = await result;
+    if (photoSliders.length == 0) {
+      throw new HttpException(
+        this.i18n.translate('test.photoSlider.notFound'),
+        400,
+      );
+    }
+    return { photoSliders, pagination: paginationObj };
+  }
 
-  async findOne(id: string){
-    const photoSlider=await this.photoSliderModel.findById(id);
+  async findOne(id: string) {
+    const photoSlider = await this.photoSliderModel.findById(id);
     if (!photoSlider)
-      throw new InternalServerErrorException(this.i18n.translate("test.photoSlider.notFound"));
-    return {photoSlider};
+      throw new InternalServerErrorException(
+        this.i18n.translate('test.photoSlider.notFound'),
+      );
+    return { photoSlider };
   }
 
   async update(
@@ -63,21 +67,29 @@ export class PhotoSliderService {
     updatePhotoSliderDto: UpdatePhotoSliderDto,
   ) {
     const photoSlider = await this.photoSliderModel.findOneAndUpdate(
-      {shopId,_id:id},updatePhotoSliderDto,{new:true}
+      { shopId, _id: id },
+      updatePhotoSliderDto,
+      { new: true },
     );
     if (!photoSlider)
-      throw new InternalServerErrorException(this.i18n.translate("test.photoSlider.notFound"));
-    return {photoSlider};
-  };
+      throw new InternalServerErrorException(
+        this.i18n.translate('test.photoSlider.notFound'),
+      );
+    return { photoSlider };
+  }
 
-  async remove(id: string,shopId:string){
+  async remove(id: string, shopId: string) {
     const photoSlider = await this.photoSliderModel.findOneAndDelete({
-      shopId,_id:id
+      shopId,
+      _id: id,
     });
     if (!photoSlider)
-      throw new InternalServerErrorException(this.i18n.translate("test.photoSlider.notFound"));
-    await this.shopModel
-      .findByIdAndUpdate(shopId,{$pull:{containers:{containerID:id }}});
-    return {status:this.i18n.translate("test.photoSlider.deleted")};
+      throw new InternalServerErrorException(
+        this.i18n.translate('test.photoSlider.notFound'),
+      );
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $pull: { containers: { containerID: id } },
+    });
+    return { status: this.i18n.translate('test.photoSlider.deleted') };
   }
-;}
+}

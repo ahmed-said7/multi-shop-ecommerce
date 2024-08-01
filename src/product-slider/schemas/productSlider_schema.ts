@@ -12,7 +12,7 @@ export class ProductSlider {
   products: Types.ObjectId[];
   @Prop()
   title: string;
-  @Prop({ type:Boolean , default: false })
+  @Prop({ type: Boolean, default: false })
   isSlider: boolean;
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;

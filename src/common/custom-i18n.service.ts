@@ -8,4 +8,4 @@ export class CustomI18nService {
     const lang = I18nContext.current().lang;
     return this.i18n.t(key, { lang, ...options });
   }
-};
+}

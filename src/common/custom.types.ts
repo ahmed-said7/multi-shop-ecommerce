@@ -1,9 +1,9 @@
-import { IAuthUser } from "./enums";
+import { IAuthUser } from './enums';
 
 declare global {
-    namespace Express {
-        interface Request {
-            user?:IAuthUser
-        }
+  namespace Express {
+    interface Request {
+      user?: IAuthUser;
     }
+  }
 }

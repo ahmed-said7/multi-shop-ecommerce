@@ -76,12 +76,14 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     BannerModule,
     VideoContainerModule,
     UploadModule,
-    ApiModule
+    ApiModule,
   ],
   controllers: [ShopController],
-  providers: [ShopService,{provide:"field",useValue:"logo"},CustomI18nService
+  providers: [
+    ShopService,
+    { provide: 'field', useValue: 'logo' },
+    CustomI18nService,
   ],
-  exports: [
-    MongooseModule, ShopService]
+  exports: [MongooseModule, ShopService],
 })
 export class ShopModule {}

@@ -53,10 +53,11 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    UserModule,ApiModule
+    UserModule,
+    ApiModule,
   ],
   controllers: [ProductSliderController],
-  providers: [ProductSliderService,CustomI18nService],
+  providers: [ProductSliderService, CustomI18nService],
   exports: [ProductSliderService],
 })
 export class ProductSliderModule {}

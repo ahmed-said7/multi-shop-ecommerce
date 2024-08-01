@@ -1,3 +1,3 @@
-import { FindQuery } from "src/common/enums";
+import { FindQuery } from 'src/common/enums';
 
-export class QueryThemeDto extends FindQuery {};
+export class QueryThemeDto extends FindQuery {}

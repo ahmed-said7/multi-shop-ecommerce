@@ -55,11 +55,16 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
     ]),
-    AuthModule,ApiModule,
-    UploadModule
+    AuthModule,
+    ApiModule,
+    UploadModule,
   ],
   controllers: [ItemController],
-  providers: [ItemService,{provide:"field",useValue:"images"},CustomI18nService],
+  providers: [
+    ItemService,
+    { provide: 'field', useValue: 'images' },
+    CustomI18nService,
+  ],
   exports: [ItemService],
 })
 export class ItemModule {}

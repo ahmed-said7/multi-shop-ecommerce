@@ -26,7 +26,7 @@ export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
@@ -34,16 +34,16 @@ export class ProductSliderController {
   ) {
     return this.productSliderService.create(
       createProductSliderDto,
-      user.shopId
+      user.shopId,
     );
   }
 
   @Get('shop/:id')
   findAll(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @Query() query:QueryProductSliderDto
+    @Query() query: QueryProductSliderDto,
   ) {
-    query.shopId=id;
+    query.shopId = id;
     return this.productSliderService.findAll(query);
   }
 
@@ -52,24 +52,27 @@ export class ProductSliderController {
     return this.productSliderService.findOne(id);
   }
 
-  
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateProductSliderDto: UpdateProductSliderDto,
-    @AuthUser() user:IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.productSliderService.update(id,user.shopId ,updateProductSliderDto);
+    return this.productSliderService.update(
+      id,
+      user.shopId,
+      updateProductSliderDto,
+    );
   }
 
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
     return this.productSliderService.remove(id, user?.shopId);
   }

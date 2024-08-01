@@ -31,45 +31,42 @@ export class MerchantController {
   }
 
   @Post('login')
-  login( @Body() body:LoginMerchantDto ) {
+  login(@Body() body: LoginMerchantDto) {
     return this.merchantService.merchantSignIn(body.email, body.password);
   }
 
   @Get()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
-  findAll( @Query() query: QueryMerchantDto) {
+  findAll(@Query() query: QueryMerchantDto) {
     return this.merchantService.findAll(query);
   }
 
-  @Get("logged")
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Get('logged')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  findMe( @AuthUser() merchant : IAuthUser ) {
+  findMe(@AuthUser() merchant: IAuthUser) {
     return this.merchantService.findOne(merchant._id);
-  };
+  }
 
   @Get(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
   findOne(@Param('id', ValidateObjectIdPipe) merchntId: string) {
     return this.merchantService.findOne(merchntId);
-  };
+  }
 
   @Patch()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  update(
-    @AuthUser() user :  IAuthUser,
-    @Body() data: UpdateMerchantDto,
-  ) {
+  update(@AuthUser() user: IAuthUser, @Body() data: UpdateMerchantDto) {
     return this.merchantService.update(user._id, data);
   }
 
   @Delete()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  delete(@AuthUser() user :  IAuthUser ) {
+  delete(@AuthUser() user: IAuthUser) {
     return this.merchantService.delete(user._id);
   }
 }

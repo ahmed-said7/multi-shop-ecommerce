@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 import { IntroPage, IntroPageDocument } from './schemas/intro_page_schema';
@@ -19,55 +15,77 @@ export class IntroPageService {
     @InjectModel(IntroPage.name)
     private introPageModel: Model<IntroPageDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private apiService:ApiService<IntroPageDocument,QueryIntroPageDto>,
-    private i18n:CustomI18nService
-  ) {};
+    private apiService: ApiService<IntroPageDocument, QueryIntroPageDto>,
+    private i18n: CustomI18nService,
+  ) {}
   async create(createIntroPageDto: CreateIntroPageDto, shopId: string) {
-      const introPage = await this.introPageModel.create({
-        ... createIntroPageDto , shopId
-      });
-      await this.shopModel
-          .findByIdAndUpdate(shopId,{$addToSet:{introPages:introPage._id}});
-      return {introPage};
-  };
+    const introPage = await this.introPageModel.create({
+      ...createIntroPageDto,
+      shopId,
+    });
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $addToSet: { introPages: introPage._id },
+    });
+    return { introPage };
+  }
 
-  async findAll(query:QueryIntroPageDto) {
-    const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.introPageModel.find(),query);
-    const IntroPages=await result;
-    if( IntroPages.length == 0  ){
-      throw new HttpException(this.i18n.translate("test.introPage.notFound"),400);
-    };
-    return { IntroPages , pagination : paginationObj };
+  async findAll(query: QueryIntroPageDto) {
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.introPageModel.find(),
+      query,
+    );
+    const IntroPages = await result;
+    if (IntroPages.length == 0) {
+      throw new HttpException(
+        this.i18n.translate('test.introPage.notFound'),
+        400,
+      );
+    }
+    return { IntroPages, pagination: paginationObj };
   }
 
   async findOne(id: string) {
     const introPage = await this.introPageModel.findById(id);
     if (!introPage) {
-      throw new NotFoundException(this.i18n.translate("test.introPage.notFound"));
-    };
+      throw new NotFoundException(
+        this.i18n.translate('test.introPage.notFound'),
+      );
+    }
     return { introPage };
   }
 
-  async update(id: string,shopId:string, updateIntroPageDto: UpdateIntroPageDto) {
-      const introPage = await this.introPageModel.findByIdAndUpdate(
-        { _id:id , shopId },
-        updateIntroPageDto,
-        { new: true },
+  async update(
+    id: string,
+    shopId: string,
+    updateIntroPageDto: UpdateIntroPageDto,
+  ) {
+    const introPage = await this.introPageModel.findByIdAndUpdate(
+      { _id: id, shopId },
+      updateIntroPageDto,
+      { new: true },
+    );
+    if (!introPage) {
+      throw new HttpException(
+        this.i18n.translate('test.introPage.notFound'),
+        400,
       );
-      if( ! introPage ){
-        throw new HttpException(this.i18n.translate("test.introPage.notFound"),400);
-      };
-      return { introPage };
+    }
+    return { introPage };
   }
 
-  async remove(id: string,shopId: string) {
-      const introPage = await this.introPageModel.findOneAndDelete({ _id:id , shopId });
-      if ( !introPage ) {
-        throw new NotFoundException(this.i18n.translate("test.introPage.notFound"));
-      }
-      await this.shopModel
-          .findByIdAndUpdate(shopId,{$pull:{introPages:id}});
-      return { status : this.i18n.translate("test.introPage.deleted")};
+  async remove(id: string, shopId: string) {
+    const introPage = await this.introPageModel.findOneAndDelete({
+      _id: id,
+      shopId,
+    });
+    if (!introPage) {
+      throw new NotFoundException(
+        this.i18n.translate('test.introPage.notFound'),
+      );
+    }
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $pull: { introPages: id },
+    });
+    return { status: this.i18n.translate('test.introPage.deleted') };
   }
 }

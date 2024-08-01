@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,21 +8,22 @@ import { ApiService } from 'src/common/filter/api.service';
 import { QueryUserDto } from './dto/query-user.dto';
 import { CustomI18nService } from 'src/common/custom-i18n.service';
 
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private apiService:ApiService<User,QueryUserDto>,
+    private apiService: ApiService<User, QueryUserDto>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    private i18n:CustomI18nService
+    private i18n: CustomI18nService,
   ) {}
 
-  async findAll( filter: QueryUserDto ) {
-    const { paginationObj , query }=await this.apiService
-      .getAllDocs( this.userModel.find(),filter );
-    const users=await query;
-    return { paginationObj , users };
+  async findAll(filter: QueryUserDto) {
+    const { paginationObj, query } = await this.apiService.getAllDocs(
+      this.userModel.find(),
+      filter,
+    );
+    const users = await query;
+    return { paginationObj, users };
   }
 
   async findOne(id: string) {
@@ -38,46 +36,49 @@ export class UserService {
       .populate({
         path: 'favorites',
         model: 'Item',
-      }).select("-password");
-    if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
-    return { user:foundUser };
+      })
+      .select('-password');
+    if (!foundUser)
+      throw new NotFoundException(this.i18n.translate('test.user.notFound'));
+    return { user: foundUser };
   }
 
-  async findOneWithEmail( email: string ) {
-    const foundUser= await this.userModel.findOne({ email });
-    if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
+  async findOneWithEmail(email: string) {
+    const foundUser = await this.userModel.findOne({ email });
+    if (!foundUser)
+      throw new NotFoundException(this.i18n.translate('test.user.notFound'));
     return { foundUser };
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
-      const updatedUser = await this.userModel
-        .findByIdAndUpdate(userId, updateUserDto, { new: true })
-        .select("-password")
-        .populate({ path: 'cart', model: 'Item' });
-      return { updatedUser };
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(userId, updateUserDto, { new: true })
+      .select('-password')
+      .populate({ path: 'cart', model: 'Item' });
+    return { updatedUser };
   }
 
-  async remove( userId: string) {
+  async remove(userId: string) {
     await this.orderModel.deleteMany({ userId });
 
     await this.userModel.findByIdAndDelete(userId);
 
-    return { status : this.i18n.translate("test.user.deleted")};
+    return { status: this.i18n.translate('test.user.deleted') };
   }
 
-  async addFav(itemId: string, userId: string ) {
-      const user = await this.userModel.findByIdAndUpdate(
-        userId,
-        {
-          $addToSet: {
-            favorites: itemId,
-          },
+  async addFav(itemId: string, userId: string) {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $addToSet: {
+          favorites: itemId,
         },
-        { new: true },
-      );
-      return { favorites : user?.favorites || [] };
+      },
+      { new: true },
+    );
+    return { favorites: user?.favorites || [] };
   }
-  async removeFav(itemId: string, userId: string ) {
+  async removeFav(itemId: string, userId: string) {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       {
@@ -87,6 +88,6 @@ export class UserService {
       },
       { new: true },
     );
-    return { favorites : user?.favorites || [] };
+    return { favorites: user?.favorites || [] };
   }
 }

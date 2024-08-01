@@ -17,9 +17,9 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
       { name: Merchant.name, schema: merchantSchema },
-    ])
+    ]),
   ],
   controllers: [ReportsController],
-  providers: [ReportsService,CustomI18nService],
+  providers: [ReportsService, CustomI18nService],
 })
 export class ReportsModule {}

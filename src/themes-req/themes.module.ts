@@ -35,7 +35,7 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     MongooseModule.forFeature([
       { name: Theme.name, schema: ThemeSchema },
       { name: User.name, schema: UserSchema },
-      { name: Merchant.name, schema: merchantSchema},
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
@@ -50,9 +50,9 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Category.name, schema: CategorySchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
-    ApiModule
+    ApiModule,
   ],
   controllers: [ThemesController],
-  providers: [ThemesService,CustomI18nService],
+  providers: [ThemesService, CustomI18nService],
 })
 export class ThemesModule {}

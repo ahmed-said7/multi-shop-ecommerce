@@ -16,7 +16,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';
-import { AllRoles,  IAuthUser, optsImg } from 'src/common/enums';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
 import { Roles } from 'src/common/decorator/roles';
@@ -29,8 +29,11 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FileInterceptor("image",optsImg),UploadSingleFileInterceptor)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   @Roles(AllRoles.MERCHANT)
   create(
     @AuthUser() user: IAuthUser,
@@ -39,25 +42,26 @@ export class CategoryController {
     return this.categoryService.create(user.shopId, createCategoryDto);
   }
 
-  @Get(":shopId")
+  @Get(':shopId')
   findAll(
-    @Param("shopId",ValidateObjectIdPipe) shopId: string,
-    @Query() query:QueryCategoryDto
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryCategoryDto,
   ) {
-    query.shopId=shopId;
+    query.shopId = shopId;
     return this.categoryService.findAll(query);
   }
 
   @Get('/one/:id')
-  findOne(
-    @Param('id', ValidateObjectIdPipe) id: string
-  ) {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.categoryService.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
-  @UseInterceptors(FileInterceptor("image",optsImg),UploadSingleFileInterceptor)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
@@ -67,9 +71,8 @@ export class CategoryController {
     return this.categoryService.update(id, user.shopId, updateCategoryDto);
   }
 
-  
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,

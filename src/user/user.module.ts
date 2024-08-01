@@ -1,45 +1,45 @@
-import { Module } from "@nestjs/common";
-import { UserService } from "./user.service";
-import { UserController } from "./user.controller";
-import { JwtModule } from "@nestjs/jwt";
-import { MongooseModule } from "@nestjs/mongoose";
-import { ConfigModule } from "@nestjs/config";
-import { User, UserSchema } from "./schemas/user_schema";
-import { Shop, ShopSchema } from "../shop/schemas/shop_schema";
-import { Item, ItemSchema } from "../item/schemas/item-schema";
-import { Category, CategorySchema } from "../category/schemas/category_schema";
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
+import { User, UserSchema } from './schemas/user_schema';
+import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
+import { Item, ItemSchema } from '../item/schemas/item-schema';
+import { Category, CategorySchema } from '../category/schemas/category_schema';
 import {
   ProductSlider,
   ProductSliderSchema,
-} from "../product-slider/schemas/productSlider_schema";
+} from '../product-slider/schemas/productSlider_schema';
 import {
   PhotoSlider,
   PhotoSliderSchema,
-} from "../photo-slider/schemas/photo-slider_schema";
-import { Review, ReviewSchema } from "../review/schemas/review_schema";
+} from '../photo-slider/schemas/photo-slider_schema';
+import { Review, ReviewSchema } from '../review/schemas/review_schema';
 import {
   ReviewContainer,
   ReviewContainerSchema,
-} from "../review-container/schemas/reviewContainer_schema";
-import { Order, OrderSchema } from "../order/schemas/order_schema";
-import { UserTrackController } from "./track.controller";
-import { TrackService } from "./track.service";
-import { Coupon, CouponSchema } from "../coupon/schemas/coupon.schema";
-import { Cart, CartSchema } from "../cart/schemas/cart.schema";
+} from '../review-container/schemas/reviewContainer_schema';
+import { Order, OrderSchema } from '../order/schemas/order_schema';
+import { UserTrackController } from './track.controller';
+import { TrackService } from './track.service';
+import { Coupon, CouponSchema } from '../coupon/schemas/coupon.schema';
+import { Cart, CartSchema } from '../cart/schemas/cart.schema';
 import {
   VideoContainer,
   VideoContainerSchema,
-} from "../video-container/schemas/videoContainer-schema";
-import { Banner, BannerSchema } from "../banner/schemas/banner_schema";
+} from '../video-container/schemas/videoContainer-schema';
+import { Banner, BannerSchema } from '../banner/schemas/banner_schema';
 import {
   IntroPage,
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
 import { ApiModule } from 'src/common/filter/api.module';
-import { Merchant, merchantSchema } from "src/merchant/schema/merchant.schema";
-import { jwtTokenModule } from "src/jwt/jwt.module";
-import { CustomI18nService } from "src/common/custom-i18n.service";
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { jwtTokenModule } from 'src/jwt/jwt.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -64,13 +64,14 @@ import { CustomI18nService } from "src/common/custom-i18n.service";
     ]),
     JwtModule.register({
       secret: process.env.SECRET,
-      signOptions: { expiresIn: "1h" },
+      signOptions: { expiresIn: '1h' },
     }),
     jwtTokenModule,
-    UploadModule,ApiModule
+    UploadModule,
+    ApiModule,
   ],
   controllers: [UserController, UserTrackController],
-  providers: [UserService,  TrackService,CustomI18nService],
+  providers: [UserService, TrackService, CustomI18nService],
   exports: [UserService, MongooseModule],
 })
 export class UserModule {}

@@ -10,15 +10,14 @@ export class AdminStatisticsController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('/registrations-per-month')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
   async getRegistrationsPerMonth() {
     return this.adminService.getUsersPerMonth();
   }
 
-  
   @Get('/shops-per-month')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.ADMIN)
   async getshopsPerMonth() {
     return this.adminService.getShopsPerMonth();

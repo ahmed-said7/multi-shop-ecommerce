@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -21,44 +17,50 @@ export class CategoryService {
     private readonly categoryModel: mongoose.Model<CategoryDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    private apiService:ApiService<CategoryDocument,QueryCategoryDto>,
-    private i18n:CustomI18nService
-  ) {};
+    private apiService: ApiService<CategoryDocument, QueryCategoryDto>,
+    private i18n: CustomI18nService,
+  ) {}
 
   async create(shopId: string, body: CreateCategoryDto) {
     const category = await this.categoryModel.create({
-      ... body , shopId
+      ...body,
+      shopId,
     });
 
-    await this.shopModel.findByIdAndUpdate(
-      category.shopId,
-      {
-        $addToSet: { categories: category._id },
-      }
-    );
+    await this.shopModel.findByIdAndUpdate(category.shopId, {
+      $addToSet: { categories: category._id },
+    });
 
-    return {category};
+    return { category };
   }
 
-  async findAll(query:QueryCategoryDto) {
+  async findAll(query: QueryCategoryDto) {
     // const filter={ shopId : new Types.ObjectId(shopId) };
-    const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.categoryModel.find(),query,[]);
-    const categories=await result;
-    if( categories.length == 0  ){
-      throw new HttpException(this.i18n.translate("test.category.notFound"),400);
-    };
-    return { categories , pagination:paginationObj };
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.categoryModel.find(),
+      query,
+      [],
+    );
+    const categories = await result;
+    if (categories.length == 0) {
+      throw new HttpException(
+        this.i18n.translate('test.category.notFound'),
+        400,
+      );
+    }
+    return { categories, pagination: paginationObj };
   }
 
   async findOne(id: string) {
     const category = await this.categoryModel.findOne({ _id: id });
 
     if (!category) {
-      throw new NotFoundException(this.i18n.translate("test.category.notFound"));
-    };
+      throw new NotFoundException(
+        this.i18n.translate('test.category.notFound'),
+      );
+    }
 
-    return {category};
+    return { category };
   }
 
   async update(
@@ -73,30 +75,30 @@ export class CategoryService {
     );
 
     if (!category) {
-      throw new NotFoundException(this.i18n.translate("test.category.notFound"));
+      throw new NotFoundException(
+        this.i18n.translate('test.category.notFound'),
+      );
     }
 
-    return {category};
+    return { category };
   }
 
   async remove(id: string, shopId: string) {
     const category = await this.categoryModel.findOneAndDelete({
       _id: id,
-      shopId
+      shopId,
     });
 
     if (!category) {
-      throw new NotFoundException(this.i18n.translate("test.category.notFound"));
-    };
+      throw new NotFoundException(
+        this.i18n.translate('test.category.notFound'),
+      );
+    }
 
-    await this.shopModel.findByIdAndUpdate(
-      shopId,
-      {
-        $pull: { categories: id },
-      }
-    );
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $pull: { categories: id },
+    });
 
-    return {category};
-
-  };
+    return { category };
+  }
 }

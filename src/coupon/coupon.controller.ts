@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -20,7 +20,7 @@ import { Roles } from 'src/common/decorator/roles';
 import { AllRoles, IAuthUser } from 'src/common/enums';
 import { AuthUser } from 'src/common/decorator/param.decorator';
 import { QueryCouponDto } from './dto/query-coupon.dto';
-@Controller("coupon")
+@Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
@@ -32,7 +32,7 @@ export class CouponController {
     @AuthUser() user: IAuthUser,
   ) {
     return this.couponService.create(createCouponDto, user.shopId);
-  };
+  }
 
   // @Post('/apply')
   // @UseGuards(AuthenticationGuard,AuthorizationGuard)
@@ -44,46 +44,41 @@ export class CouponController {
   //   return this.couponService.applyCoupon(userId, applyCoupon);
   // }
 
-
   @Get()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
-  findAll(
-    @AuthUser() user: IAuthUser,
-    @Query() query: QueryCouponDto,
-  ) {
+  findAll(@AuthUser() user: IAuthUser, @Query() query: QueryCouponDto) {
     return this.couponService.findAll(query, user.shopId);
   }
 
-  @Get("/one/:id")
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Get('/one/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   findOne(
-    @Param("id", ValidateObjectIdPipe) id: string,
-    @AuthUser( ) user: IAuthUser
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.couponService.findOne(id,user.shopId);
+    return this.couponService.findOne(id, user.shopId);
   }
 
-
   @Patch(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   update(
-    @Param("id", ValidateObjectIdPipe) id: string,
+    @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateCouponDto: UpdateCouponDto,
-    @AuthUser( ) user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.couponService.update(id,user.shopId, updateCouponDto);
+    return this.couponService.update(id, user.shopId, updateCouponDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.couponService.remove(id,user.shopId);
+    return this.couponService.remove(id, user.shopId);
   }
 }

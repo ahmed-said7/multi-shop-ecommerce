@@ -1,7 +1,7 @@
-import { ArgumentsHost, Catch, HttpException } from "@nestjs/common";
-import { BaseExceptionFilter } from "@nestjs/core";
-import { Response } from "express";
-import { Error } from "mongoose";
+import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core';
+import { Response } from 'express';
+import { Error } from 'mongoose';
 
 interface MongoError {
   driver?: boolean;
@@ -30,13 +30,12 @@ export class catchExceptionsFilter extends BaseExceptionFilter {
     //   Array.isArray(exception.response.message)
     // ) {
     //   this.handleNestError(exception.response, object);
-    // } else 
+    // } else
     if (exception instanceof HttpException) {
       this.handleHttpException(exception, object);
-    } 
-    else if (exception.name === "ValidationError") {
+    } else if (exception.name === 'ValidationError') {
       this.handleMongoValidatioError(exception, object);
-    } else if (exception.name === "CastError") {
+    } else if (exception.name === 'CastError') {
       this.handleCastError(exception, object);
     } else if (exception.code === 11000) {
       this.handleDuplicationError(exception, object);
@@ -55,7 +54,7 @@ export class catchExceptionsFilter extends BaseExceptionFilter {
   ) {
     object.message = Object.values(exception.errors)
       .map((Err: Error.ValidatorError) => Err.message)
-      .join(" and ");
+      .join(' and ');
   }
   handleCastError(exception: Error.CastError, object: ServerError) {
     object.message = `invalid ${exception.path} value ${exception.value}`;

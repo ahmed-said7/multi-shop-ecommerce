@@ -51,7 +51,7 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     ]),
   ],
   controllers: [CartController],
-  providers: [CartService,CustomI18nService],
+  providers: [CartService, CustomI18nService],
   exports: [CartService],
 })
 export class CartModule {}

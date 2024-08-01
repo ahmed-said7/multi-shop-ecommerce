@@ -21,9 +21,9 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
     jwtTokenModule,
     ShopModule,
     AuthModule,
-    ApiModule
+    ApiModule,
   ],
   controllers: [MerchantController],
-  providers: [MerchantService,CustomI18nService],
+  providers: [MerchantService, CustomI18nService],
 })
 export class MerchantModule {}

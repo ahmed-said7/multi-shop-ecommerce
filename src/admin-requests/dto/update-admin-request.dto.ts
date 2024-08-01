@@ -8,6 +8,8 @@ export class UpdateAdminRequestDto extends PartialType(CreateAdminRequestDto) {
   // @IsString()
   adminId?: string;
   @IsOptional()
-  @IsString({ message: i18nValidationMessage("validation.admin_request.status.isString")})
+  @IsString({
+    message: i18nValidationMessage('validation.admin_request.status.isString'),
+  })
   status?: string;
 }

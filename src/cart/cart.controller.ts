@@ -23,46 +23,41 @@ import { AddToCartDto } from './dto/add-to-cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  
-  @Get(":shopId")
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @Get(':shopId')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
   async getUserCart(
     @AuthUser() user: IAuthUser,
-    @Param('shopId',ValidateObjectIdPipe) shopId: string,
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
   ) {
     return this.cartService.getCart(user._id, shopId);
   }
 
-  
   @Post('/add')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
-  addToCart( @AuthUser() user: IAuthUser, @Body() item: AddToCartDto ) {
+  addToCart(@AuthUser() user: IAuthUser, @Body() item: AddToCartDto) {
     return this.cartService.addToCart(user._id, item);
   }
 
-  
   @Delete('/remove/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
-  removeFromCart
-  (
+  removeFromCart(
     @AuthUser() user: IAuthUser,
     @Param('id', ValidateObjectIdPipe) cartItemId: string,
   ) {
-    return this.cartService.removeFromCart(cartItemId,user);
-  };
+    return this.cartService.removeFromCart(cartItemId, user);
+  }
 
-  
   @Put('/update/:id')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.USER)
   updateItemQuantity(
     @Param('id', ValidateObjectIdPipe) itemId: string,
-    @Body('quantity',ParseIntPipe) quantity: number,
-    @AuthUser() user: IAuthUser
+    @Body('quantity', ParseIntPipe) quantity: number,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.cartService.updateItemQuantity(itemId, quantity,user);
+    return this.cartService.updateItemQuantity(itemId, quantity, user);
   }
 }

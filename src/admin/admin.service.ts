@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
@@ -16,31 +12,32 @@ export class AdminService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    private i18n:CustomI18nService
-  ) {};
+    private i18n: CustomI18nService,
+  ) {}
 
   async findOne(id: string) {
-      const foundUser = await this.userModel.findById(id).select("-password");
-      if (!foundUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
-      return { foundUser };
+    const foundUser = await this.userModel.findById(id).select('-password');
+    if (!foundUser)
+      throw new NotFoundException(this.i18n.translate('test.user.notFound'));
+    return { foundUser };
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto , { new: true })
-      .select("-password");
-      if (!updatedUser) throw new NotFoundException(this.i18n.translate("test.user.notFound"));
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .select('-password');
+    if (!updatedUser)
+      throw new NotFoundException(this.i18n.translate('test.user.notFound'));
     return { updatedUser };
-  };
+  }
 
-  async remove( deleteId: string) {
+  async remove(deleteId: string) {
     const deletedUser = this.userModel.findByIdAndDelete(deleteId);
     if (!deletedUser) {
-      throw new NotFoundException(this.i18n.translate("test.user.notFound"));
-    };
-    return { status : this.i18n.translate("test.user.deleted")};
-  };
-
+      throw new NotFoundException(this.i18n.translate('test.user.notFound'));
+    }
+    return { status: this.i18n.translate('test.user.deleted') };
+  }
 
   async getUsersPerMonth() {
     const now = new Date();
@@ -83,20 +80,19 @@ export class AdminService {
       },
       {
         $project: {
-          _id: 0, 
+          _id: 0,
           month: 1,
           count: 1,
         },
       },
     ]);
 
-  if (result.length === 0) {
-    throw new HttpException(this.i18n.translate("test.user.statistics"), 400);
-  };
+    if (result.length === 0) {
+      throw new HttpException(this.i18n.translate('test.user.statistics'), 400);
+    }
 
-  return { data: result };
-
-};
+    return { data: result };
+  }
 
   async getShopsPerMonth() {
     const now = new Date();
@@ -139,17 +135,17 @@ export class AdminService {
       },
       {
         $project: {
-          _id: 0, 
+          _id: 0,
           month: 1,
-          count: 1
+          count: 1,
         },
       },
     ]);
 
     if (result.length === 0) {
-      throw new HttpException(this.i18n.translate("test.user.statistics"), 400);
+      throw new HttpException(this.i18n.translate('test.user.statistics'), 400);
     }
 
     return { data: result };
   }
-};
+}

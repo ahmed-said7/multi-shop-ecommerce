@@ -9,14 +9,14 @@ export class TrackService {
   constructor(
     @InjectModel(Shop.name)
     private readonly shopModel: mongoose.Model<ShopDocument>,
-    private i18n:CustomI18nService
+    private i18n: CustomI18nService,
   ) {}
 
   async trackShop(userId: string, shopId: string) {
     const shop = await this.shopModel.findById(shopId);
 
     if (!shop) {
-      throw new NotFoundException(this.i18n.translate("test.shop.notFound"));
+      throw new NotFoundException(this.i18n.translate('test.shop.notFound'));
     }
 
     const updatedShop = await this.shopModel.findByIdAndUpdate(

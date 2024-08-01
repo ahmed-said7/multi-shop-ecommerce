@@ -3,7 +3,6 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AllRoles } from 'src/common/enums';
 
-
 export type MerchantDocument = HydratedDocument<Merchant>;
 
 @Schema({
@@ -33,11 +32,11 @@ export class Merchant {
 
   @Prop({
     default: AllRoles.MERCHANT,
-    enum: [AllRoles.MERCHANT]
+    enum: [AllRoles.MERCHANT],
   })
   role: string;
 
-  @Prop({  type: Types.ObjectId, ref: 'Shop' })
+  @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shopId: string;
 }
 

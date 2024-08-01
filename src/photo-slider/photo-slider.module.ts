@@ -60,9 +60,10 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
     ]),
-    UploadModule,ApiModule
+    UploadModule,
+    ApiModule,
   ],
   controllers: [PhotoSliderController],
-  providers: [PhotoSliderService,CustomI18nService],
+  providers: [PhotoSliderService, CustomI18nService],
 })
 export class PhotoSliderModule {}

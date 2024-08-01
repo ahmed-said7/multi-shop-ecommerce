@@ -1,4 +1,4 @@
-import {  Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
@@ -30,7 +30,11 @@ import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 import { ShopModule } from './shop/shop.module';
 import { jwtTokenModule } from './jwt/jwt.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { I18nModule, I18nValidationExceptionFilter, QueryResolver } from 'nestjs-i18n';
+import {
+  I18nModule,
+  I18nValidationExceptionFilter,
+  QueryResolver,
+} from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -43,16 +47,15 @@ import { I18nModule, I18nValidationExceptionFilter, QueryResolver } from 'nestjs
       signOptions: { expiresIn: '1d' },
       global: true,
     }),
-    jwtTokenModule
-    ,
+    jwtTokenModule,
     I18nModule.forRoot({
-      loaderOptions:{
-        path:"src/i18n/"
-        ,watch:true
+      loaderOptions: {
+        path: 'src/i18n/',
+        watch: true,
       },
-      fallbackLanguage:"ar",
-      resolvers:[ { use:QueryResolver , options:["lang"] } ]
-    })
+      fallbackLanguage: 'ar',
+      resolvers: [{ use: QueryResolver, options: ['lang'] }],
+    }),
     // MulterModule.register({
     //   storage: diskStorage({
     //     destination: './images/',
@@ -64,13 +67,12 @@ import { I18nModule, I18nValidationExceptionFilter, QueryResolver } from 'nestjs
     //       callback(null, name);
     //     },
     //   }),
-    ,
-    EventEmitterModule.forRoot({global:true}),
+    EventEmitterModule.forRoot({ global: true }),
     MongooseModule.forRootAsync({
-      useFactory( config:ConfigService ){
-        return { uri : config.get("DB_URI") }
+      useFactory(config: ConfigService) {
+        return { uri: config.get('DB_URI') };
       },
-      inject:[ConfigService]
+      inject: [ConfigService],
     }),
     UserModule,
     AuthModule,
@@ -96,10 +98,10 @@ import { I18nModule, I18nValidationExceptionFilter, QueryResolver } from 'nestjs
     MerchantModule,
   ],
   controllers: [AppController],
-  providers: [ 
-    AppService 
-    , { provide:APP_FILTER , useClass: catchExceptionsFilter } 
-    // ,{ provide:APP_FILTER , useClass: I18nValidationExceptionFilter } 
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: catchExceptionsFilter },
+    // ,{ provide:APP_FILTER , useClass: I18nValidationExceptionFilter }
   ],
   exports: [MongooseModule],
 })

@@ -54,9 +54,14 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    ApiModule,UploadModule
+    ApiModule,
+    UploadModule,
   ],
   controllers: [CategoryController],
-  providers: [CategoryService,{provide:"field",useValue:"image"},CustomI18nService],
+  providers: [
+    CategoryService,
+    { provide: 'field', useValue: 'image' },
+    CustomI18nService,
+  ],
 })
 export class CategoryModule {}

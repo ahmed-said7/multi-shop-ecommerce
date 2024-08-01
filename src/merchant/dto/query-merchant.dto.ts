@@ -1,3 +1,3 @@
-import { FindQuery } from "src/common/enums";
+import { FindQuery } from 'src/common/enums';
 
-export class QueryMerchantDto extends FindQuery {};
+export class QueryMerchantDto extends FindQuery {}

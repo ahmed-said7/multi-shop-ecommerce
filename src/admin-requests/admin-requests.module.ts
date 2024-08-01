@@ -18,9 +18,9 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Merchant.name, schema: merchantSchema },
       { name: AdminRequest.name, schema: AdminRequestSchema },
     ]),
-    ApiModule
+    ApiModule,
   ],
   controllers: [AdminRequestsController],
-  providers: [AdminRequestsService,CustomI18nService],
+  providers: [AdminRequestsService, CustomI18nService],
 })
 export class AdminRequestsModule {}

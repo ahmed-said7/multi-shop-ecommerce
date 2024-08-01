@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -20,79 +16,93 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
 @Injectable()
 export class VideoContainerService {
   constructor(
-    private apiService: ApiService<VideoContainerDocument,QueryVideoContainerDto>,
+    private apiService: ApiService<
+      VideoContainerDocument,
+      QueryVideoContainerDto
+    >,
     @InjectModel(VideoContainer.name)
     private videoContainerModel: Model<VideoContainerDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
-    private i18n:CustomI18nService
-  ) {};
+    private i18n: CustomI18nService,
+  ) {}
 
-  async create(
-    shopId: string,
-    body: CreateVideoContainerDto,
-  ) {
+  async create(shopId: string, body: CreateVideoContainerDto) {
     const videoContainer = await this.videoContainerModel.create({
-      ... body , shopId
+      ...body,
+      shopId,
     });
 
-    await this.shopModel.findByIdAndUpdate(shopId,{
-      $addToSet : {
-        containers : {
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $addToSet: {
+        containers: {
           containerID: videoContainer._id,
-          containerType: 'VideoContainer'
-        }
-      }
+          containerType: 'VideoContainer',
+        },
+      },
     });
-    return {videoContainer};
+    return { videoContainer };
   }
 
-  async findAll(query:QueryVideoContainerDto) {
+  async findAll(query: QueryVideoContainerDto) {
     console.log(query);
-    const {query:result,paginationObj}=await this.apiService
-      .getAllDocs(this.videoContainerModel.find(),query);
-    const videos=await result;
-    if( videos.length == 0  ){
-      throw new HttpException(this.i18n.translate("test.videoContainer.notFound"),400);
-    };
-    return { videos , pagination : paginationObj };
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.videoContainerModel.find(),
+      query,
+    );
+    const videos = await result;
+    if (videos.length == 0) {
+      throw new HttpException(
+        this.i18n.translate('test.videoContainer.notFound'),
+        400,
+      );
+    }
+    return { videos, pagination: paginationObj };
   }
 
   async findOne(id: string) {
-      const video = await this.videoContainerModel.findById(id);
-      if (!video) {
-        throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
-      }
-      return { video };
-  }
-
-  async update(id: string,shopId:string, body: UpdateVideoContainerDto) {
-      const video= await this.videoContainerModel.findOneAndUpdate(
-        { _id:id , shopId },
-          body,
-        {
-          new: true,
-        },
-      );
-      if (!video) {
-        throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
-      }
-      return { video };
-  }
-
-  async remove(id: string,shopId: string) {
-    const video= await this.videoContainerModel.findOneAndDelete(
-      { _id:id , shopId });
+    const video = await this.videoContainerModel.findById(id);
     if (!video) {
-      throw new NotFoundException(this.i18n.translate("test.videoContainer.notFound"));
-    };
+      throw new NotFoundException(
+        this.i18n.translate('test.videoContainer.notFound'),
+      );
+    }
+    return { video };
+  }
 
-    await this.shopModel.findByIdAndUpdate(shopId,{
-      $pull : {
-        containers : {
-          containerID:id
-        }
-      }
+  async update(id: string, shopId: string, body: UpdateVideoContainerDto) {
+    const video = await this.videoContainerModel.findOneAndUpdate(
+      { _id: id, shopId },
+      body,
+      {
+        new: true,
+      },
+    );
+    if (!video) {
+      throw new NotFoundException(
+        this.i18n.translate('test.videoContainer.notFound'),
+      );
+    }
+    return { video };
+  }
+
+  async remove(id: string, shopId: string) {
+    const video = await this.videoContainerModel.findOneAndDelete({
+      _id: id,
+      shopId,
     });
-    return {status:this.i18n.translate("test.videoContainer.deleted")};
+    if (!video) {
+      throw new NotFoundException(
+        this.i18n.translate('test.videoContainer.notFound'),
+      );
+    }
+
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $pull: {
+        containers: {
+          containerID: id,
+        },
+      },
+    });
+    return { status: this.i18n.translate('test.videoContainer.deleted') };
   }
 }

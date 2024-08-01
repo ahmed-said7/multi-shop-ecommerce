@@ -17,12 +17,12 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
       { name: Shop.name, schema: ShopSchema },
-      { name:Merchant.name , schema:merchantSchema }
-    ])
-    ,ApiModule
+      { name: Merchant.name, schema: merchantSchema },
+    ]),
+    ApiModule,
   ],
   controllers: [ReviewController],
-  providers: [ReviewService,CustomI18nService],
+  providers: [ReviewService, CustomI18nService],
   exports: [ReviewService],
 })
 export class ReviewModule {}

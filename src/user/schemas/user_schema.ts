@@ -6,9 +6,6 @@ import validator from 'validator';
 
 export type Gender = 'male' | 'female' | 'other';
 
-
-
-
 // Define the document type for the user schema
 export type UserDocument = HydratedDocument<User>;
 

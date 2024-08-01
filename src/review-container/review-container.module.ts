@@ -54,10 +54,10 @@ import { CustomI18nService } from 'src/common/custom-i18n.service';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    ApiModule
+    ApiModule,
   ],
   controllers: [ReviewContainerController],
-  providers: [ReviewContainerService,CustomI18nService],
+  providers: [ReviewContainerService, CustomI18nService],
   exports: [ReviewContainerService],
 })
 export class ReviewContainerModule {}

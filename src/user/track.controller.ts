@@ -11,7 +11,7 @@ export class UserTrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post('shop')
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   addNewShopCustomer(
     @Body('userId') userId: string,

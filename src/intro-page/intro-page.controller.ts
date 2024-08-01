@@ -12,7 +12,6 @@ import {
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
-import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { Roles } from 'src/common/decorator/roles';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
@@ -26,50 +25,47 @@ export class IntroPageController {
   constructor(private readonly introPageService: IntroPageService) {}
 
   @Post()
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.introPageService.create(
-      createIntroPageDto,
-      user.shopId
-    );
+    return this.introPageService.create(createIntroPageDto, user.shopId);
   }
 
-  @Get("shop/:shopId")
+  @Get('shop/:shopId')
   findAll(
-    @Param("shopId",ValidateObjectIdPipe) shopId: string,
-    @Query() query: QueryIntroPageDto 
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryIntroPageDto,
   ) {
     query.shopId = shopId;
     return this.introPageService.findAll(query);
-  };
+  }
 
   @Get('/one/:id')
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.introPageService.findOne(id);
   }
 
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   @Patch(':id')
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateIntroPageDto: UpdateIntroPageDto,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.introPageService.update(id, user.shopId,updateIntroPageDto);
+    return this.introPageService.update(id, user.shopId, updateIntroPageDto);
   }
 
-  @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Roles(AllRoles.MERCHANT)
   @Delete(':id')
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.introPageService.remove(id,user.shopId);
+    return this.introPageService.remove(id, user.shopId);
   }
 }
