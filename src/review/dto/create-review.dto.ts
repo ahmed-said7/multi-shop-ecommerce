@@ -1,11 +1,4 @@
-import {
-  IsMongoId,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsMongoId, IsNumber, IsString, Max, Min } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateReviewDto {

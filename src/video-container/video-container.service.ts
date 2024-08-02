@@ -8,7 +8,6 @@ import {
   VideoContainer,
   VideoContainerDocument,
 } from './schemas/videoContainer-schema';
-import { Types } from 'mongoose';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryVideoContainerDto } from './dto/query-video-container.dto';
 import { CustomI18nService } from 'src/common/custom-i18n.service';

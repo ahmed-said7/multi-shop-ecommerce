@@ -5,7 +5,6 @@ import { BannerService } from './banner.service';
 import { Banner, BannerSchema } from './schemas/banner_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
-import { JwtModule } from '@nestjs/jwt';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';

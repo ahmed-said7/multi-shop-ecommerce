@@ -3,7 +3,7 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item, ItemDocument } from './schemas/item-schema';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';

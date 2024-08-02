@@ -3,7 +3,7 @@ import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
 import { IntroPage, IntroPageDocument } from './schemas/intro_page_schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryIntroPageDto } from './dto/query-intro-page.dto';

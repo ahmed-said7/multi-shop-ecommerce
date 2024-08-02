@@ -10,7 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';

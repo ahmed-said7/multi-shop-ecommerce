@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpException, Injectable } from '@nestjs/common';
 import { Theme, ThemeDocument } from './schemas/theme.schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryThemeDto } from './dto/query-themes.dto';
 import { CustomI18nService } from 'src/common/custom-i18n.service';

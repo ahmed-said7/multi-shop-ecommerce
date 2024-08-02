@@ -61,9 +61,9 @@ export class OrderController {
   @Roles(AllRoles.ADMIN)
   confirmDeliver(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser,
+    // @AuthUser() user: IAuthUser,
   ) {
-    return this.orderService.confimeDelivery(id, user);
+    return this.orderService.confimeDelivery(id);
   }
 
   @Patch('confirm-paid/:id')
@@ -71,9 +71,9 @@ export class OrderController {
   @Roles(AllRoles.ADMIN)
   confirmPaid(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @AuthUser() user: IAuthUser,
+    // @AuthUser() user: IAuthUser,
   ) {
-    return this.orderService.confimePaid(id, user);
+    return this.orderService.confimePaid(id);
   }
 
   @Delete(':id')

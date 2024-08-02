@@ -12,7 +12,6 @@ import {
 import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
-import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';

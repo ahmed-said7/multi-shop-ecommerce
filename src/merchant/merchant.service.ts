@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import {
   BadRequestException,
@@ -15,7 +15,7 @@ import { UpdateMerchantDto as UpdateDto } from './dto/updateMerchant.dto';
 import { Merchant, MerchantDocument } from './schema/merchant.schema';
 
 import { Shop, ShopDocument } from '../shop/schemas/shop_schema';
-import { ApiService, IQuery } from 'src/common/filter/api.service';
+import { ApiService } from 'src/common/filter/api.service';
 import { jwtTokenService } from 'src/jwt/jwt.service';
 import { AllRoles } from 'src/common/enums';
 import { QueryMerchantDto } from './dto/query-merchant.dto';

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsString, MinLength, MaxLength } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateCategoryDto {

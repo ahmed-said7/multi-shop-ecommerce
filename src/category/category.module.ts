@@ -4,7 +4,6 @@ import { CategoryController } from './category.controller';
 import { Category, CategorySchema } from './schemas/category_schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
-import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';

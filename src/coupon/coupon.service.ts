@@ -13,7 +13,7 @@ import { Coupon } from './schemas/coupon.schema';
 import { Cart } from 'src/cart/schemas/cart.schema';
 import { ApiService } from 'src/common/filter/api.service';
 import { QueryCouponDto } from './dto/query-coupon.dto';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CartService } from 'src/cart/cart.service';
 import { CustomI18nService } from 'src/common/custom-i18n.service';
 

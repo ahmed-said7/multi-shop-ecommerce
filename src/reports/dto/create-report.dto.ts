@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { reportTypes } from 'src/common/enums';
 

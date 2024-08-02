@@ -10,7 +10,6 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';

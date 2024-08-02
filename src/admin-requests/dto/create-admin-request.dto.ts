@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsArray,
-  IsString,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { RequestType } from 'src/common/enums';
 // admin_request

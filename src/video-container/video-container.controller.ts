@@ -13,7 +13,6 @@ import {
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
-import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guard/authorization.guard';

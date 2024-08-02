@@ -3,7 +3,7 @@ import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import {
   ProductSlider,
   ProductSliderDocument,

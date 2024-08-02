@@ -7,7 +7,6 @@ import {
   VideoContainer,
   VideoContainerSchema,
 } from './schemas/videoContainer-schema';
-import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';

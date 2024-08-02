@@ -1,7 +1,6 @@
 import { Model } from 'mongoose';
 import {
   BadRequestException,
-  Body,
   HttpException,
   Injectable,
   NotFoundException,

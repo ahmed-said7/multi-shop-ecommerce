@@ -1,7 +1,6 @@
 import {
   IsArray,
   IsMongoId,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,

@@ -13,7 +13,6 @@ import {
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { Types } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
 import { AuthUser } from 'src/common/decorator/param.decorator';

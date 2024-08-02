@@ -30,11 +30,7 @@ import { catchExceptionsFilter } from './common/errorHandler/base.filter';
 import { ShopModule } from './shop/shop.module';
 import { jwtTokenModule } from './jwt/jwt.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import {
-  I18nModule,
-  I18nValidationExceptionFilter,
-  QueryResolver,
-} from 'nestjs-i18n';
+import { I18nModule, QueryResolver } from 'nestjs-i18n';
 
 @Module({
   imports: [

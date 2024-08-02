@@ -137,7 +137,7 @@ export class OrderService {
   }
 
   // only admin
-  async confimeDelivery(id: string, user: IAuthUser) {
+  async confimeDelivery(id: string) {
     const order = await this.orderModel.findOneAndUpdate(
       { _id: id },
       {
@@ -153,7 +153,7 @@ export class OrderService {
   }
 
   // only admin
-  async confimePaid(id: string, user: IAuthUser) {
+  async confimePaid(id: string) {
     const order = await this.orderModel.findOneAndUpdate(
       { _id: id },
       {
