@@ -26,12 +26,16 @@ import {
   ReviewContainer,
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Theme.name, schema: ThemeSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
@@ -46,8 +50,9 @@ import {
       { name: Category.name, schema: CategorySchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
     ]),
+    ApiModule,
   ],
   controllers: [ThemesController],
-  providers: [ThemesService],
+  providers: [ThemesService, CustomI18nService],
 })
 export class ThemesModule {}

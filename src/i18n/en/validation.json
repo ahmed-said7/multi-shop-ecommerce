@@ -1,0 +1,400 @@
+{
+  "admin_request": {
+    "title": {
+      "isNotEmpty": "Title should not be empty",
+      "isString": "Title should be a string"
+    },
+    "type": {
+      "isNotEmpty": "Type should not be empty",
+      "isEnum": "Invalid type"
+    },
+    "description": {
+      "isNotEmpty": "Description should not be empty",
+      "isString": "Description should be a string"
+    },
+    "status": {
+      "isNotEmpty": "Status should not be empty",
+      "isString": "Status should be a string"
+    },
+    "info": {
+      "isNotEmpty": "Info should not be empty",
+      "isString": "Info should be a string"
+    },
+    "userId": {
+      "isMongoId": "User ID must be a valid MongoDB ID"
+    }
+  },
+  "user": {
+    "name": {
+      "isNotEmpty": "A user must have a name",
+      "isString": "A user name must be a string"
+    },
+    "password": {
+      "isNotEmpty": "A user must have a password",
+      "isString": "A user password must be a string",
+      "minLength": "A user password must be at least 6 characters long",
+      "maxLength": "A user password must not exceed 25 characters"
+    },
+    "role": {
+      "isEnum": "Invalid user role"
+    },
+    "email": {
+      "isNotEmpty": "A user must have an email",
+      "isEmail": "Invalid email format"
+    },
+    "phone": {
+      "isNotEmpty": "A user must have a phone number",
+      "isMobilePhone": "Invalid phone number format"
+    },
+    "gender": {
+      "isNotEmpty": "A user must have a gender",
+      "isEnum": "Invalid gender status"
+    },
+    "birthday": {
+      "isDateString": "Invalid date format for birthday"
+    }
+  },
+  "banner": {
+    "title": {
+      "isNotEmpty": "Title should not be empty",
+      "isString": "Title should be a string"
+    },
+    "subTitle": {
+      "isNotEmpty": "Subtitle should not be empty",
+      "isString": "Subtitle should be a string"
+    },
+    "titleAndSubTitlePosition": {
+      "isNotEmpty": "Title and Subtitle position should not be empty",
+      "isString": "Title and Subtitle position should be a string"
+    },
+    "titleAndSubTitleColor": {
+      "isNotEmpty": "Title and Subtitle color should not be empty",
+      "isString": "Title and Subtitle color should be a string"
+    },
+    "buttonText": {
+      "isNotEmpty": "Button text should not be empty",
+      "isString": "Button text should be a string"
+    },
+    "buttonLink": {
+      "isNotEmpty": "Button link should not be empty",
+      "isString": "Button link should be a string"
+    },
+    "buttonColor": {
+      "isNotEmpty": "Button color should not be empty",
+      "isString": "Button color should be a string"
+    },
+    "buttonTextColor": {
+      "isNotEmpty": "Button text color should not be empty",
+      "isString": "Button text color should be a string"
+    },
+    "buttonPosition": {
+      "isNotEmpty": "Button position should not be empty",
+      "isString": "Button position should be a string"
+    },
+    "image": {
+      "isNotEmpty": "Image should not be empty",
+      "isString": "Image should be a string"
+    }
+  },
+  "cart": {
+    "itemId": {
+      "isNotEmpty": "Item ID should not be empty",
+      "isMongoId": "Invalid item ID format"
+    },
+    "quantity": {
+      "isNumber": "Quantity should be a number"
+    },
+    "size": {
+      "isString": "Size should be a string"
+    },
+    "color": {
+      "isNotEmpty": "Color should not be empty",
+      "isString": "Color should be a string"
+    }
+  },
+  "category": {
+    "title": {
+      "isNotEmpty": "Category title should not be empty",
+      "isString": "Category title should be a string",
+      "minLength": "Category title must be at least 3 characters long",
+      "maxLength": "Category title must not exceed 20 characters"
+    },
+    "image": {
+      "isNotEmpty": "Category image should not be empty",
+      "isString": "Category image should be a string"
+    }
+  },
+  "coupon": {
+    "text": {
+      "isNotEmpty": "Coupon text should not be empty",
+      "isString": "Coupon text must be a string"
+    },
+    "endDate": {
+      "isDateString": "Invalid date format for end date"
+    },
+    "numOfTimes": {
+      "isNumber": "Number of times must be a number"
+    },
+    "discountPercentage": {
+      "isNotEmpty": "Discount percentage should not be empty",
+      "isNumber": "Discount percentage must be a number"
+    },
+    "shopId": {
+      "isNotEmpty": "Shop ID must not be empty",
+      "isMongoId": "Shop ID must be a valid MongoDB ID"
+    }
+  },
+  "IntroPage": {
+    "title": {
+      "isNotEmpty": "Intro page must have a title",
+      "isString": "Title must be a string"
+    },
+    "paragraph": {
+      "isNotEmpty": "Intro page must have a paragraph",
+      "isString": "Paragraph must be a string"
+    }
+  },
+  "item": {
+    "name": {
+      "isNotEmpty": "Item name should not be empty",
+      "isString": "Item name must be a string"
+    },
+    "price": {
+      "isNotEmpty": "Item price should not be empty",
+      "isNumber": "Item price must be a number"
+    },
+    "amount": {
+      "isNotEmpty": "Item amount should not be empty",
+      "isNumber": "Item amount must be a number"
+    },
+    "description": {
+      "isNotEmpty": "Item description should not be empty",
+      "isString": "Item description must be a string"
+    },
+    "category": {
+      "isNotEmpty": "Item category should not be empty",
+      "isMongoId": "Invalid category ID format"
+    },
+    "sizes": {
+      "isArray": "Sizes should be an array",
+      "isString": "Each size in sizes array must be a string"
+    },
+    "images": {
+      "isArray": "Images should be an array",
+      "isString": "Each image in images array must be a string"
+    },
+    "colors": {
+      "isArray": "Colors should be an array",
+      "isString": "Each color in colors array must be a string"
+    },
+    "soldTimes": {
+      "isNumber": "Sold times must be a number"
+    }
+  },
+  "merchant": {
+    "name": {
+      "isNotEmpty": "Merchant name should not be empty",
+      "isString": "Merchant name must be a string"
+    },
+    "email": {
+      "isNotEmpty": "Email should not be empty",
+      "isString": "Email must be a string",
+      "isEmail": "Invalid email format"
+    },
+    "phone": {
+      "isNotEmpty": "Phone number should not be empty",
+      "isString": "Phone number must be a string",
+      "isMobilePhone": "Invalid phone number format"
+    },
+    "password": {
+      "isNotEmpty": "Password should not be empty",
+      "isString": "Password must be a string",
+      "minLength": "Password must be at least 6 characters long"
+    },
+    "gender": {
+      "isNotEmpty": "Gender should not be empty",
+      "isEnum": "Invalid gender status"
+    },
+    "birthday": {
+      "isDateString": "Invalid date format for birthday"
+    }
+  },
+  "order": {
+    "shopId": {
+      "isNotEmpty": "An order must have a shop",
+      "isMongoId": "Invalid shop ID format"
+    },
+    "userId": {
+      "isMongoId": "User ID must be a valid MongoDB ID"
+    },
+    "userAddresse": {
+      "isNotEmpty": "User address should not be empty"
+    },
+    "couponName": {
+      "isString": "Coupon name must be a string"
+    }
+  },
+  "addresse": {
+    "city": {
+      "isNotEmpty": "City should not be empty",
+      "isString": "City must be a string"
+    },
+    "mobile": {
+      "isNotEmpty": "Mobile number should not be empty",
+      "isString": "Mobile number must be a string",
+      "isMobilePhone": "Invalid mobile phone number format"
+    },
+    "streetName": {
+      "isNotEmpty": "Street name should not be empty",
+      "isString": "Street name must be a string"
+    },
+    "zipCode": {
+      "isNumber": "Zip code must be a number"
+    },
+    "country": {
+      "isNotEmpty": "Country should not be empty",
+      "isString": "Country must be a string"
+    }
+  },
+  "photoSlider": {
+    "photoSlides": {
+      "isArray": "Photo slides should be an array",
+      "arrayMinSize": "At least one photo slide is required"
+    }
+  },
+  "photoSlides": {
+    "title": {
+      "isNotEmpty": "Slide title should not be empty",
+      "isString": "Slide title must be a string"
+    },
+    "subTitle": {
+      "isNotEmpty": "Slide subtitle should not be empty",
+      "isString": "Slide subtitle must be a string"
+    },
+    "titleAndSubTitlePostion": {
+      "isNotEmpty": "Slide title and subtitle position should not be empty",
+      "isString": "Slide title and subtitle position must be a string"
+    },
+    "titleAndSubTitleColor": {
+      "isNotEmpty": "Slide title and subtitle color should not be empty",
+      "isString": "Slide title and subtitle color must be a string"
+    },
+    "buttonText": {
+      "isNotEmpty": "Button text should not be empty",
+      "isString": "Button text must be a string"
+    },
+    "buttonLink": {
+      "isNotEmpty": "Button link should not be empty",
+      "isString": "Button link must be a string"
+    },
+    "buttonColor": {
+      "isNotEmpty": "Button color should not be empty",
+      "isString": "Button color must be a string"
+    },
+    "buttonTextColor": {
+      "isNotEmpty": "Button text color should not be empty",
+      "isString": "Button text color must be a string"
+    },
+    "buttonPosition": {
+      "isNotEmpty": "Button position should not be empty",
+      "isString": "Button position must be a string"
+    },
+    "photo": {
+      "isNotEmpty": "Slide photo should not be empty",
+      "isString": "Slide photo must be a string"
+    }
+  },
+  "productSlider": {
+    "products": {
+      "isArray": "Products should be an array",
+      "isMongoId": "Each product ID should be a valid MongoDB ID"
+    },
+    "title": {
+      "isNotEmpty": "Slider title should not be empty",
+      "isString": "Slider title must be a string"
+    },
+    "isSlider": {
+      "isBoolean": "Slider indicator should be a boolean value"
+    }
+  },
+  "report": {
+    "report": {
+      "isNotEmpty": "Report type is required",
+      "isEnum": "Invalid report type"
+    },
+    "year": {
+      "isNumber": "Year must be a number"
+    },
+    "month": {
+      "isNumber": "Month must be a number"
+    }
+  },
+  "review": {
+    "user": {
+      "isMongoId": "User ID must be a valid MongoDB ID"
+    },
+    "rating": {
+      "isNotEmpty": "A review must have a rating!",
+      "isNumber": "Rating must be a number",
+      "min": "Rating must be at least 1",
+      "max": "Rating cannot be more than 5"
+    },
+    "item": {
+      "isNotEmpty": "A review must have an item!",
+      "isMongoId": "Item ID must be a valid MongoDB ID"
+    },
+    "title": {
+      "isNotEmpty": "A review must have a title!",
+      "isString": "Title must be a string"
+    }
+  },
+  "reviewContainer": {
+    "reviews": {
+      "isNotEmpty": "Review container must have a reference to at least one review",
+      "isArray": "Reviews should be provided as an array",
+      "isMongoId": "Each review ID should be a valid MongoDB ID"
+    }
+  },
+  "shop": {
+    "userID": {
+      "isMongoId": "User ID must be a valid MongoDB ID"
+    },
+    "title": {
+      "isNotEmpty": "A shop must have a title",
+      "isString": "A shop must have a string title"
+    },
+    "description": {
+      "isNotEmpty": "A shop must have a description",
+      "isString": "A shop must have a string description",
+      "minLength": "A shop description must be at least 10 characters long",
+      "maxLength": "A shop description cannot be more than 150 characters long"
+    },
+    "twitter": {
+      "isString": "Twitter handle must be a string"
+    },
+    "facebook": {
+      "isString": "Facebook URL must be a string"
+    },
+    "instagram": {
+      "isString": "Instagram handle must be a string"
+    },
+    "whatsapp": {
+      "isString": "WhatsApp number must be a string"
+    }
+  },
+  "theme": {
+    "title": {
+      "isNotEmpty": "Theme title must not be empty",
+      "isEnum": "Invalid theme type"
+    },
+    "description": {
+      "isString": "Description must be a string"
+    }
+  },
+  "videoContainer": {
+    "link": {
+      "isNotEmpty": "Video link must not be empty",
+      "isString": "Video link must be a string"
+    }
+  }
+}

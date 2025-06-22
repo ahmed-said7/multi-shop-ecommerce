@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order_schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
-import { JwtModule } from '@nestjs/jwt';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import {
@@ -33,6 +32,9 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -42,6 +44,7 @@ import {
         schema: OrderSchema,
       },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
 
@@ -57,14 +60,11 @@ import {
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
     CouponModule,
     CartModule,
+    ApiModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, CustomI18nService],
 })
 export class OrderModule {}

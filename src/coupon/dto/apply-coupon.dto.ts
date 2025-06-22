@@ -1,18 +1,16 @@
-import { Types } from 'mongoose';
-
-import {
-  IsArray,
-  IsDateString,
-  IsMongoId,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsMongoId, IsString } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class applyCoupon {
-  @IsString({ message: 'text must be string' })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.text.isNotEmpty") })
+  @IsString({
+    message: i18nValidationMessage('validation.coupon.text.isString'),
+  })
   text: string;
 
-  @IsString({ message: 'shop id must be string  ' })
-  @IsMongoId({ message: 'should be valid id ' })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.shopId.isNotEmpty") })
+  @IsMongoId({
+    message: i18nValidationMessage('validation.coupon.shopId.isMongoId'),
+  })
   shopId: string;
 }

@@ -7,64 +7,81 @@ import {
   Patch,
   Delete,
   UseGuards,
+  Query,
   UseInterceptors,
-  Logger,
   UploadedFiles,
 } from '@nestjs/common';
 import { PhotoSliderService } from './photo-slider.service';
 import { UpdatePhotoSliderDto } from './dto/update-photo-slider.dto';
-import { PhotoSlider } from './schemas/photo-slider_schema';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
-
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { CreatePhotoSliderDto } from './dto/create-photo-slider.dto';
+import { QueryPhotoSliderDto } from './dto/query-photo-slider.dto';
+import { UploadService } from 'src/upload/upload.service';
 
 @Controller('photo-slider')
 export class PhotoSliderController {
-  constructor(private readonly photoSliderService: PhotoSliderService) {}
+  constructor(
+    private readonly photoSliderService: PhotoSliderService,
+    private uploadService: UploadService,
+  ) {}
 
-  private readonly logger = new Logger(PhotoSliderController.name);
-
-  @UseGuards(MerchantGuard)
   @Post()
-  create(@MerchantUser() user: MerchantPayload) {
-    return this.photoSliderService.create(user.shopId);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  create(@AuthUser() user: IAuthUser, @Body() body: CreatePhotoSliderDto) {
+    return this.photoSliderService.create(user.shopId, body);
   }
 
-  @UseGuards(MerchantGuard)
   @Post('preview')
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  @UseInterceptors(FilesInterceptor('images', 50, optsImg))
   uploadPreviewImages(@UploadedFiles() files: Express.Multer.File[]) {
-    return this.photoSliderService.uploadFilesToView(files);
+    return this.uploadService.uploadFiles(files);
   }
 
-  @Get()
-  findAll(): Promise<PhotoSlider[]> {
-    return this.photoSliderService.findAll();
+  @Get('shop/:shopId')
+  findAll(
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryPhotoSliderDto,
+  ) {
+    query.shopId = shopId;
+    return this.photoSliderService.findAll(query);
   }
 
   @Get(':id')
-  findOne(
-    @Param('id', ValidateObjectIdPipe) id: string,
-  ): Promise<PhotoSlider | null> {
+  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.photoSliderService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
   @Patch(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updatePhotoSliderDto: UpdatePhotoSliderDto,
-  ): Promise<PhotoSlider | null> {
-    return this.photoSliderService.update(id, updatePhotoSliderDto);
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.photoSliderService.update(
+      id,
+      user.shopId,
+      updatePhotoSliderDto,
+    );
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string): Promise<string> {
-    return this.photoSliderService.remove(id);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  remove(
+    @AuthUser() user: IAuthUser,
+    @Param('id', ValidateObjectIdPipe) id: string,
+  ) {
+    return this.photoSliderService.remove(id, user.shopId);
   }
 }

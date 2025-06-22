@@ -1,20 +1,25 @@
-import { Controller, Get, UseGuards, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AllRoles } from 'src/common/enums';
 
 @Controller('admin-statistics')
 export class AdminStatisticsController {
   constructor(private readonly adminService: AdminService) {}
 
-  @UseGuards(JwtGuard)
   @Get('/registrations-per-month')
-  async getRegistrationsPerMonth(@Body('userId') userId: string) {
-    return this.adminService.getUsersPerMonth(userId);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  async getRegistrationsPerMonth() {
+    return this.adminService.getUsersPerMonth();
   }
 
-  @UseGuards(JwtGuard)
   @Get('/shops-per-month')
-  async getshopsPerMonth(@Body('userId') userId: string) {
-    return this.adminService.getShopsPerMonth(userId);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  async getshopsPerMonth() {
+    return this.adminService.getShopsPerMonth();
   }
 }

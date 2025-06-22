@@ -1,49 +1,39 @@
 import mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
-
+import { HttpException, Injectable } from '@nestjs/common';
 import { Theme, ThemeDocument } from './schemas/theme.schema';
-
-import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { ApiService } from 'src/common/filter/api.service';
+import { QueryThemeDto } from './dto/query-themes.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ThemesService {
   constructor(
+    private apiService: ApiService<ThemeDocument, QueryThemeDto>,
     @InjectModel(Theme.name)
     private readonly themeModel: mongoose.Model<ThemeDocument>,
-    @InjectModel(User.name)
-    private readonly userModel: mongoose.Model<UserDocument>,
+    private i18n: CustomI18nService,
   ) {}
 
-  async createTheme(
-    title: string,
-    description: string,
-    userId: string,
-  ): Promise<ThemeDocument> {
-    const user = await this.userModel.findById(userId);
-
-    if (!user) {
-      throw new NotFoundException('There is no user with this id');
-    }
-
-    const createdTheme = new this.themeModel({
+  async createTheme(title: string, description: string, userId: string) {
+    const createdTheme = await this.themeModel.create({
       title,
       description,
-      createdBy: user.email,
+      createdBy: userId,
     });
 
-    return await createdTheme.save();
+    return { createdTheme };
   }
 
-  async getThemes(
-    page: number = 1,
-    limit: number = 10,
-  ): Promise<ThemeDocument[]> {
-    return await this.themeModel
-      .find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-      .exec();
+  async getThemes(query: QueryThemeDto) {
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.themeModel.find(),
+      query,
+    );
+    const themes = await result;
+    if (themes.length == 0) {
+      throw new HttpException(this.i18n.translate('test.theme.notFound'), 400);
+    }
+    return { themes, pagination: paginationObj };
   }
 }

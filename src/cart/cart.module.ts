@@ -26,12 +26,15 @@ import {
   ReviewContainerSchema,
 } from 'src/review-container/schemas/reviewContainer_schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Cart.name, schema: CartSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
@@ -48,7 +51,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
     ]),
   ],
   controllers: [CartController],
-  providers: [CartService],
+  providers: [CartService, CustomI18nService],
   exports: [CartService],
 })
 export class CartModule {}

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ShopModule } from './shop/shop.module';
 import { UserModule } from './user/user.module';
 import { ItemModule } from './item/item.module';
 import { OrderModule } from './order/order.module';
@@ -22,17 +21,16 @@ import { AdminRequestsModule } from './admin-requests/admin-requests.module';
 import { VideoContainerModule } from './video-container/video-container.module';
 import { PhotoSliderModule } from './photo-slider/photo-slider.module';
 import { ThemesModule } from './themes-req/themes.module';
-import { FileManagerModule } from './file-manager/file-manager.module';
 import { CartModule } from './cart/cart.module';
 import { BannerModule } from './banner/banner.module';
 import { UploadModule } from './upload/upload.module';
 import { MerchantModule } from './merchant/merchant.module';
-
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { DateTime } from 'luxon';
-import { v4 as uuid } from 'uuid';
-import { extension } from 'mime-types';
+import { APP_FILTER } from '@nestjs/core';
+import { catchExceptionsFilter } from './common/errorHandler/base.filter';
+import { ShopModule } from './shop/shop.module';
+import { jwtTokenModule } from './jwt/jwt.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { I18nModule, QueryResolver } from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -45,23 +43,36 @@ import { extension } from 'mime-types';
       signOptions: { expiresIn: '1d' },
       global: true,
     }),
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './images/',
-        filename(_req, file, callback) {
-          const nowDate = DateTime.now().toISODate();
-
-          const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
-
-          callback(null, name);
-        },
-      }),
+    jwtTokenModule,
+    I18nModule.forRoot({
+      loaderOptions: {
+        path: 'src/i18n/',
+        watch: true,
+      },
+      fallbackLanguage: 'ar',
+      resolvers: [{ use: QueryResolver, options: ['lang'] }],
     }),
-    MongooseModule.forRoot(process.env.DB_URI),
+    // MulterModule.register({
+    //   storage: diskStorage({
+    //     destination: './images/',
+    //     filename(_req, file, callback) {
+    // }),      const nowDate = DateTime.now().toISODate();
 
-    ShopModule,
+    //       const name = `${file.originalname.split('.').at(0)}-${nowDate}-${uuid()}.${extension(file.mimetype)}`;
+
+    //       callback(null, name);
+    //     },
+    //   }),
+    EventEmitterModule.forRoot({ global: true }),
+    MongooseModule.forRootAsync({
+      useFactory(config: ConfigService) {
+        return { uri: config.get('DB_URI') };
+      },
+      inject: [ConfigService],
+    }),
     UserModule,
     AuthModule,
+    ShopModule,
     AdminModule,
     ReviewContainerModule,
     ItemModule,
@@ -78,13 +89,16 @@ import { extension } from 'mime-types';
     AdminRequestsModule,
     VideoContainerModule,
     ThemesModule,
-    FileManagerModule,
     CartModule,
     UploadModule,
     MerchantModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: catchExceptionsFilter },
+    // ,{ provide:APP_FILTER , useClass: I18nValidationExceptionFilter }
+  ],
   exports: [MongooseModule],
 })
 export class AppModule {}

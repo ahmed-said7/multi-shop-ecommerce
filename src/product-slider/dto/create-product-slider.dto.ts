@@ -1,8 +1,34 @@
-import { IsNotEmpty } from 'class-validator';
-import { Types } from 'mongoose';
+import {
+  IsArray,
+  IsBoolean,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateProductSliderDto {
+  @IsOptional()
+  @IsArray({
+    message: i18nValidationMessage('validation.productSlider.products.isArray'),
+  })
+  @IsMongoId({
+    each: true,
+    message: i18nValidationMessage(
+      'validation.productSlider.products.isMongoId',
+    ),
+  })
   products: string[];
+  // @IsNotEmpty({message:i18nValidationMessage("validation.productSlider.title.isNotEmpty")})
+  @IsString({
+    message: i18nValidationMessage('validation.productSlider.title.isString'),
+  })
   title: string;
-  isSlider: boolean = false;
+  @IsOptional()
+  @IsBoolean({
+    message: i18nValidationMessage(
+      'validation.productSlider.isSlider.isBoolean',
+    ),
+  })
+  isSlider: boolean;
 }

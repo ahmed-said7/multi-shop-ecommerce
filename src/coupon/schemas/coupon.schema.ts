@@ -10,15 +10,13 @@ export class Coupon {
   text: string;
 
   @Prop({
-    required: true,
+    type: Date,
     default: DateTime.now().plus({ days: 10 }).toJSDate(),
   })
   endDate: Date;
 
   @Prop({
-    required: true,
     default: 1,
-    min: 1,
   })
   numOfTimes: number;
 

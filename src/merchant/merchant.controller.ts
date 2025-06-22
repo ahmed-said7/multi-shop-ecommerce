@@ -9,14 +9,17 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-
 import { MerchantService } from './merchant.service';
 import { CreateMerchantDto } from './dto/createMerchant.dto';
 import { UpdateMerchantDto } from './dto/updateMerchant.dto';
-
-import { AdminGuard } from '../auth/guards/admin.guard';
-import { ValidateMerchantGuard } from './guards/validate-merchant.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { LoginMerchantDto } from './dto/loginMerchant.dt';
+import { QueryMerchantDto } from './dto/query-merchant.dto';
 
 @Controller('merchant')
 export class MerchantController {
@@ -28,34 +31,42 @@ export class MerchantController {
   }
 
   @Post('login')
-  login(@Body('email') email: string, @Body('password') password: string) {
-    return this.merchantService.merchantSignIn(email, password);
+  login(@Body() body: LoginMerchantDto) {
+    return this.merchantService.merchantSignIn(body.email, body.password);
   }
 
   @Get()
-  @UseGuards(AdminGuard)
-  findAll(@Query('page') page?: number) {
-    return this.merchantService.findAll(page);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  findAll(@Query() query: QueryMerchantDto) {
+    return this.merchantService.findAll(query);
+  }
+
+  @Get('logged')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  findMe(@AuthUser() merchant: IAuthUser) {
+    return this.merchantService.findOne(merchant._id);
   }
 
   @Get(':id')
-  @UseGuards(ValidateMerchantGuard)
-  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.merchantService.findOne(id);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  findOne(@Param('id', ValidateObjectIdPipe) merchntId: string) {
+    return this.merchantService.findOne(merchntId);
   }
 
-  @Patch(':id')
-  @UseGuards(ValidateMerchantGuard)
-  update(
-    @Param('id', ValidateObjectIdPipe) id: string,
-    @Body() data: UpdateMerchantDto,
-  ) {
-    return this.merchantService.update(id, data);
+  @Patch()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  update(@AuthUser() user: IAuthUser, @Body() data: UpdateMerchantDto) {
+    return this.merchantService.update(user._id, data);
   }
 
-  @Delete(':id')
-  @UseGuards(ValidateMerchantGuard)
-  delete(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.merchantService.delete(id);
+  @Delete()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  delete(@AuthUser() user: IAuthUser) {
+    return this.merchantService.delete(user._id);
   }
 }

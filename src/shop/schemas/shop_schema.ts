@@ -12,10 +12,10 @@ export class Shop {
   @Prop({ required: true }) // Ensure title is required and unique
   title: string;
 
-  @Prop({ required: true, default: 'default text' }) // Ensure description is required
+  @Prop({ type: String, default: 'default text' }) // Ensure description is required
   description: string;
 
-  @Prop({ required: false, type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   userID: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'Item', default: [] })

@@ -25,11 +25,11 @@ export class PhotoSlider {
     },
   ];
 
-  @Prop({ default: true })
-  isRounded: boolean;
+  // @Prop({ default: true })
+  // isRounded: boolean;
 
-  @Prop({ default: true })
-  isContainer: boolean;
+  // @Prop({ default: true })
+  // isContainer: boolean;
 
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shopId: mongoose.Types.ObjectId;

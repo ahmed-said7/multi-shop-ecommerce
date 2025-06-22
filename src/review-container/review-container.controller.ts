@@ -7,52 +7,63 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ReviewContainerService } from './review-container.service';
 import { CreateReviewContainerDto } from './dto/create-reviewContainer.dto';
 import { UpdateReviewContainerDto } from './dto/update-reviewContainer.dto';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { QueryReviewContainerDto } from './dto/query-review.dto';
+import { Roles } from 'src/common/decorator/roles';
 
 @Controller('review-container')
 export class ReviewContainerController {
   constructor(private readonly reviewService: ReviewContainerService) {}
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createReviewDto: CreateReviewContainerDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.reviewService.create(createReviewDto, user.shopId);
   }
 
   @Get('/shop/:id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.reviewService.findAll(id);
+  findAll(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Query() query: QueryReviewContainerDto,
+  ) {
+    query.shopId = id;
+    return this.reviewService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.reviewService.findOne(id);
   }
-  @UseGuards(MerchantGuard)
+
   @Patch(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateReviewDto: UpdateReviewContainerDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.reviewService.update(id, updateReviewDto);
+    return this.reviewService.update(id, user.shopId, updateReviewDto);
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.reviewService.remove(id, user.shopId);
   }

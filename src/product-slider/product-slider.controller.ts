@@ -7,26 +7,29 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductSliderService } from './product-slider.service';
 import { CreateProductSliderDto } from './dto/create-product-slider.dto';
 import { UpdateProductSliderDto } from './dto/update-product-slider.dto';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { Types } from 'mongoose';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { QueryProductSliderDto } from './dto/query-product-slider.dto';
 
 @Controller('product-slider')
 export class ProductSliderController {
   constructor(private readonly productSliderService: ProductSliderService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createProductSliderDto: CreateProductSliderDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.productSliderService.create(
       createProductSliderDto,
@@ -35,8 +38,12 @@ export class ProductSliderController {
   }
 
   @Get('shop/:id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.productSliderService.findAll(id);
+  findAll(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Query() query: QueryProductSliderDto,
+  ) {
+    query.shopId = id;
+    return this.productSliderService.findAll(query);
   }
 
   @Get('one/:id')
@@ -44,20 +51,27 @@ export class ProductSliderController {
     return this.productSliderService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
   @Patch(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateProductSliderDto: UpdateProductSliderDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.productSliderService.update(id, updateProductSliderDto);
+    return this.productSliderService.update(
+      id,
+      user.shopId,
+      updateProductSliderDto,
+    );
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   remove(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.productSliderService.remove(id, user?.shopId);
   }

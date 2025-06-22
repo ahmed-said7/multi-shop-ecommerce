@@ -7,7 +7,6 @@ import {
   VideoContainer,
   VideoContainerSchema,
 } from './schemas/videoContainer-schema';
-import { JwtModule } from '@nestjs/jwt';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
@@ -31,6 +30,10 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { UploadModule } from 'src/upload/upload.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import {
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Order.name, schema: OrderSchema },
@@ -49,12 +53,14 @@ import {
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
+    ApiModule,
+    UploadModule,
   ],
   controllers: [VideoContainerController],
-  providers: [VideoContainerService],
+  providers: [
+    VideoContainerService,
+    { provide: 'field', useValue: 'link' },
+    CustomI18nService,
+  ],
 })
 export class VideoContainerModule {}

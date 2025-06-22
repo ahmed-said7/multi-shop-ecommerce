@@ -1,30 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, HydratedDocument } from 'mongoose';
+import { UserRole } from 'src/common/enums';
 
 import validator from 'validator';
 
 export type Gender = 'male' | 'female' | 'other';
-
-// Enum for user roles
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MERCHANT = 'merchant',
-}
-
-export enum UserExperienceType {
-  STORE = 'store',
-  SOCIALMEDIA = 'social_media',
-}
-
-export enum ReadyOption {
-  PRODUCTS = 'products',
-  DESIGN = 'design',
-  STATEMENTS = 'statements',
-  PAYMENTS = 'payments',
-  LOGISTICS = 'logistics',
-  DIGITAL_MARKETING = 'digital_marketing',
-}
 
 // Define the document type for the user schema
 export type UserDocument = HydratedDocument<User>;
@@ -41,7 +21,6 @@ export class User {
   password: string;
 
   @Prop({
-    required: true,
     enum: [UserRole.ADMIN, UserRole.USER],
     default: UserRole.USER,
   })
@@ -59,9 +38,6 @@ export class User {
 
   @Prop({ unique: true })
   phone: string;
-
-  @Prop({ type: Types.ObjectId, ref: 'Shop' })
-  shopId: Types.ObjectId;
 
   @Prop({ type: [Types.ObjectId], ref: 'User' })
   reviews: Types.ObjectId[];

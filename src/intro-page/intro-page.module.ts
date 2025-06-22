@@ -27,6 +27,9 @@ import {
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
 import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: IntroPage.name, schema: IntroPageSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
 
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
 
@@ -48,8 +52,9 @@ import { Banner, BannerSchema } from 'src/banner/schemas/banner_schema';
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
     ]),
+    ApiModule,
   ],
   controllers: [IntroPageController],
-  providers: [IntroPageService],
+  providers: [IntroPageService, CustomI18nService],
 })
 export class IntroPageModule {}

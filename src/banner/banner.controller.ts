@@ -8,73 +8,84 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
+
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { Banner } from './schemas/banner_schema';
-import { Types } from 'mongoose';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from '../upload/upload.service';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser, optsImg } from 'src/common/enums';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { QueryBannerDto } from './dto/query-banner.dto';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller('banner')
 export class BannerController {
-  constructor(
-    private readonly bannerService: BannerService,
-    private readonly uploadService: UploadService,
-  ) {}
+  constructor(private readonly bannerService: BannerService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   async create(
-    @UploadedFile() file: Express.Multer.File,
-    @MerchantUser() user: MerchantPayload,
+    // @UploadedFile() file: Express.Multer.File,
+    @AuthUser() user: IAuthUser,
     @Body() createBannerDto: CreateBannerDto,
   ) {
-    const url = await this.uploadService.uploadFile(file);
-    createBannerDto.image = url as string;
+    // const url = await this.uploadService.uploadFile(file);
+    // createBannerDto.image = url as string;
 
-    return this.bannerService.create(
-      Types.ObjectId.createFromHexString(user.shopId),
-      createBannerDto,
-    );
+    return this.bannerService.create(user.shopId, createBannerDto);
   }
 
-  @Get()
-  findAll(): Promise<Banner[]> {
-    return this.bannerService.findAll();
+  @Get('shop/:shopId')
+  findAll(
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Body() query: QueryBannerDto,
+  ) {
+    query.shopId = shopId;
+    return this.bannerService.findAll(query);
   }
 
   @Get(':id')
-  findOne(
-    @Param('id', ValidateObjectIdPipe) id: string,
-  ): Promise<Banner | null> {
-    return this.bannerService.findOne(id);
+  // @UseGuards(AuthenticationGuard)
+  // @Roles(AllRoles.MERCHANT,AllRoles.ADMIN)
+  findOne(@Param('id', ValidateObjectIdPipe) bannerId: string) {
+    return this.bannerService.findOne(bannerId);
   }
 
-  @UseGuards(MerchantGuard)
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  @UseInterceptors(
+    FileInterceptor('image', optsImg),
+    UploadSingleFileInterceptor,
+  )
   async update(
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateBannerDto: UpdateBannerDto,
-  ): Promise<Banner | null> {
-    const url = await this.uploadService.uploadFile(file);
-    updateBannerDto.image = url as string;
-    return this.bannerService.update(id, updateBannerDto);
+    @AuthUser() user: IAuthUser,
+  ) {
+    // const url = await this.uploadService.uploadFile(file);
+    // updateBannerDto.image = url as string;
+    return this.bannerService.update(id, updateBannerDto, user);
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string): Promise<string> {
-    return this.bannerService.remove(id);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.bannerService.remove(id, user);
   }
 }

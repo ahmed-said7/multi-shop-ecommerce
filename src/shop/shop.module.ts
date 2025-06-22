@@ -31,7 +31,6 @@ import {
   VideoContainer,
   VideoContainerSchema,
 } from 'src/video-container/schemas/videoContainer-schema';
-import { JwtModule } from '@nestjs/jwt';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { Order, OrderSchema } from 'src/order/schemas/order_schema';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
@@ -43,8 +42,9 @@ import {
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
 import { UploadModule } from 'src/upload/upload.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -52,6 +52,7 @@ import { diskStorage } from 'multer';
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Category.name, schema: CategorySchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
@@ -65,15 +66,6 @@ import { diskStorage } from 'multer';
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './images/shop',
-      }),
-    }),
     AuthModule,
     ReviewContainerModule,
     ProductSliderModule,
@@ -84,9 +76,14 @@ import { diskStorage } from 'multer';
     BannerModule,
     VideoContainerModule,
     UploadModule,
+    ApiModule,
   ],
   controllers: [ShopController],
-  providers: [ShopService],
-  exports: [MongooseModule, ShopService], // Export MongooseModule to make ShopModel available in other modules
+  providers: [
+    ShopService,
+    { provide: 'field', useValue: 'logo' },
+    CustomI18nService,
+  ],
+  exports: [MongooseModule, ShopService],
 })
 export class ShopModule {}

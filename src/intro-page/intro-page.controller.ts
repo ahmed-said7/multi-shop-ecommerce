@@ -7,36 +7,40 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { IntroPageService } from './intro-page.service';
 import { CreateIntroPageDto } from './dto/create-intro-page.dto';
 import { UpdateIntroPageDto } from './dto/update-intro-page.dto';
-
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { Types } from 'mongoose';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { QueryIntroPageDto } from './dto/query-intro-page.dto';
 
 @Controller('intro-page')
 export class IntroPageController {
   constructor(private readonly introPageService: IntroPageService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   create(
     @Body() createIntroPageDto: CreateIntroPageDto,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.introPageService.create(
-      createIntroPageDto,
-      new Types.ObjectId(user.shopId),
-    );
+    return this.introPageService.create(createIntroPageDto, user.shopId);
   }
 
-  @Get(':id')
-  findAll(@Param('id', ValidateObjectIdPipe) id?: Types.ObjectId) {
-    return this.introPageService.findAll(new Types.ObjectId(id));
+  @Get('shop/:shopId')
+  findAll(
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
+    @Query() query: QueryIntroPageDto,
+  ) {
+    query.shopId = shopId;
+    return this.introPageService.findAll(query);
   }
 
   @Get('/one/:id')
@@ -44,18 +48,24 @@ export class IntroPageController {
     return this.introPageService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   @Patch(':id')
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateIntroPageDto: UpdateIntroPageDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.introPageService.update(id, updateIntroPageDto);
+    return this.introPageService.update(id, user.shopId, updateIntroPageDto);
   }
 
-  @UseGuards(MerchantGuard)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.introPageService.remove(id);
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.introPageService.remove(id, user.shopId);
   }
 }

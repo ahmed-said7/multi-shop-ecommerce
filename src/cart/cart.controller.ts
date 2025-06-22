@@ -6,44 +6,58 @@ import {
   Delete,
   UseGuards,
   Put,
+  ParseIntPipe,
+  Get,
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CreateCartItemDto } from './dto/create-cart.dto';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { AddToCartDto } from './dto/add-to-cart.dto';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @UseGuards(JwtGuard)
-  @Post()
+  @Get(':shopId')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
   async getUserCart(
-    @Body('userId') userId: string,
-    @Body('shopId') shopId: string,
+    @AuthUser() user: IAuthUser,
+    @Param('shopId', ValidateObjectIdPipe) shopId: string,
   ) {
-    return this.cartService.getCart(userId, shopId);
+    return this.cartService.getCart(user._id, shopId);
   }
 
-  @UseGuards(JwtGuard)
   @Post('/add')
-  addToCart(@Body('userId') userId: string, @Body() item: CreateCartItemDto) {
-    return this.cartService.addToCart(userId, item);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
+  addToCart(@AuthUser() user: IAuthUser, @Body() item: AddToCartDto) {
+    return this.cartService.addToCart(user._id, item);
   }
 
-  @UseGuards(JwtGuard)
   @Delete('/remove/:id')
-  removeFromCart(@Param('id', ValidateObjectIdPipe) cartItemId: string) {
-    return this.cartService.removeFromCart(cartItemId);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
+  removeFromCart(
+    @AuthUser() user: IAuthUser,
+    @Param('id', ValidateObjectIdPipe) cartItemId: string,
+  ) {
+    return this.cartService.removeFromCart(cartItemId, user);
   }
 
-  @UseGuards(JwtGuard)
   @Put('/update/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
   updateItemQuantity(
     @Param('id', ValidateObjectIdPipe) itemId: string,
-    @Body('quantity') quantity: number,
+    @Body('quantity', ParseIntPipe) quantity: number,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.cartService.updateItemQuantity(itemId, quantity);
+    return this.cartService.updateItemQuantity(itemId, quantity, user);
   }
 }

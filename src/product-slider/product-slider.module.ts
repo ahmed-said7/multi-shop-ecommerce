@@ -8,8 +8,6 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { UserModule } from 'src/user/user.module'; // Import UserModule
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Coupon, CouponSchema } from 'src/coupon/schemas/coupon.schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
@@ -33,6 +31,9 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import {
       { name: Shop.name, schema: ShopSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Order.name, schema: OrderSchema },
       { name: PhotoSlider.name, schema: PhotoSliderSchema },
@@ -51,14 +53,11 @@ import {
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
-    JwtModule.register({
-      secret: process.env.SECRET,
-      signOptions: { expiresIn: '1h' },
-    }),
     UserModule,
+    ApiModule,
   ],
   controllers: [ProductSliderController],
-  providers: [ProductSliderService],
+  providers: [ProductSliderService, CustomI18nService],
   exports: [ProductSliderService],
 })
 export class ProductSliderModule {}

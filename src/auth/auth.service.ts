@@ -1,61 +1,55 @@
-import { Injectable } from '@nestjs/common';
-
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-
-import { UserService } from './user.service';
-import { User } from '../user/schemas/user_schema';
+import { UserService } from 'src/user/user.service';
+import { LoginUserDto } from './dto/login.dto';
+import { jwtTokenService } from 'src/jwt/jwt.service';
+import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/user/schemas/user_schema';
+import { Model } from 'mongoose';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private i18n: CustomI18nService,
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private jwt: jwtTokenService,
   ) {}
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.findOneWithEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      delete user.password;
-      return user;
+  async register(createUserDto: CreateUserDto) {
+    const { email, phone } = createUserDto;
+    const foundUser = await this.userModel.findOne({
+      $or: [{ email }, { phone }],
+    });
+    if (foundUser) {
+      throw new BadRequestException(this.i18n.translate('test.user.duplicate'));
     }
-
-    return null;
+    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    const savedUser = await this.userModel.create(createUserDto);
+    const { accessToken, refreshToken } = await this.jwt.createTokens({
+      userId: savedUser._id.toString(),
+      role: savedUser.role,
+    });
+    return { accessToken, refreshToken, user: savedUser.toObject() };
   }
 
-  async login(user: User) {
-    const payload = {
-      userId: user?.['_id'],
-    };
-
-    user.password = undefined;
-
-    return {
-      ...user,
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.jwtService.sign(payload, { expiresIn: '1d' }),
-    };
-  }
-
-  async getToken(data: any) {
-    delete data.password;
-
-    return {
-      accessToken: await this.jwtService.signAsync(data),
-    };
-  }
-
-  async verifyToken<T>(token: string) {
-    return await this.jwtService.decode<T>(token);
-  }
-
-  async refreshToken(user: User) {
-    const payload = {
-      userId: user?.['_id'],
-    };
-
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
+  async loginUser(body: LoginUserDto) {
+    const { foundUser: user } = await this.userService.findOneWithEmail(
+      body.email,
+    );
+    const valid = await bcrypt.compare(body.password, user.password);
+    if (!valid) {
+      throw new HttpException(
+        this.i18n.translate('test.user.credentials'),
+        400,
+      );
+    }
+    const { accessToken, refreshToken } = await this.jwt.createTokens({
+      userId: user._id.toString(),
+      role: user.role,
+    });
+    return { accessToken, refreshToken };
   }
 }

@@ -1,17 +1,29 @@
-import { IsNotEmpty } from 'class-validator';
-import { Types } from 'mongoose';
+import { IsMongoId, IsNumber, IsString, Max, Min } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateReviewDto {
-  @IsNotEmpty({ message: 'A review must have a rating!' })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.review.rating.isNotEmpty") })
+  @IsNumber(
+    {},
+    { message: i18nValidationMessage('validation.review.rating.isNumber') },
+  )
+  @Min(1, {
+    message: i18nValidationMessage('validation.review.rating.minLength'),
+  })
+  @Max(5, {
+    message: i18nValidationMessage('validation.review.rating.maxLength'),
+  })
   rating: number;
-  @IsNotEmpty({ message: 'A review must have a description!' })
-  description: string;
-  @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  shopId: Types.ObjectId;
-  @IsNotEmpty({ message: 'A review must belong to a shop!' })
-  user: Types.ObjectId;
-  @IsNotEmpty({ message: 'A review must have an item!' })
+  shopId: string;
+  user: string;
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.review.item.isNotEmpty") })
+  @IsMongoId({
+    message: i18nValidationMessage('validation.review.item.isMongoId'),
+  })
   item: string;
-  @IsNotEmpty({ message: 'A review must have a title!' })
+  // @IsNotEmpty({ message: i18nValidationMessage("validation.review.title.isNotEmpty") })
+  @IsString({
+    message: i18nValidationMessage('validation.review.title.isString'),
+  })
   title: string;
 }

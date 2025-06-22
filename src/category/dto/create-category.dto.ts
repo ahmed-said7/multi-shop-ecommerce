@@ -1,23 +1,23 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsArray,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsString, MinLength, MaxLength } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateCategoryDto {
   // Category title, must not be empty, and should be a string
-  @IsNotEmpty({ message: 'A Category must have a title' })
-  @IsString({ message: 'A Category must have a string title' })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.category.title.isNotEmpty") })
+  @IsString({
+    message: i18nValidationMessage('validation.category.title.isString'),
+  })
   @MinLength(3, {
-    message: 'A Category title must be at least 3 characters long',
+    message: i18nValidationMessage('validation.category.title.minLength'),
   })
   @MaxLength(20, {
-    message: 'A Category title must be at most 20 characters long',
+    message: i18nValidationMessage('validation.category.title.maxLength'),
   })
   title: string;
 
-  @IsArray({ message: 'A Category must have a string array subCategory' })
-  subCategory: string[];
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.category.image.isNotEmpty") })
+  @IsString({
+    message: i18nValidationMessage('validation.category.image.isString'),
+  })
+  image: string;
 }

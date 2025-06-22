@@ -1,15 +1,14 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-
+import { Model } from 'mongoose';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { Banner, BannerDocument } from './schemas/banner_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { QueryBannerDto } from './dto/query-banner.dto';
+import { ApiService } from 'src/common/filter/api.service';
+import { IAuthUser } from 'src/common/enums';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class BannerService {
@@ -17,84 +16,75 @@ export class BannerService {
     @InjectModel(Banner.name)
     private readonly bannerModel: Model<BannerDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    private apiService: ApiService<BannerDocument, QueryBannerDto>,
+    private i18n: CustomI18nService,
   ) {}
 
-  async create(
-    shopId: Types.ObjectId,
-    createBannerDto: CreateBannerDto,
-  ): Promise<Banner> {
-    const payload = {
+  async create(shopId: string, createBannerDto: CreateBannerDto) {
+    const createdBanner = await this.bannerModel.create({
       ...createBannerDto,
       shopId,
-    };
-
-    let createdBanner = await new this.bannerModel(payload).save();
+    });
 
     const Shop = await this.shopModel.findById(shopId);
 
     if (!Shop) {
-      throw new NotFoundException("Couldn't find the shop");
+      throw new NotFoundException(this.i18n.translate('test.shop.notFound'));
     }
 
-    if (Shop?.containers) {
-      Shop.containers.push({
-        containerID: createdBanner.id,
-        containerType: 'Banner',
-      });
-    } else {
-      Shop.$set('containers', [
-        {
-          containerID: createdBanner.id,
-          containerType: 'Banner',
-        },
-      ]);
-    }
-
-    await Shop.save();
-    return createdBanner;
-  }
-
-  async findAll(): Promise<Banner[]> {
-    return this.bannerModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<Banner | null> {
-    const banner = await this.bannerModel.findById(id);
-    if (!banner) {
-      throw new NotFoundException('this banner not found');
-    }
-    return banner;
-  }
-
-  async update(
-    id: string,
-    updateBannerDto: UpdateBannerDto,
-  ): Promise<Banner | null> {
-    const banner = await this.bannerModel.findById(id);
-    if (!banner) {
-      throw new NotFoundException('this banner not found');
-    }
-    return this.bannerModel
-      .findByIdAndUpdate(id, updateBannerDto, { new: true })
-      .exec();
-  }
-
-  async remove(id: string): Promise<string> {
-    const banner = await this.bannerModel.findById(id);
-    if (!banner) throw new NotFoundException("this banner doesn't exist");
-
-    const shop = await this.shopModel.findById(banner.shopId).catch((err) => {
-      console.log(err);
-      throw new InternalServerErrorException(err);
+    await this.shopModel.findByIdAndUpdate(shopId, {
+      $addToSet: {
+        containers: { containerID: createdBanner.id, containerType: 'Banner' },
+      },
     });
-    for (let i = 0; i < shop.containers.length; i++) {
-      if (shop.containers[i].containerID.toString() === id) {
-        shop.containers.splice(i, 1);
-        break;
-      }
+    return { banner: createdBanner };
+  }
+
+  async findAll(query: QueryBannerDto) {
+    const { query: result, paginationObj } = await this.apiService.getAllDocs(
+      this.bannerModel.find(),
+      query,
+    );
+    const banners = await result;
+    if (banners.length == 0) {
+      throw new HttpException(this.i18n.translate('test.banner.notFound'), 400);
     }
-    await shop.save();
-    await this.bannerModel.findByIdAndDelete(id);
-    return 'banner has been deleted successfully!';
+    return { banners, pagination: paginationObj };
+  }
+
+  async findOne(id: string) {
+    const banner = await this.bannerModel.findById(id);
+    if (!banner) {
+      throw new NotFoundException(this.i18n.translate('test.banner.notFound'));
+    }
+    return { banner };
+  }
+
+  async update(id: string, updateBannerDto: UpdateBannerDto, user: IAuthUser) {
+    const banner = await this.bannerModel.findOneAndUpdate(
+      { _id: id, shopId: user.shopId },
+      updateBannerDto,
+      { new: true },
+    );
+    if (!banner) {
+      throw new NotFoundException(this.i18n.translate('test.banner.notFound'));
+    }
+    return { banner };
+  }
+
+  async remove(id: string, user: IAuthUser) {
+    const banner = await this.bannerModel.findOneAndDelete({
+      _id: id,
+      shopId: user.shopId,
+    });
+    if (!banner)
+      throw new NotFoundException(this.i18n.translate('test.banner.notFound'));
+
+    await this.shopModel.findByIdAndUpdate(banner.shopId, {
+      $pull: { containerID: id },
+    });
+    // if (!shop) throw new NotFoundException("this shop doesn't exist");
+    // await this.bannerModel.findByIdAndDelete(id);
+    return { status: this.i18n.translate('test.banner.deleted') };
   }
 }

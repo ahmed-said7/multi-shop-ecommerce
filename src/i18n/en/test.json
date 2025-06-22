@@ -1,0 +1,81 @@
+{
+  "user": {
+    "duplicate": "There is a user with the same email or phone!",
+    "credentials": "Email or password is not correct.",
+    "notFound": "This user doesn't exist.",
+    "deleted": "User Deleted Successfully.",
+    "statistics": "Statistics Data not found."
+  },
+  "admin_request": {
+    "notFound": "no requests found",
+    "credentials": "You can't delete this request.",
+    "deleted": "Request deleted successfully."
+  },
+  "shop": {
+    "notFound": "shop not found",
+    "duplicate": "you have already a shop",
+    "deleted": "shop deleted successfully",
+    "added": "shop added successfully",
+    "credentials": "you do not have access"
+  },
+  "banner": {
+    "notFound": "banner not found",
+    "deleted": "banner has been deleted successfully!"
+  },
+  "items": {
+    "notFound": "items not found"
+  },
+  "cart": {
+    "notFound": "cart not found"
+  },
+  "category": {
+    "notFound": "category not found"
+  },
+  "coupon": {
+    "notFound": "coupon not found",
+    "limit": "Coupon usage limit reached",
+    "deleted": "The coupon was deleted successfully",
+    "applicable": "Coupon not applicable to this shop",
+    "duplicate": "This coupon already exists",
+    "expired": "This coupon has expired"
+  },
+  "introPage": {
+    "notFound": "intro pages not found",
+    "deleted": "Intro page has been deleted successfully"
+  },
+  "merchant": {
+    "notFound": "merchant not found",
+    "deleted": "merchant deleted successfully",
+    "updated": "merchant updated successfully",
+    "created": "merchant created successfully"
+  },
+  "order": {
+    "notFound": "orders not found"
+  },
+  "photoSlider": {
+    "notFound": "photoSlider not found",
+    "deleted": "photo slider deleted successfully"
+  },
+  "productSlider": {
+    "notFound": "product Slider not found",
+    "deleted": "product slider deleted successfully"
+  },
+  "report": {
+    "notFound": "report not found"
+  },
+  "review": {
+    "duplicate": "review already exists",
+    "deleted": "review deleted successfully",
+    "notFound": "review not found"
+  },
+  "videoContainer": {
+    "notFound": "user not found",
+    "deleted": "User Deleted Successfully."
+  },
+  "reviewContainer": {
+    "notFound": "review container not found"
+  },
+  "theme": {
+    "notFound": "themes not found"
+  }
+}

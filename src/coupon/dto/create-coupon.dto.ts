@@ -1,14 +1,38 @@
-import { Types } from 'mongoose';
-
-import { IsArray, IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateCouponDto {
-  @IsString({ message: 'text must be string' })
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.text.isNotEmpty") })
+  @IsString({
+    message: i18nValidationMessage('validation.coupon.text.isString'),
+  })
   text: string;
-  @IsDateString()
+  @IsOptional()
+  @IsDateString(
+    {},
+    {
+      message: i18nValidationMessage('validation.coupon.endDate.isDateString'),
+    },
+  )
   endDate: Date;
-  @IsNumber()
+  @IsOptional()
+  @IsNumber(
+    {},
+    {
+      message: i18nValidationMessage(
+        'validation.coupon.discountPercentage.isNumber',
+      ),
+    },
+  )
   numOfTimes: number;
-  @IsNumber()
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.coupon.text.isNotEmpty") })
+  @IsNumber(
+    {},
+    {
+      message: i18nValidationMessage(
+        'validation.coupon.discountPercentage.isNumber',
+      ),
+    },
+  )
   discountPercentage: number;
 }

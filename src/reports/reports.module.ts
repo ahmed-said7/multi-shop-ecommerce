@@ -6,7 +6,8 @@ import { Order, OrderSchema } from 'src/order/schemas/order_schema';
 import { Shop, ShopSchema } from 'src/shop/schemas/shop_schema';
 import { Item, ItemSchema } from 'src/item/schemas/item-schema';
 import { User, UserSchema } from 'src/user/schemas/user_schema';
-import { JwtModule } from '@nestjs/jwt';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -15,13 +16,10 @@ import { JwtModule } from '@nestjs/jwt';
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
     ]),
-    JwtModule.register({
-      secret: `${process.env.SECRET}`,
-      signOptions: { expiresIn: '1h' },
-    }),
   ],
   controllers: [ReportsController],
-  providers: [ReportsService],
+  providers: [ReportsService, CustomI18nService],
 })
 export class ReportsModule {}

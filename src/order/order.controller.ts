@@ -7,76 +7,79 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 
-import { JwtGuard } from 'src/auth/guards/jwt-auth.guard';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
+import { Roles } from 'src/common/decorator/roles';
+import { QueryOrderDto } from './dto/order-query.dto';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtGuard)
   @Post()
-  create(
-    @Body('userId') userId: string,
-    @Body() createOrderDto: CreateOrderDto,
-  ) {
-    return this.orderService.create(userId, createOrderDto);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
+  create(@AuthUser() user: IAuthUser, @Body() createOrderDto: CreateOrderDto) {
+    return this.orderService.create(user._id, createOrderDto);
   }
 
-  @UseGuards(JwtGuard)
   @Get('/shop')
-  findShopOrders(
-    @Body('shopId') shopId: string,
-    @Body('userRole') userRole: string,
-  ) {
-    return this.orderService.findAllShopOrder(shopId, userRole);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER, AllRoles.MERCHANT)
+  findShopOrders(@AuthUser() user: IAuthUser, @Query() query: QueryOrderDto) {
+    return this.orderService.findAllOrders(query, user);
   }
 
-  @UseGuards(JwtGuard)
   @Get('/me')
-  findUserOrders(
-    @Body('userId') userId: string,
-    @Body('shopId') shopId: string,
-  ) {
-    return this.orderService.findAllUserOrder(userId, shopId);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
+  findUserOrders(@AuthUser() user: IAuthUser, @Query() query: QueryOrderDto) {
+    return this.orderService.findAllOrders(query, user);
   }
 
-  @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.orderService.findOne(id);
-  }
-
-  @UseGuards(MerchantGuard)
-  @Patch(':id')
-  update(
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN, AllRoles.USER, AllRoles.MERCHANT)
+  findOne(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.orderService.update(id, updateOrderDto);
+    return this.orderService.findOne(id, user);
   }
 
-  @UseGuards(MerchantGuard)
-  @Patch('confirm/:id')
-  confirmDeliver(@Param('id', ValidateObjectIdPipe) id: string) {
+  @Patch('confirm-deliver/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  confirmDeliver(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    // @AuthUser() user: IAuthUser,
+  ) {
     return this.orderService.confimeDelivery(id);
   }
 
-  @UseGuards(MerchantGuard)
-  @Delete(':id')
-  remove(
+  @Patch('confirm-paid/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  confirmPaid(
     @Param('id', ValidateObjectIdPipe) id: string,
-    @MerchantUser() user: MerchantPayload,
+    // @AuthUser() user: IAuthUser,
   ) {
-    return this.orderService.remove(id, user.id);
+    return this.orderService.confimePaid(id);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  remove(@Param('id', ValidateObjectIdPipe) id: string) {
+    return this.orderService.remove(id);
   }
 }

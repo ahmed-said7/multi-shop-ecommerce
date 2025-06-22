@@ -1,19 +1,21 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-
 import { TrackService } from './track.service';
-import { MerchantGuard } from '../auth/guards/merchant.guard';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 
 @Controller('user/track')
 export class UserTrackController {
   constructor(private readonly trackService: TrackService) {}
 
-  @UseGuards(MerchantGuard)
   @Post('shop')
-  addNewShop(
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  addNewShopCustomer(
     @Body('userId') userId: string,
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
   ) {
     return this.trackService.trackShop(userId, user.shopId);
   }

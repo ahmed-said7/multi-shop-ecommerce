@@ -1,94 +1,81 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
-  ValidationPipe,
-  UsePipes,
-  Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
-
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { EmailService } from './email/email.service';
-import { User } from './schemas/user_schema';
-
-import { AuthService } from '../auth/auth.service';
-import { JwtGuard } from '../auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { UserService } from './user.service';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AllRoles } from 'src/common/enums';
+import { QueryUserDto } from './dto/query-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private authService: AuthService,
-    private readonly emailService: EmailService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    await this.emailService.emailOTPCode(
-      createUserDto.email,
-      createUserDto.name,
-    );
-
-    return this.userService.register(createUserDto);
-  }
-
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  @UsePipes(ValidationPipe)
-  async login(@Request() req) {
-    const user = req.user;
-
-    return await this.authService.login(user);
-  }
-
-  @UseGuards(JwtGuard)
   @Get()
-  findAll(@Param('page') page: number, @Body('userId') userId: string) {
-    return this.userService.findAll(userId, page);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.ADMIN)
+  findAll(@Query() query: QueryUserDto) {
+    return this.userService.findAll(query);
   }
 
-  @UseGuards(JwtGuard)
   @Get('me')
-  findOneUser(@Body('userId') userId: string) {
+  @UseGuards(AuthenticationGuard)
+  findLoggedUser(@AuthUser('_id') userId: string) {
     return this.userService.findOne(userId);
   }
 
-  @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id', ValidateObjectIdPipe) id: string): Promise<User | null> {
-    return this.userService.findOne(id);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER, AllRoles.ADMIN, AllRoles.MERCHANT)
+  findOneUser(@Param('id', ValidateObjectIdPipe) userId: string) {
+    return this.userService.findOne(userId);
   }
 
-  @UseGuards(JwtGuard)
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto, @Body('userId') userId: string) {
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER, AllRoles.ADMIN)
+  updateLoggedUser(
+    @Body() updateUserDto: UpdateUserDto,
+    @AuthUser('_id') userId: string,
+  ) {
     return this.userService.update(userId, updateUserDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  remove(
-    @Param('id', ValidateObjectIdPipe) id: string,
-    @Body('userId') userId: string,
-  ) {
-    return this.userService.remove(id, userId);
+  @Delete()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER, AllRoles.ADMIN)
+  removeLoggedUser(@AuthUser('_id') userId: string) {
+    return this.userService.remove(userId);
   }
 
-  @UseGuards(JwtGuard)
   @Patch('/fav/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
   addFavorite(
     @Param('id', ValidateObjectIdPipe) itemId: string,
-    @Body('userId') userId: string,
+    @AuthUser('_id') userId: string,
   ) {
     return this.userService.addFav(itemId, userId);
+  }
+
+  @Delete('/fav/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER)
+  removeFavorite(
+    @Param('id', ValidateObjectIdPipe) itemId: string,
+    @AuthUser('_id') userId: string,
+  ) {
+    return this.userService.removeFav(itemId, userId);
   }
 }

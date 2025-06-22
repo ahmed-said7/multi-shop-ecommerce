@@ -1,105 +1,90 @@
 import { Model } from 'mongoose';
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
 import { Cart } from './schemas/cart.schema';
-import { CreateCartItemDto } from './dto/create-cart.dto';
+import { IAuthUser } from 'src/common/enums';
+import { AddToCartDto } from './dto/add-to-cart.dto';
+import { Item, ItemDocument } from 'src/item/schemas/item-schema';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class CartService {
-  applyCoupon(
-    userId: string,
-    shopId: string,
-    couponName: string,
-  ): { finalPrice: any } | PromiseLike<{ finalPrice: any }> {
-    throw new Error('Method not implemented.');
-  }
-  constructor(@InjectModel(Cart.name) private cartModel: Model<Cart>) {}
+  constructor(
+    @InjectModel(Cart.name) private cartModel: Model<Cart>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+    private i18n: CustomI18nService,
+  ) {}
 
   // get user cart
   async getCart(userId: string, shopId: string) {
-    try {
-      const items = await this.cartModel
-        .find({ userId, shopId })
-        .populate('itemId', 'name price images');
+    const items = await this.cartModel
+      .find({ userId, shopId })
+      .populate('itemId', 'name price images');
 
-      if (items.length < 1) {
-        return `no item in cart`;
-      }
-
-      const totalPrice = items.reduce((total, item) => {
-        const itemPrice = (item.itemId as any).price;
-        return total + itemPrice * item.quantity;
-      }, 0);
-
-      return { items, totalPrice };
-    } catch (error) {
-      throw new BadRequestException(`cannot found cart ${error}`);
+    if (items.length == 0) {
+      throw new BadRequestException(this.i18n.translate('test.cart.notFound'));
     }
+
+    const totalPrice = items.reduce((total, item) => {
+      const itemPrice = (item.itemId as any)?.price || 0;
+      return total + itemPrice * item.quantity;
+    }, 0);
+
+    return { items, totalPrice };
   }
   // create cart and add or edit item in cart
-  async addToCart(userId: string, item: CreateCartItemDto) {
+  async addToCart(userId: string, item: AddToCartDto) {
+    const itemExists = await this.itemModel.findById(item.itemId);
+    if (!itemExists) {
+      throw new HttpException(this.i18n.translate('test.items.notFound'), 400);
+    }
+    item.shopId = itemExists.shopId.toString();
     const cartItem = await this.cartModel.findOne({
       userId,
-      sizes: item.sizes,
-      colors: item.colors,
+      color: item.color,
       itemId: item.itemId,
       shopId: item.shopId,
     });
 
     // Update The Exsiting Item if it exisists.
-    if (cartItem?.id) {
-      const updateCartItem = await this.cartModel.findByIdAndUpdate(
-        cartItem.id,
-        {
-          $inc: {
-            quantity: item.quantity,
-          },
+    if (cartItem) {
+      await this.cartModel.findByIdAndUpdate(cartItem._id, {
+        $inc: {
+          quantity: item.quantity || 1,
         },
-        {
-          new: true,
-        },
-      );
-
-      return updateCartItem;
+      });
+    } else {
+      await this.cartModel.create({ ...item, userId });
     }
-
-    const addedCartItem = await new this.cartModel({
-      ...item,
-      userId,
-      quantity: item.quantity,
-    }).save();
-
-    return addedCartItem;
+    return this.getCart(userId, item.shopId);
   }
 
   // remove item from cart
-  async removeFromCart(cartItemId: string) {
-    const cart = await this.cartModel.findByIdAndDelete(cartItemId);
-
+  async removeFromCart(cartItemId: string, user: IAuthUser) {
+    const cart = await this.cartModel.findOneAndDelete({
+      _id: cartItemId,
+      userId: user._id,
+    });
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(this.i18n.translate('test.cart.notFound'));
     }
-
-    return 'item deleted successfully';
+    return this.getCart(cart.userId.toString(), cart.shopId.toString());
   }
 
   // update item quantity in global (not needed at now)
-  async updateItemQuantity(itemId: string, quantity: number) {
-    const cart = await this.cartModel.findById(itemId);
-
-    if (!cart) {
-      throw new NotFoundException('Cart not found');
-    }
-
-    return await this.cartModel.findByIdAndUpdate(
-      itemId,
+  async updateItemQuantity(itemId: string, quantity: number, user: IAuthUser) {
+    const cart = await this.cartModel.findOneAndUpdate(
+      { _id: itemId, userId: user._id },
       { quantity },
-      { new: true },
     );
+    if (!cart) {
+      throw new NotFoundException(this.i18n.translate('test.cart.notFound'));
+    }
+    return this.getCart(cart.userId.toString(), cart.shopId.toString());
   }
 }

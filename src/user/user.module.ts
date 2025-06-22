@@ -3,11 +3,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/auth.module';
-import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { User, UserSchema } from './schemas/user_schema';
-import { Otp, OtpSchema } from './schemas/otp-schema';
 import { Shop, ShopSchema } from '../shop/schemas/shop_schema';
 import { Item, ItemSchema } from '../item/schemas/item-schema';
 import { Category, CategorySchema } from '../category/schemas/category_schema';
@@ -25,9 +22,6 @@ import {
   ReviewContainerSchema,
 } from '../review-container/schemas/reviewContainer_schema';
 import { Order, OrderSchema } from '../order/schemas/order_schema';
-import { OtpService } from './otp/otp.service';
-import { OtpController } from './otp/otp.controller';
-import { EmailService } from './email/email.service';
 import { UserTrackController } from './track.controller';
 import { TrackService } from './track.service';
 import { Coupon, CouponSchema } from '../coupon/schemas/coupon.schema';
@@ -41,9 +35,11 @@ import {
   IntroPage,
   IntroPageSchema,
 } from '../intro-page/schemas/intro_page_schema';
-import { ShopService } from '../shop/shop.service';
 import { UploadModule } from 'src/upload/upload.module';
-
+import { ApiModule } from 'src/common/filter/api.module';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { jwtTokenModule } from 'src/jwt/jwt.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -51,7 +47,7 @@ import { UploadModule } from 'src/upload/upload.module';
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: Otp.name, schema: OtpSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: Item.name, schema: ItemSchema },
       { name: Category.name, schema: CategorySchema },
@@ -62,7 +58,6 @@ import { UploadModule } from 'src/upload/upload.module';
       { name: Order.name, schema: OrderSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
-
       { name: Cart.name, schema: CartSchema },
       { name: VideoContainer.name, schema: VideoContainerSchema },
       { name: Banner.name, schema: BannerSchema },
@@ -71,12 +66,12 @@ import { UploadModule } from 'src/upload/upload.module';
       secret: process.env.SECRET,
       signOptions: { expiresIn: '1h' },
     }),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    AuthModule,
+    jwtTokenModule,
     UploadModule,
+    ApiModule,
   ],
-  controllers: [UserController, OtpController, UserTrackController],
-  providers: [UserService, OtpService, EmailService, ShopService, TrackService],
-  exports: [UserService, MongooseModule], // Export UserService and MongooseModule
+  controllers: [UserController, UserTrackController],
+  providers: [UserService, TrackService, CustomI18nService],
+  exports: [UserService, MongooseModule],
 })
 export class UserModule {}

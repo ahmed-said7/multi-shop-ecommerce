@@ -1,12 +1,13 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ThemeType } from '../schemas/theme.schema';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
+import { ThemeType } from 'src/common/enums';
 
 export class CreateThemeDto {
-  @IsEnum(ThemeType)
-  @IsNotEmpty()
+  // @IsNotEmpty({ message:i18nValidationMessage("theme.title.isNotEmpty") })
+  @IsEnum(ThemeType, { message: i18nValidationMessage('theme.title.isEnum') })
   title: ThemeType;
 
-  @IsString()
   @IsOptional()
+  @IsString({ message: i18nValidationMessage('theme.description.isNotEmpty') })
   description?: string;
 }

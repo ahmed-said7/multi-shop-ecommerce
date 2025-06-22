@@ -9,11 +9,11 @@ export type ProductSliderDocument = ProductSlider & Document;
 })
 export class ProductSlider {
   @Prop({ type: [Types.ObjectId], ref: 'Item' })
-  products: Types.Array<string>;
+  products: Types.ObjectId[];
   @Prop()
   title: string;
-  @Prop()
-  isSlider: boolean = false;
+  @Prop({ type: Boolean, default: false })
+  isSlider: boolean;
   @Prop({ type: Types.ObjectId, ref: 'Shop' })
   shopId: Types.ObjectId;
 }

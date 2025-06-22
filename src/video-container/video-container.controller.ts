@@ -7,55 +7,85 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { VideoContainerService } from './video-container.service';
 import { CreateVideoContainerDto } from './dto/create-video-container.dto';
 import { UpdateVideoContainerDto } from './dto/update-video-container.dto';
-import { Types } from 'mongoose';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
-import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
-import { MerchantPayload } from 'src/merchant/merchant.service';
-import { MerchantUser } from 'utils/extractors/merchant-user.param';
+import { ValidateObjectIdPipe } from 'src/common/pipes/validate-object-id.pipe';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { AllRoles, IAuthUser, optsVideo } from 'src/common/enums';
+import { Roles } from 'src/common/decorator/roles';
+import { QueryVideoContainerDto } from './dto/query-video-container.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadSingleFileInterceptor } from 'src/common/interceptors/upload-file.interceptor';
 
 @Controller('video-container')
 export class VideoContainerController {
   constructor(private readonly videoContainerService: VideoContainerService) {}
 
-  @UseGuards(MerchantGuard)
   @Post()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('link', optsVideo),
+    UploadSingleFileInterceptor,
+  )
+  @Roles(AllRoles.MERCHANT)
   create(
-    @MerchantUser() user: MerchantPayload,
+    @AuthUser() user: IAuthUser,
     @Body() createVideoContainerDto: CreateVideoContainerDto,
   ) {
     return this.videoContainerService.create(
-      new Types.ObjectId(user.shopId),
+      user.shopId,
       createVideoContainerDto,
     );
   }
 
   @Get(':id')
-  findAll(@Param('id', ValidateObjectIdPipe) id: Types.ObjectId) {
-    return this.videoContainerService.findAll(new Types.ObjectId(id));
+  findAll(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Query() query: QueryVideoContainerDto,
+  ) {
+    query.shopId = id;
+    return this.videoContainerService.findAll(query);
   }
 
-  @UseGuards(MerchantGuard)
   @Get('/one/:id')
+  // @UseGuards(AuthenticationGuard,AuthorizationGuard)
+  // @Roles(AllRoles.MERCHANT)
   findOne(@Param('id', ValidateObjectIdPipe) id: string) {
     return this.videoContainerService.findOne(id);
   }
 
-  @UseGuards(MerchantGuard)
   @Patch(':id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @UseInterceptors(
+    FileInterceptor('link', optsVideo),
+    UploadSingleFileInterceptor,
+  )
+  @Roles(AllRoles.MERCHANT)
   update(
     @Param('id', ValidateObjectIdPipe) id: string,
     @Body() updateVideoContainerDto: UpdateVideoContainerDto,
+    @AuthUser() user: IAuthUser,
   ) {
-    return this.videoContainerService.update(id, updateVideoContainerDto);
+    return this.videoContainerService.update(
+      id,
+      user.shopId,
+      updateVideoContainerDto,
+    );
   }
 
-  @UseGuards(MerchantGuard)
   @Delete(':id')
-  remove(@Param('id', ValidateObjectIdPipe) id: string) {
-    return this.videoContainerService.remove(id);
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.MERCHANT)
+  remove(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @AuthUser() user: IAuthUser,
+  ) {
+    return this.videoContainerService.remove(id, user.shopId);
   }
 }

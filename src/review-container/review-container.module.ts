@@ -31,6 +31,9 @@ import {
   IntroPage,
   IntroPageSchema,
 } from 'src/intro-page/schemas/intro_page_schema';
+import { Merchant, merchantSchema } from 'src/merchant/schema/merchant.schema';
+import { ApiModule } from 'src/common/filter/api.module';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import {
       { name: ReviewContainer.name, schema: ReviewContainerSchema },
       { name: Shop.name, schema: ShopSchema },
       { name: User.name, schema: UserSchema },
+      { name: Merchant.name, schema: merchantSchema },
       { name: Review.name, schema: ReviewSchema },
       { name: ProductSlider.name, schema: ProductSliderSchema },
       { name: Coupon.name, schema: CouponSchema },
@@ -50,9 +54,10 @@ import {
       { name: Banner.name, schema: BannerSchema },
       { name: IntroPage.name, schema: IntroPageSchema },
     ]),
+    ApiModule,
   ],
   controllers: [ReviewContainerController],
-  providers: [ReviewContainerService],
+  providers: [ReviewContainerService, CustomI18nService],
   exports: [ReviewContainerService],
 })
 export class ReviewContainerModule {}

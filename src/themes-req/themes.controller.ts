@@ -1,30 +1,33 @@
 import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
 import { ThemesService } from './themes.service';
-import { ThemeDocument } from './schemas/theme.schema';
 import { CreateThemeDto } from './dto/create-themes.dto';
-import { MerchantGuard } from 'src/auth/guards/merchant.guard';
+import { Roles } from 'src/common/decorator/roles';
+import { AuthenticationGuard } from 'src/common/guard/authentication.guard';
+import { AuthorizationGuard } from 'src/common/guard/authorization.guard';
+import { AuthUser } from 'src/common/decorator/param.decorator';
+import { QueryThemeDto } from './dto/query-themes.dto';
+import { AllRoles, IAuthUser } from 'src/common/enums';
 
 @Controller('themes')
 export class ThemesController {
   constructor(private readonly themesService: ThemesService) {}
-  @UseGuards(MerchantGuard)
+
   @Post()
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Roles(AllRoles.USER, AllRoles.ADMIN)
   async createTheme(
-    @Body('userId') userId: string,
+    @AuthUser() user: IAuthUser,
     @Body() themeData: CreateThemeDto,
-  ): Promise<ThemeDocument> {
-    return await this.themesService.createTheme(
+  ) {
+    return this.themesService.createTheme(
       themeData.title,
       themeData.description,
-      userId,
+      user._id,
     );
   }
 
   @Get()
-  async getThemes(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-  ): Promise<ThemeDocument[]> {
-    return await this.themesService.getThemes(page, limit);
+  async getThemes(@Query() query: QueryThemeDto) {
+    return this.themesService.getThemes(query);
   }
 }

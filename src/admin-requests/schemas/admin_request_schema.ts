@@ -1,30 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsNotEmpty, IsString } from 'class-validator';
 import { Document, Types } from 'mongoose';
+import { RequestType } from 'src/common/enums';
 
 export type AdminRequestDocument = AdminRequest & Document;
-export enum RequestType {
-  SHOP = 'Shop',
-  DESIGN = 'Design',
-}
 @Schema({
   timestamps: true, // Add timestamps for createdAt and updatedAt
 })
 export class AdminRequest {
-  @Prop()
+  @Prop({ type: String })
   title: string;
-  @Prop({ enum: RequestType })
+  @Prop({ type: String, enum: Object.values(RequestType) })
   type: RequestType;
-  @Prop()
+  @Prop({ type: String })
   description: string;
-  @Prop()
+  @Prop({ type: String })
   status: string;
-  @Prop()
+  @Prop({ type: String })
   info: string;
-  @Prop()
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   adminId?: string;
-  @Prop()
-  userId: string;
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  userId?: string;
 }
 
 export const AdminRequestSchema = SchemaFactory.createForClass(AdminRequest);

@@ -1,17 +1,12 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import moment from 'moment';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-
 import { Order, OrderDocument } from 'src/order/schemas/order_schema';
 import { Item, ItemDocument } from 'src/item/schemas/item-schema';
-import { User, UserDocument } from 'src/user/schemas/user_schema';
 import { Shop, ShopDocument } from 'src/shop/schemas/shop_schema';
+import { IAuthUser } from 'src/common/enums';
+import { CreateReportDto } from './dto/create-report.dto';
+import { CustomI18nService } from 'src/common/custom-i18n.service';
 
 @Injectable()
 export class ReportsService {
@@ -19,61 +14,48 @@ export class ReportsService {
     @InjectModel(Shop.name) private readonly shopModel: Model<ShopDocument>,
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private i18n: CustomI18nService,
   ) {}
 
-  async findOne(userId: string, report: string, year?: string, month?: string) {
-    try {
-      const user = await this.userModel.findById(userId);
-
-      if (user.role != 'merchant') {
-        throw new UnauthorizedException("You don't have a shop");
-      }
-
-      const shopId = user.shopId;
-
-      let result: any;
-
-      user.password = undefined;
-      switch (report) {
-        case 'monthlySales':
-          const reportYear = parseInt(year);
-          const reportMonth = parseInt(month);
-          result = await this.generateMonthlySalesReport(
-            shopId.toString(),
-            reportYear,
-            reportMonth,
-          );
-          return { result };
-        case 'itemSales':
-          result = await this.generateItemSalesReport(shopId.toString());
-          return { result };
-        case 'itemRatings':
-          result = await this.getShopItemRatings(shopId.toString());
-          return { result };
-        case 'orderMetrics':
-          result = await this.getShopOrdersMetrics(shopId.toString());
-          return { result };
-      }
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException(error);
+  async findOne(user: IAuthUser, body: CreateReportDto) {
+    const shopId = user.shopId;
+    const { year, report, month } = body;
+    let result: any;
+    switch (report) {
+      case 'monthlySales':
+        const reportYear = year || new Date().getFullYear();
+        const reportMonth = month || new Date().getMonth() + 1;
+        result = await this.generateMonthlySalesReport(
+          shopId,
+          reportYear,
+          reportMonth,
+        );
+        return { monthlySales: result };
+      case 'itemSales':
+        result = await this.generateItemSalesReport(shopId);
+        return { itemSales: result };
+      case 'itemRatings':
+        result = await this.getShopItemRatings(shopId);
+        return { itemRatings: result };
+      case 'orderMetrics':
+        result = await this.getShopOrdersMetrics(shopId);
+        return { orderMetrics: result };
+      case 'mostProfitable':
+        result = await this.getTheMostProfitableItems(shopId);
+        return { mostProfitable: result };
+      // MostProfitable
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} report`;
   }
 
   async generateMonthlySalesReport(
     shopId: string,
     year: number,
     month: number,
-  ): Promise<Map<string, number>> {
+  ) {
     const monthlySales = await this.orderModel.aggregate([
       {
         $match: {
-          shopID: shopId,
+          shopId: shopId,
           createdAt: {
             $gte: new Date(year, month - 1, 1),
             $lt: new Date(year, month, 1),
@@ -81,171 +63,244 @@ export class ReportsService {
         },
       },
       {
-        $group: {
-          _id: '$items.itemID',
-          totalSales: { $sum: '$items.price' },
+        $unwind: '$cartItems',
+      },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product',
         },
       },
+      { $unwind: '$cartItems.product' },
+      {
+        $group: {
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name: { $first: '$cartItems.product.name' },
+          price: { $first: '$cartItems.product.price' },
+          images: { $first: '$cartItems.product.images' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { quantity: -1 },
+      },
     ]);
-
-    const result = new Map<string, number>();
-
-    monthlySales.forEach((entry: { _id: string; totalSales: number }) => {
-      result.set(entry._id, entry.totalSales);
-    });
-
-    return result;
+    if (monthlySales.length == 0) {
+      throw new NotFoundException(this.i18n.translate('test.report.notFound'));
+    }
+    return monthlySales;
   }
 
-  async generateItemSalesReport(shopId: string): Promise<Map<string, number>> {
+  async generateItemSalesReport(shopId: string) {
     const itemSales = await this.orderModel.aggregate([
       {
-        $match: { shopID: shopId },
+        $match: {
+          shopId: shopId,
+        },
       },
       {
-        $unwind: '$items',
+        $unwind: '$cartItems',
       },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product',
+        },
+      },
+      { $unwind: '$cartItems.product' },
       {
         $group: {
-          _id: '$items.itemID',
-          totalSales: { $sum: '$items.price' },
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name: { $first: '$cartItems.product.name' },
+          price: { $first: '$cartItems.product.price' },
+          images: { $first: '$cartItems.product.images' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { quantity: -1 },
+      },
+    ]);
+    if (itemSales.length == 0) {
+      throw new NotFoundException(this.i18n.translate('test.report.notFound'));
+    }
+    return itemSales;
+  }
+
+  async getShopItemRatings(shopId: string) {
+    const shop = await this.shopModel.findById(shopId);
+
+    if (!shop) {
+      throw new NotFoundException(this.i18n.translate('test.shop.notFound'));
+    }
+
+    const ratingsMap = await this.itemModel.aggregate([
+      { $match: { shopId } },
+      {
+        $group: {
+          _id: '$rating',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: { rating: '$_id' },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    if (ratingsMap.length == 0) {
+      throw new NotFoundException(this.i18n.translate('test.report.notFound'));
+    }
+    return ratingsMap[0];
+  }
+
+  async getShopCustomerCount(shopId: string) {
+    const shop = await this.shopModel.findById(shopId);
+    if (!shop) {
+      throw new HttpException(this.i18n.translate('test.shop.notFound'), 400);
+    }
+    return { customers: shop.customers.length };
+  }
+
+  async getShopOrdersMetrics(shopId: string) {
+    const shop = await this.shopModel.findById(shopId);
+    if (!shop) {
+      throw new NotFoundException(this.i18n.translate('test.shop.notFound'));
+    }
+
+    const hoursWithMostOrders = await this.orderModel.aggregate([
+      { $match: { shopId } },
+      {
+        $group: {
+          _id: { hour: { $hour: '$createdAt' } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: { hour: '$_id.hour', _id: 0 },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    const daysWithMostOrders = await this.orderModel.aggregate([
+      { $match: { shopId } },
+      {
+        $group: {
+          _id: { day: { $dayOfMonth: '$createdAt' } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: { day: '$_id.day', _id: 0 },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    const buyerWithMostOrders = await this.orderModel.aggregate([
+      { $match: { shopId } },
+      {
+        $group: {
+          _id: '$userId',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: { userId: '$_id', _id: 0 },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    if (
+      buyerWithMostOrders.length == 0 &&
+      daysWithMostOrders.length == 0 &&
+      hoursWithMostOrders.length == 0
+    ) {
+      throw new NotFoundException(this.i18n.translate('test.report.notFound'));
+    }
+    return {
+      buyerWithMostOrders: buyerWithMostOrders[0],
+      daysWithMostOrders: daysWithMostOrders[0],
+      hoursWithMostOrders: hoursWithMostOrders[0],
+    };
+  }
+
+  async getTheMostProfitableItems(shopId: string) {
+    const mostProfitable = await this.orderModel.aggregate([
+      {
+        $match: {
+          shopId: shopId,
+        },
+      },
+      {
+        $unwind: '$cartItems',
+      },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'cartItems.product',
+          foreignField: '_id',
+          as: 'cartItems.product',
+        },
+      },
+      { $unwind: '$cartItems.product' },
+      {
+        $group: {
+          _id: '$cartItems.product._id',
+          quantity: { $sum: '$cartItems.quantity' },
+          name: { $first: '$cartItems.product.name' },
+          price: { $first: '$cartItems.product.price' },
+          images: { $first: '$cartItems.product.images' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          profit: { $multiply: ['$quantity', '$price'] },
+          name: 1,
+          price: 1,
+          images: 1,
+          quantity: 1,
+        },
+      },
+      {
+        $sort: {
+          profit: -1,
         },
       },
     ]);
-
-    const result = new Map<string, number>();
-
-    itemSales.forEach((entry: { _id: string; totalSales: number }) => {
-      result.set(entry._id, entry.totalSales);
-    });
-
-    return result;
-  }
-
-  async getShopItemRatings(shopId: string): Promise<Map<number, number>> {
-    const shop = await this.shopModel.findById(shopId).exec();
-
-    if (!shop) {
-      throw new NotFoundException('Shop not found');
+    if (mostProfitable.length == 0) {
+      throw new HttpException(this.i18n.translate('test.report.notFound'), 400);
     }
-
-    const items = await this.itemModel
-      .find({ _id: { $in: shop.itemsIDs } })
-      .exec();
-
-    const ratingsMap = new Map<number, number>();
-
-    items.forEach((item) => {
-      const rating = item.rating || 0;
-      ratingsMap.set(rating, (ratingsMap.get(rating) || 0) + 1);
-    });
-
-    return ratingsMap;
-  }
-
-  async getShopCustomerCount(shopId: string): Promise<number> {
-    const shop = await this.shopModel.findById(shopId).exec();
-
-    return shop.customers.length;
-  }
-
-  async getShopOrdersMetrics(shopId: string): Promise<Map<string, any>> {
-    const shop = await this.shopModel.findById(shopId).exec();
-
-    if (!shop) {
-      throw new NotFoundException('Shop not found');
-    }
-
-    const orders = await this.orderModel.find({ shopID: shopId }).exec();
-
-    const hoursWithMostOrders = this.calculateMostOrdersByHour(orders);
-    const daysWithMostOrders = this.calculateMostOrdersByDay(orders);
-    const buyersWithMostOrders = this.calculateMostOrdersByBuyer(orders);
-
-    const data = new Map<string, any>();
-
-    data.set('hoursWithMostOrders', hoursWithMostOrders);
-    data.set('daysWithMostOrders', daysWithMostOrders);
-    data.set('buyersWithMostOrders', buyersWithMostOrders);
-
-    return data;
-  }
-
-  private calculateMostOrdersByHour(orders: OrderDocument[]) {
-    const orderCountsByHour = new Map<number, number>();
-
-    orders.forEach((order) => {
-      const orderHour = moment(order?.['createdAt']).hour();
-      orderCountsByHour.set(
-        orderHour,
-        (orderCountsByHour.get(orderHour) || 0) + 1,
-      );
-    });
-
-    let mostOrdersHour: number;
-    let mostOrdersCount = 0;
-
-    orderCountsByHour.forEach((count, hour) => {
-      if (count > mostOrdersCount) {
-        mostOrdersCount = count;
-        mostOrdersHour = hour;
-      }
-    });
-
-    return {
-      mostOrdersHour,
-      mostOrdersCount,
-    };
-  }
-
-  private calculateMostOrdersByDay(orders: OrderDocument[]) {
-    const orderCountsByDay = new Map<string, number>();
-
-    orders.forEach((order) => {
-      const orderDay = moment(order?.['createdAt']).format('dddd');
-      orderCountsByDay.set(orderDay, (orderCountsByDay.get(orderDay) || 0) + 1);
-    });
-
-    let mostOrdersDay: string;
-    let mostOrdersCount = 0;
-
-    orderCountsByDay.forEach((count, day) => {
-      if (count > mostOrdersCount) {
-        mostOrdersCount = count;
-        mostOrdersDay = day;
-      }
-    });
-
-    return {
-      mostOrdersDay,
-      mostOrdersCount,
-    };
-  }
-
-  private calculateMostOrdersByBuyer(orders: OrderDocument[]) {
-    const orderCountsByBuyer = new Map<string, number>();
-
-    orders.forEach((order) => {
-      const buyerId = order.userId;
-      orderCountsByBuyer.set(
-        buyerId,
-        (orderCountsByBuyer.get(buyerId) || 0) + 1,
-      );
-    });
-
-    let mostOrdersBuyerId: string;
-    let mostOrdersCount = 0;
-
-    orderCountsByBuyer.forEach((count, buyerId) => {
-      if (count > mostOrdersCount) {
-        mostOrdersCount = count;
-        mostOrdersBuyerId = buyerId;
-      }
-    });
-
-    return {
-      mostOrdersBuyerId,
-      mostOrdersCount,
-    };
+    return mostProfitable;
   }
 }

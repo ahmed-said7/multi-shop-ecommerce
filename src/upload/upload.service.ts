@@ -1,12 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import { join } from 'path';
-
 import { v2 as cloudinary } from 'cloudinary';
-
-import { rm } from 'fs/promises';
 
 @Injectable()
 export class UploadService {
@@ -19,51 +13,29 @@ export class UploadService {
     });
   }
 
-  private readonly filesPath = join(__dirname, '..', '..', '..');
-
   async uploadFile(file: Express.Multer.File) {
-    file.path = join(this.filesPath, file.path);
-
-    const { url } = await cloudinary.uploader.upload(file.path);
-
-    await rm(file.path);
-
-    return url;
+    const b64 = Buffer.from(file.buffer).toString('base64');
+    const dataURI = 'data:' + file.mimetype + ';base64,' + b64;
+    const res = await cloudinary.uploader.upload(dataURI);
+    return res.url;
   }
 
   async uploadFiles(files: Express.Multer.File[]) {
-    const fileList = files.map((img) => {
-      return {
-        ...img,
-        path: join(this.filesPath, img.path),
-      };
-    });
-
-    try {
-      const links: string[] = [];
-
-      for (const file of fileList) {
-        const { url } = await cloudinary.uploader.upload(file.path);
-        links.push(url);
-
-        await rm(file.path);
-      }
-
-      return links;
-    } catch (error) {
-      throw new InternalServerErrorException(error);
+    const links: string[] = [];
+    for (const file of files) {
+      const url = await this.uploadFile(file);
+      links.push(url);
     }
+    return links;
   }
 
   async removeFile(path: string) {
     await cloudinary.uploader.destroy(path);
-
     return 'File Deleted';
   }
 
   async removeFiles(paths: string[]) {
     await cloudinary.api.delete_resources(paths);
-
     return 'Files Deleted';
   }
 }

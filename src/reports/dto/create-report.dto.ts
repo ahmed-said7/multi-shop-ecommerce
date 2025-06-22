@@ -1,11 +1,23 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
+import { reportTypes } from 'src/common/enums';
 
 export class CreateReportDto {
-  @IsNotEmpty({ message: 'A shop must have a title' })
-  @IsString({ message: 'A shop must have a string title' })
-  report: string;
-
-  year?: string;
-
-  month?: string;
+  // @IsNotEmpty({ message:i18nValidationMessage("validation.report.report.isNotEmpty") })
+  @IsEnum(reportTypes, {
+    message: i18nValidationMessage('validation.report.report.isEnum'),
+  })
+  report: reportTypes;
+  @IsOptional()
+  @IsNumber(
+    {},
+    { message: i18nValidationMessage('validation.report.year.isNumber') },
+  )
+  year?: number;
+  @IsOptional()
+  @IsNumber(
+    {},
+    { message: i18nValidationMessage('validation.report.month.isNumber') },
+  )
+  month?: number;
 }
